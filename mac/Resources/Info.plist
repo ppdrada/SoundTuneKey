@@ -20,6 +20,8 @@
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.2</string>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>O Sound Tune Key captura o som do app escolhido para mudar o volume só dele.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

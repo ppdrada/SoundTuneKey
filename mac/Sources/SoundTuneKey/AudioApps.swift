@@ -7,11 +7,14 @@ struct AudioApp: Identifiable, Equatable {
     let displayName: String
     let icon: NSImage?
     let isPlaying: Bool
+    /// Processos de áudio do Core Audio que pertencem ao app (o principal e os auxiliares).
+    let processes: [AudioObjectID]
 
     var id: String { bundleID }
 
     static func == (a: AudioApp, b: AudioApp) -> Bool {
         a.bundleID == b.bundleID && a.displayName == b.displayName && a.isPlaying == b.isPlaying
+            && a.processes == b.processes
     }
 }
 
@@ -33,21 +36,23 @@ enum AudioApps {
     static func list() -> [AudioApp] {
         let regularApps = NSWorkspace.shared.runningApplications.filter { $0.activationPolicy == .regular }
 
-        var apps: [String: (app: NSRunningApplication, playing: Bool)] = [:]
+        var apps: [String: (app: NSRunningApplication, playing: Bool, processes: [AudioObjectID])] = [:]
         for object in processObjects() {
             guard let pid = processPID(object), let owner = owningApp(pid: pid, regularApps: regularApps),
                   let bundleID = owner.bundleIdentifier, owner.processIdentifier != getpid(),
                   !ignored.contains(bundleID) else { continue }
 
             let playing = isRunningOutput(object)
-            apps[bundleID] = (owner, (apps[bundleID]?.playing ?? false) || playing)
+            apps[bundleID] = (owner, (apps[bundleID]?.playing ?? false) || playing,
+                              (apps[bundleID]?.processes ?? []) + [object])
         }
 
         return apps.map { bundleID, entry in
             AudioApp(bundleID: bundleID,
                      displayName: entry.app.localizedName ?? bundleID,
                      icon: entry.app.icon,
-                     isPlaying: entry.playing)
+                     isPlaying: entry.playing,
+                     processes: entry.processes.sorted())
         }
         .sorted {
             if $0.isPlaying != $1.isPlaying { return $0.isPlaying }

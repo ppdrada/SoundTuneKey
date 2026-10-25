@@ -15,7 +15,9 @@ struct ContentView: View {
             ScrollView {
                 LazyVStack(spacing: 2) {
                     ForEach(model.apps) { app in
-                        AppRow(app: app, selected: app.bundleID == model.selectedBundleID)
+                        AppRow(app: app,
+                               volume: model.volume(of: app.bundleID),
+                               selected: app.bundleID == model.selectedBundleID)
                             .contentShape(Rectangle())
                             .onTapGesture { model.selectedBundleID = app.bundleID }
                     }
@@ -33,13 +35,7 @@ struct ContentView: View {
 
             Divider().overlay(Theme.border)
 
-            Text(selectedText)
-                .font(.system(size: 13))
-                .foregroundStyle(model.selectedBundleID == nil ? Theme.mutedText : Theme.text)
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
+            volumePanel
         }
         .frame(width: 411, height: 458)
         .background(Theme.background)
@@ -47,15 +43,46 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
     }
 
-    private var selectedText: String {
-        guard let id = model.selectedBundleID else { return "Selecione um app na lista" }
-        let name = model.apps.first { $0.bundleID == id }?.displayName ?? id
-        return "Controlando: \(name)"
+    private var volumePanel: some View {
+        let app = model.selectedApp
+        let volume = app.map { Int((model.volume(of: $0.bundleID) * 100).rounded()) }
+
+        return VStack(alignment: .leading, spacing: 8) {
+            Text(app.map { "Controlando: \($0.displayName)" } ?? "Selecione um app na lista")
+                .font(.system(size: 13))
+                .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
+                .lineLimit(1)
+
+            HStack(spacing: 10) {
+                VolumeBar(value: volume ?? 0, enabled: app != nil) { newValue in
+                    if let app { model.setVolume(Float(newValue) / 100, for: app.bundleID) }
+                }
+                Text(volume.map { "\($0)%" } ?? "—")
+                    .font(.system(size: 13).monospacedDigit())
+                    .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
+                    .frame(width: 44, alignment: .trailing)
+            }
+
+            Text("⌘⌥↑ / ⌘⌥↓  volume ±5% (funciona com qualquer janela na frente)")
+                .font(.system(size: 11))
+                .foregroundStyle(Theme.mutedText)
+
+            if let error = model.errorMessage {
+                Text(error)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.mutedText)
+                    .lineLimit(2)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
     }
 }
 
 private struct AppRow: View {
     let app: AudioApp
+    let volume: Float
     let selected: Bool
 
     var body: some View {
@@ -79,6 +106,10 @@ private struct AppRow: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.dim)
             }
+            Text("\(Int((volume * 100).rounded()))%")
+                .font(.system(size: 12).monospacedDigit())
+                .foregroundStyle(Theme.mutedText)
+                .frame(width: 40, alignment: .trailing)
         }
         .font(.system(size: 13))
         .padding(.horizontal, 8)
