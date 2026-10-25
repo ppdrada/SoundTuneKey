@@ -75,6 +75,7 @@ The `.exe` is not digitally signed yet, so Windows may show **"Windows protected
 
 Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program is in Portuguese; right-click the icon for:
 
+- At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — switch the controlled app without opening the window
 - **⏮ ⏯ ⏭** — previous, play/pause and next, in one row; the menu stays open so you can click more than once
@@ -92,6 +93,8 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 The program remembers the last app you picked and the volume of each app. The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume until you open it again.
 
 The **Iniciar com o Mac** (Start with Mac) checkbox at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
+
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify** and **Music**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps, such as Chrome, they are greyed out.
 
 #### ⚠️ macOS warning on first run
 
@@ -124,4 +127,5 @@ To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command
 
 - **Swift / SwiftUI** — native Mac app
 - **Core Audio process taps** — per-app volume control
+- **AppleScript** — play/pause, next, previous and the time bar for Spotify and Music
 - **Carbon `RegisterEventHotKey`** — global keyboard hotkeys

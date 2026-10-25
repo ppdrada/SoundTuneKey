@@ -34,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     // MARK: - Janela
 
     private func setupWindow() {
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 411, height: 458),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 411, height: 500),
                           styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = "Sound Tune Key"
         window.appearance = NSAppearance(named: .darkAqua)
@@ -49,10 +49,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         NSApp.setActivationPolicy(.regular)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate()
+        model.setShowingMedia(true, by: "janela")
     }
 
     func windowWillClose(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        model.setShowingMedia(false, by: "janela")
+    }
+
+    // o tempo da música só é lido com o menu aberto (ou a janela visível)
+    func menuWillOpen(_ menu: NSMenu) {
+        if menu === statusItem.menu { model.setShowingMedia(true, by: "menu") }
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        if menu === statusItem.menu { model.setShowingMedia(false, by: "menu") }
     }
 
     // MARK: - Barra de menus
@@ -72,6 +83,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         statusItem.button?.toolTip = "Sound Tune Key"
 
         let menu = NSMenu()
+        let media = NSMenuItem()
+        let mediaView = NSHostingView(rootView: MenuMediaRow(model: model))
+        mediaView.frame = NSRect(origin: .zero, size: MenuMediaRow.size)
+        media.view = mediaView
+        menu.addItem(media)
+        menu.addItem(.separator())
         menu.addItem(item("Abrir", #selector(showWindow)))
         let apps = NSMenuItem(title: "Aplicativos", action: nil, keyEquivalent: "")
         apps.submenu = appsMenu

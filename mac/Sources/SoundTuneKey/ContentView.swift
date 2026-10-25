@@ -20,6 +20,7 @@ struct ContentView: View {
                                selected: app.bundleID == model.selectedBundleID)
                             .contentShape(Rectangle())
                             .onTapGesture { model.selectedBundleID = app.bundleID }
+                            .pointerCursor()
                     }
                 }
                 .padding(.horizontal, 8)
@@ -51,7 +52,7 @@ struct ContentView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
         }
-        .frame(width: 411, height: 458)
+        .frame(width: 411, height: 500)
         .background(Theme.background)
         .foregroundStyle(Theme.text)
         .preferredColorScheme(.dark)
@@ -62,20 +63,36 @@ struct ContentView: View {
         let app = model.selectedApp
         let volume = app.map { Int((model.volume(of: $0.bundleID) * 100).rounded()) }
 
-        return VStack(alignment: .leading, spacing: 8) {
+        // de cima para baixo: tempo da música, ⏮ ⏯ ⏭ e o volume (a mesma ordem do menu da barra)
+        return VStack(alignment: .leading, spacing: 14) {
             Text(app.map { "Controlando: \($0.displayName)" } ?? "Selecione um app na lista")
                 .font(.system(size: 13))
                 .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
                 .lineLimit(1)
 
-            HStack(spacing: 10) {
+            // a bolinha do tempo é menor: tempos 3 pontos mais largos para as trilhas começarem juntas
+            TimeBar(status: model.mediaStatus, labelWidth: 43) { model.seek(to: $0) }
+
+            HStack(spacing: 0) {
+                MediaButton(glyph: .previous, size: 14, enabled: model.mediaSupported,
+                            help: "Volta ao começo (2x rápido: música anterior)") { model.mediaPrevious() }
+                MediaButton(glyph: .playPause, size: 14, enabled: model.mediaSupported,
+                            help: "Pausar / continuar") { model.mediaPlayPause() }
+                MediaButton(glyph: .next, size: 14, enabled: model.mediaSupported,
+                            help: "Próxima música") { model.mediaNext() }
+            }
+
+            HStack(spacing: 6) {
+                // alto-falante ao lado do volume, para não confundir com a barra de tempo
+                MediaIcon(glyph: .speaker, size: 14, color: Theme.mutedText)
+                    .frame(width: 40, alignment: .leading) // mesma largura do tempo, para as barras se alinharem
                 VolumeBar(value: volume ?? 0, enabled: app != nil) { newValue in
                     if let app { model.setVolume(Float(newValue) / 100, for: app.bundleID) }
                 }
                 Text(volume.map { "\($0)%" } ?? "—")
                     .font(.system(size: 13).monospacedDigit())
                     .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
-                    .frame(width: 44, alignment: .trailing)
+                    .frame(width: 40, alignment: .trailing)
             }
 
             if let error = model.errorMessage {
@@ -87,7 +104,7 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
     }
 }
 

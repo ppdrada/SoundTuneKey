@@ -7,8 +7,13 @@ import CoreAudio
 final class AppModel: ObservableObject {
     @Published private(set) var apps: [AudioApp] = []
     @Published var selectedBundleID: String? {
-        didSet { defaults.set(selectedBundleID, forKey: Keys.lastApp) }
+        didSet {
+            defaults.set(selectedBundleID, forKey: Keys.lastApp)
+            refreshMedia()
+        }
     }
+    /// Tempo da música do app escolhido; nil quando o app não informa (só Spotify e Música informam).
+    @Published private(set) var mediaStatus: MediaPlayer.Status?
     @Published private(set) var volumes: [String: Float] = [:]
     @Published private(set) var errorMessage: String?
     @Published private(set) var startsAtLogin = LoginItem.isEnabled
@@ -26,6 +31,10 @@ final class AppModel: ObservableObject {
     private var failed: Set<String> = []
     private var timer: Timer?
     private var hotkeys: GlobalHotkeys?
+    private var mediaTimer: Timer?
+    /// Quem está mostrando o tempo da música (janela, menu); o tempo só é lido enquanto alguém mostra.
+    private var mediaViewers: Set<String> = []
+    private var lastPreviousPress = Date.distantPast
 
     init() {
         selectedBundleID = defaults.string(forKey: Keys.lastApp)
@@ -73,6 +82,79 @@ final class AppModel: ObservableObject {
         } else {
             syncTaps()
         }
+    }
+
+    // MARK: - Mídia (botões ⏮ ⏯ ⏭ e barra de tempo)
+
+    var mediaSupported: Bool { selectedBundleID.map(MediaPlayer.supports) ?? false }
+
+    /// Um toque: volta para o começo da música. Dois toques em menos de 1 s: música anterior.
+    func mediaPrevious() {
+        let now = Date()
+        let doublePress = now.timeIntervalSince(lastPreviousPress) < 1
+        // depois de um toque duplo, o próximo toque começa a contagem de novo
+        lastPreviousPress = doublePress ? .distantPast : now
+        sendMedia(doublePress ? .previous : .restart)
+    }
+
+    func mediaPlayPause() { sendMedia(.playPause) }
+    func mediaNext() { sendMedia(.next) }
+
+    func seek(to seconds: Double) {
+        guard let bundleID = selectedBundleID else { return }
+        do {
+            try MediaPlayer.seek(bundleID, to: seconds)
+            // mostra o novo tempo na hora, sem esperar a próxima leitura
+            if let status = mediaStatus {
+                mediaStatus = .init(isPlaying: status.isPlaying, position: seconds, duration: status.duration)
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func sendMedia(_ command: MediaPlayer.Command) {
+        guard let bundleID = selectedBundleID else { return }
+        do {
+            try MediaPlayer.send(command, to: bundleID)
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        refreshMedia()
+    }
+
+    /// O player não avisa quando a música anda: com a janela ou o menu aberto, o tempo é lido
+    /// duas vezes por segundo (como no Windows).
+    func setShowingMedia(_ showing: Bool, by viewer: String) {
+        if showing { mediaViewers.insert(viewer) } else { mediaViewers.remove(viewer) }
+        if mediaViewers.isEmpty {
+            mediaTimer?.invalidate()
+            mediaTimer = nil
+        } else if mediaTimer == nil {
+            refreshMedia()
+            let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
+                MainActor.assumeIsolated { self?.refreshMedia() }
+            }
+            // .common: continua andando enquanto o menu da barra está aberto
+            RunLoop.main.add(timer, forMode: .common)
+            mediaTimer = timer
+        }
+    }
+
+    private func refreshMedia() {
+        guard let bundleID = selectedBundleID, MediaPlayer.supports(bundleID) else {
+            if mediaStatus != nil { mediaStatus = nil }
+            return
+        }
+        let status: MediaPlayer.Status?
+        do {
+            status = try MediaPlayer.status(of: bundleID)
+        } catch {
+            status = nil
+            if let error = error as? MediaError, error.code == -1743 { errorMessage = error.localizedDescription }
+        }
+        if status != mediaStatus { mediaStatus = status }
     }
 
     // MARK: - Iniciar com o Mac

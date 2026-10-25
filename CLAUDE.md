@@ -47,6 +47,7 @@ Tema escuro com a paleta do ícone (tabela no PRD), janela de tamanho fixo, mesm
 - O terminal **não tem permissão de gravar a tela** (`screencapture` falha). Para ver a janela, compile num programa descartável (no scratchpad) os arquivos do `mac/` com um `main.swift` que desenha `ContentView` com `ImageRenderer` e salva um PNG. O `ImageRenderer` não desenha `ScrollView`: troque por `VStack` numa cópia.
 - Funções isoladas (como `AudioApps.list()`) também se testam com um `main.swift` descartável compilado com `swiftc`.
 - A captura de áudio pede permissão **ao app que a cria**: teste volume no `SoundTuneKey.app`, não num programa de teste (a permissão iria para o terminal).
+- O mesmo vale para o AppleScript do Spotify/Música (permissão de Automação). Cuidado: desenhar a `ContentView` num programa de teste com o Spotify escolhido já lê o tempo da música por AppleScript.
 - Atalhos: dá para checar se a combinação está livre tentando `RegisterEventHotKey` num programa descartável; apertar as teclas fica com o usuário.
 
 ## Lições (não repetir)

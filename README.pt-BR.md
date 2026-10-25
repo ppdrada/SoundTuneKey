@@ -93,6 +93,8 @@ O programa lembra o último app escolhido e o volume de cada app. O volume vale 
 
 A caixinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify** e o **Música**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, como o Chrome, eles ficam apagados.
+
 #### ⚠️ Aviso do macOS na primeira vez
 
 O app não é autenticado pela Apple, então na primeira vez o macOS diz que não conseguiu verificá-lo. Clique em **OK**, vá em **Ajustes do Sistema → Privacidade e Segurança**, role até o fim e clique em **Abrir Mesmo Assim**. Isso só é preciso na primeira vez.
@@ -101,6 +103,7 @@ O app não é autenticado pela Apple, então na primeira vez o macOS diz que nã
 
 Fechar a janela não encerra o programa: ele continua no ícone da barra de menus (perto do Wi-Fi) e os atalhos seguem funcionando. Para mudar o ícone de lugar, segure **⌘** e arraste. Clique no ícone para:
 
+- No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — troca o app controlado sem abrir a janela
 - **Atalhos** — mostra a lista de atalhos
@@ -124,4 +127,5 @@ Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramen
 
 - **Swift / SwiftUI** — aplicativo nativo para Mac
 - **Core Audio process taps** — controle de volume por aplicativo
+- **AppleScript** — pausar, próxima, anterior e a barra de tempo no Spotify e no Música
 - **Carbon `RegisterEventHotKey`** — atalhos globais de teclado
