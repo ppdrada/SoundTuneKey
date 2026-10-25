@@ -1,20 +1,40 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 
 namespace SoundTuneKey;
 
 /// <summary>
-/// Slider de volume no tema escuro: trilha clara até o volume atual e apagada depois, com uma
-/// bolinha para segurar e arrastar. Clicar na trilha e as setas do teclado também funcionam.
+/// Slider no tema escuro: trilha clara até o valor atual e apagada depois, com uma bolinha para
+/// segurar e arrastar. Clicar na trilha e as setas do teclado também funcionam. Usado no volume
+/// e, mais fino, no tempo da música.
 /// </summary>
 public class VolumeBar : Control
 {
-    private const int TrackHeight = 6;
-    private const int ThumbSize = 18;
+    [System.ComponentModel.DefaultValue(6)]
+    public int TrackHeight { get; init; } = 6;
+    [System.ComponentModel.DefaultValue(18)]
+    public int ThumbSize { get; init; } = 18;
+    [System.ComponentModel.DefaultValue(5)]
+    public int KeyStep { get; init; } = 5;
 
     private int _value;
 
     public int Minimum => 0;
-    public int Maximum => 100;
+    private int _maximum = 100;
+
+    [System.ComponentModel.DefaultValue(100)]
+    public int Maximum
+    {
+        get => _maximum;
+        set
+        {
+            _maximum = Math.Max(1, value);
+            _value = Math.Min(_value, _maximum);
+            Invalidate();
+        }
+    }
+
+    /// <summary>True enquanto o botão do mouse está segurando a barra.</summary>
+    public bool IsDragging { get; private set; }
 
     [System.ComponentModel.DefaultValue(0)]
     public int Value
@@ -32,6 +52,9 @@ public class VolumeBar : Control
 
     /// <summary>Disparado só quando o usuário muda o volume (mouse ou teclado).</summary>
     public event EventHandler? Scroll;
+
+    /// <summary>Disparado quando o usuário solta o mouse depois de clicar ou arrastar.</summary>
+    public event EventHandler? Released;
 
     public VolumeBar()
     {
@@ -51,7 +74,7 @@ public class VolumeBar : Control
         float left = ThumbSize / 2f;
         float width = Width - ThumbSize;
         float centerY = Height / 2f;
-        float thumbX = left + width * _value / 100f;
+        float thumbX = left + width * _value / _maximum;
 
         var track = new RectangleF(left, centerY - TrackHeight / 2f, width, TrackHeight);
         using (var rest = new SolidBrush(Enabled ? Theme.Inactive : Theme.Border))
@@ -77,6 +100,7 @@ public class VolumeBar : Control
     {
         base.OnMouseDown(e);
         Focus();
+        IsDragging = true;
         SetFromMouse(e.X);
     }
 
@@ -87,6 +111,15 @@ public class VolumeBar : Control
             SetFromMouse(e.X);
     }
 
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+        if (!IsDragging)
+            return;
+        IsDragging = false;
+        Released?.Invoke(this, EventArgs.Empty);
+    }
+
     protected override bool IsInputKey(Keys keyData) =>
         keyData is Keys.Left or Keys.Right or Keys.Up or Keys.Down || base.IsInputKey(keyData);
 
@@ -95,8 +128,8 @@ public class VolumeBar : Control
         base.OnKeyDown(e);
         int step = e.KeyCode switch
         {
-            Keys.Right or Keys.Up => 5,
-            Keys.Left or Keys.Down => -5,
+            Keys.Right or Keys.Up => KeyStep,
+            Keys.Left or Keys.Down => -KeyStep,
             _ => 0,
         };
         if (step != 0)
@@ -115,7 +148,7 @@ public class VolumeBar : Control
     private void SetFromMouse(int x)
     {
         float fraction = (x - ThumbSize / 2f) / (Width - ThumbSize);
-        SetByUser((int)Math.Round(Math.Clamp(fraction, 0f, 1f) * 100));
+        SetByUser((int)Math.Round(Math.Clamp(fraction, 0f, 1f) * _maximum));
     }
 
     private void SetByUser(int value)

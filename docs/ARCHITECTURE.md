@@ -15,14 +15,21 @@ docs/               este arquivo e o PRD
 | Arquivo | Papel |
 |---|---|
 | `AudioApps.cs` | Lista as sessões de áudio do dispositivo de saída padrão (NAudio / WASAPI) e junta as do mesmo processo numa linha (o Chrome tem várias). `SetVolume` muda o volume de todas as sessões do processo. |
-| `MediaControls.cs` | Play/pause, próxima, anterior e voltar ao começo pelos controles de mídia do Windows (SMTC), casando a sessão de mídia (`SourceAppUserModelId`) com o nome do processo. |
+| `MediaControls.cs` | Play/pause, próxima, anterior e voltar ao começo pelos controles de mídia do Windows (SMTC), casando a sessão de mídia (`SourceAppUserModelId`) com o nome do processo. `GetTimelineAsync` lê posição e duração; `SeekAsync` pula para um tempo. |
+| `MediaIcons.cs` | Ícones ⏮ ⏯ ⏭ e alto-falante desenhados com `Graphics`; `MediaButton` (botão com ícone) e `GlyphLabel` (ícone sem clique). |
 | `GlobalHotkeys.cs` | `RegisterHotKey` numa janela invisível; avisa se outro programa já usa o atalho. |
 | `MainForm.cs` | Janela, lista, barra, bandeja e menu, toque duplo no `←`, abertura escondida com `--tray`. O app escolhido fica no campo `_current`, não na lista. |
-| `VolumeBar.cs` / `Theme.cs` | Barra desenhada e tema escuro (título escuro via DWM, ListView e menus desenhados). |
+| `VolumeBar.cs` / `Theme.cs` | Barra desenhada (usada no volume e, mais fina, no tempo: `TrackHeight`, `ThumbSize`, `Maximum`, evento `Released` ao soltar o mouse) e tema escuro (título escuro via DWM, ListView e menus desenhados). |
 | `WindowsStartup.cs` | "Iniciar com o Windows": chave em `HKCU\...\Run` com `--tray`. |
 | `AppSettings.cs` | Último app em `%AppData%\SoundTuneKey\settings.json`. |
 
 **Volume por app:** nativo do Windows (`ISimpleAudioVolume` de cada sessão). O volume fica gravado pelo próprio Windows, mesmo com o Sound Tune Key fechado.
+
+### Botões de mídia e barra de tempo
+
+- **Botões ⏮ ⏯ ⏭**: chamam o mesmo código dos atalhos (`⏮` = `PreviousPressed`, com o toque duplo). `BuildMediaRow` monta a linha e é usada duas vezes: na janela e, dentro de um `ToolStripControlHost`, no menu da bandeja. Clicar nos botões do menu **não fecha o menu**, de propósito (dá para clicar duas vezes no ⏮).
+- **Barra de tempo**: o SMTC não avisa quando a música anda, então um timer de 500 ms lê `GetTimelineProperties()` **só com a janela visível**. A posição informada vale para `LastUpdatedTime`; se está tocando, soma o tempo passado desde então. Arrastando, só o texto muda; o pulo (`TryChangePlaybackPositionAsync`, em ticks a partir de `StartTime`) acontece ao **soltar o mouse** (ou na hora, pelas setas do teclado). Testado com o Opera GX tocando vídeo.
+- **No Mac (próxima etapa)**: não há API pública para controlar a mídia de um app específico (o `MediaRemote` é privado). Caminhos a avaliar: AppleScript para Spotify/Music (`player position`, `playpause`, `next track`), as teclas de mídia do sistema para os outros apps, ou o `MediaRemote` privado (arriscado). Manter o mesmo visual: barra de tempo mais fina com os tempos nas pontas, alto-falante ao lado do volume, ícones desenhados.
 
 **Compilar e distribuir:**
 - Debug: `dotnet run --project src/SoundTuneKey` (sem apphost, veja os riscos).

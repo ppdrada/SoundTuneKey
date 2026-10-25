@@ -1,4 +1,4 @@
-namespace SoundTuneKey;
+﻿namespace SoundTuneKey;
 
 public class MainForm : Form
 {
@@ -95,6 +95,8 @@ public class MainForm : Form
         var volumeRow = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 6, 0, 6) };
         volumeRow.Controls.Add(_volume);
         volumeRow.Controls.Add(_volumeLabel);
+        // alto-falante: deixa claro que a barra é o volume, e não a posição da música
+        volumeRow.Controls.Add(new GlyphLabel(MediaGlyph.Speaker, 18f) { Dock = DockStyle.Left, Width = 30 });
 
         var volumePanel = new Panel { Dock = DockStyle.Bottom, Height = 84, Padding = new Padding(10, 6, 10, 6) };
         volumePanel.Controls.Add(volumeRow);
@@ -102,6 +104,7 @@ public class MainForm : Form
 
         Controls.Add(_list);
         Controls.Add(volumePanel);
+        Controls.Add(BuildMediaButtons());
         Controls.Add(_refresh);
         Controls.Add(BuildShortcutsBox());
         Controls.Add(_startWithWindows);
@@ -129,6 +132,146 @@ public class MainForm : Form
 
         SetupTray();
     }
+
+    // ⏮ ⏯ ⏭ abaixo da barra de volume: fazem o mesmo que os atalhos, no app escolhido.
+    // Em cima, o tempo da música (posição à esquerda, duração à direita, barra mais fina que a do
+    // volume); embaixo, os botões.
+    private Panel BuildMediaButtons()
+    {
+        var timeRow = new Panel { Dock = DockStyle.Top, Height = 28, Padding = new Padding(3, 0, 3, 4) };
+        timeRow.Controls.Add(_timeline);
+        timeRow.Controls.Add(_elapsedLabel);
+        timeRow.Controls.Add(_durationLabel);
+
+        var panel = new Panel { Dock = DockStyle.Bottom, Height = 76, Padding = new Padding(7, 0, 7, 6) };
+        panel.Controls.Add(BuildMediaRow(_mediaButtons, 16f));
+        panel.Controls.Add(timeRow);
+
+        _timeline.Scroll += (_, _) =>
+        {
+            _elapsedLabel.Text = FormatTime(TimeSpan.FromSeconds(_timeline.Value));
+            if (!_timeline.IsDragging) // setas do teclado: pula na hora
+                Seek();
+        };
+        _timeline.Released += (_, _) => Seek();
+        _timelineTimer.Tick += (_, _) => RefreshTimeline();
+        VisibleChanged += (_, _) => _timelineTimer.Enabled = Visible;
+        return panel;
+    }
+
+    private readonly VolumeBar _timeline = new()
+    {
+        Dock = DockStyle.Fill,
+        Enabled = false,
+        TrackHeight = 4,
+        ThumbSize = 12,
+        Maximum = 1,
+    };
+
+    private readonly Label _elapsedLabel = TimeLabel(DockStyle.Left);
+    private readonly Label _durationLabel = TimeLabel(DockStyle.Right);
+
+    private static Label TimeLabel(DockStyle dock) => new()
+    {
+        Dock = dock,
+        Width = 48,
+        Text = "--:--",
+        ForeColor = Theme.MutedText,
+        TextAlign = dock == DockStyle.Left ? ContentAlignment.MiddleLeft : ContentAlignment.MiddleRight,
+    };
+
+    // o Windows não avisa quando a música anda; com a janela aberta, o tempo é lido duas vezes por segundo
+    private readonly System.Windows.Forms.Timer _timelineTimer = new() { Interval = 500 };
+    private bool _readingTimeline;
+
+    private async void RefreshTimeline()
+    {
+        var app = SelectedApp;
+        if (app is null)
+        {
+            ShowTimeline(null);
+            return;
+        }
+
+        if (_readingTimeline)
+            return;
+        _readingTimeline = true;
+        try
+        {
+            var timeline = await MediaControls.GetTimelineAsync(app.ProcessName);
+            if (!_timeline.IsDragging && SelectedApp?.ProcessName == app.ProcessName)
+                ShowTimeline(timeline);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            System.Diagnostics.Debug.WriteLine($"Falha ao ler o tempo da música: {ex}");
+        }
+        finally
+        {
+            _readingTimeline = false;
+        }
+    }
+
+    // null = o app não informa o tempo (ex.: Discord): a barra fica apagada
+    private void ShowTimeline(MediaTimeline? timeline)
+    {
+        _timeline.Enabled = timeline is not null;
+        if (timeline is null)
+        {
+            _timeline.Value = 0;
+            _elapsedLabel.Text = _durationLabel.Text = "--:--";
+            return;
+        }
+
+        _timeline.Maximum = (int)Math.Ceiling(timeline.Duration.TotalSeconds);
+        _timeline.Value = (int)timeline.Position.TotalSeconds;
+        _elapsedLabel.Text = FormatTime(timeline.Position);
+        _durationLabel.Text = FormatTime(timeline.Duration);
+    }
+
+    private async void Seek()
+    {
+        var app = SelectedApp;
+        if (app is null)
+            return;
+
+        try
+        {
+            await MediaControls.SeekAsync(app.ProcessName, TimeSpan.FromSeconds(_timeline.Value));
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            System.Diagnostics.Debug.WriteLine($"Falha ao mudar o tempo da música: {ex}");
+        }
+    }
+
+    private static string FormatTime(TimeSpan time) =>
+        time.TotalHours >= 1 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"m\:ss");
+
+    // Usada na janela e no menu da bandeja; os botões criados vão para a lista, para ligar e desligar juntos.
+    private TableLayoutPanel BuildMediaRow(List<Button> buttons, float glyphSize)
+    {
+        var row = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1 };
+        for (int i = 0; i < 3; i++)
+            row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / 3));
+
+        row.Controls.Add(Add(MediaGlyph.Previous, "Volta ao começo (2x rápido: música anterior)", PreviousPressed));
+        row.Controls.Add(Add(MediaGlyph.PlayPause, "Pausar / continuar", () => SendMedia(MediaCommand.PlayPause)));
+        row.Controls.Add(Add(MediaGlyph.Next, "Próxima música", () => SendMedia(MediaCommand.Next)));
+        return row;
+
+        Button Add(MediaGlyph glyph, string tip, Action action)
+        {
+            var button = new MediaButton(glyph, glyphSize) { Dock = DockStyle.Fill, Enabled = false };
+            _toolTip.SetToolTip(button, tip);
+            button.Click += (_, _) => action();
+            buttons.Add(button);
+            return button;
+        }
+    }
+
+    private readonly ToolTip _toolTip = new();
+    private readonly List<Button> _mediaButtons = [];
 
     // Painel em vez de GroupBox: a borda do GroupBox não aceita cores do tema escuro.
     private static Panel BuildShortcutsBox()
@@ -182,9 +325,22 @@ public class MainForm : Form
         // o checkbox da janela grava no registro; os dois ficam sempre iguais
         startupItem.Click += (_, _) => _startWithWindows.Checked = startupItem.Checked;
 
+        // os mesmos botões da janela, numa linha só, para usar com ela escondida;
+        // clicar neles não fecha o menu, então dá para voltar duas vezes ou pular várias
+        var trayButtons = new List<Button>();
+        var mediaRow = new ToolStripControlHost(BuildMediaRow(trayButtons, 12f))
+        {
+            AutoSize = false,
+            Size = new Size(170, 34),
+            Margin = new Padding(2),
+        };
+
         var menu = new ContextMenuStrip();
         menu.Items.Add("Abrir", null, (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(mediaRow);
+        menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Atalhos", null, (_, _) => ShowShortcutsDialog());
         menu.Items.Add(startupItem);
         menu.Items.Add(new ToolStripSeparator());
@@ -197,6 +353,9 @@ public class MainForm : Form
         {
             FillAppsMenu(appsMenu);
             startupItem.Checked = _startWithWindows.Checked;
+            bool hasApp = AppForHotkey() is not null; // pode achar o último app que abriu depois
+            foreach (var button in trayButtons)
+                button.Enabled = hasApp;
         };
 
         _tray.Icon = Icon;
@@ -421,6 +580,9 @@ public class MainForm : Form
     {
         var app = SelectedApp;
         _volume.Enabled = app is not null;
+        foreach (var button in _mediaButtons)
+            button.Enabled = app is not null;
+        RefreshTimeline();
 
         if (app is null)
         {

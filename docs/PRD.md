@@ -21,6 +21,8 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Segurar o atalho de volume repete | ✅ | ✅ |
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | Teclas de mídia do próprio Mac (F7/F8/F9), que controlam o app que está tocando |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | — (F7 do Mac) |
+| Botões ⏮ ⏯ ⏭ na janela e numa linha no menu da bandeja / barra de menus | ✅ | Próxima etapa |
+| Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | Próxima etapa |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
@@ -39,7 +41,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 
 Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 
-**Windows** — pronto.
+**Windows** — pronto, incluindo os botões de mídia e a barra de tempo (PR `feat/media-buttons`).
 
 **macOS**
 1. ✅ Janela listando os apps com som
@@ -47,7 +49,8 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 3. ✅ Caixa de atalhos na janela, README por sistema
 4. ✅ Ícone na barra de menus + download universal
 5. ✅ Iniciar com o Mac + lembrar o último app e os volumes
-6. Depois: só o que o usuário pedir.
+6. **Próxima:** botões ⏮ ⏯ ⏭ e barra de tempo, iguais aos do Windows (veja "Botões de mídia e barra de tempo" em `ARCHITECTURE.md`).
+7. Depois: só o que o usuário pedir.
 
 **Ideias em aberto (não fazer sem perguntar)**
 - Aviso na tela (OSD) ao apertar um atalho: perguntado várias vezes no Windows, nunca respondido.
@@ -68,6 +71,8 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 | Texto secundário | `#9A9AA0` |
 | Apagado | `#4A4A50` |
 
-- **Janela de tamanho fixo** (411 × 458 de área útil), só com o botão de fechar. De cima para baixo: lista de apps (nome, tocando/parado, volume), "Controlando: <app>" com a barra de volume, caixa de atalhos.
-- **Barra de volume** desenhada: trilha clara até o volume, apagada depois, bolinha para arrastar.
+- **Janela de tamanho fixo** (411 × 458 de área útil), só com o botão de fechar. De cima para baixo: lista de apps (nome, volume), "Controlando: <app>", barra de volume, barra de tempo, botões ⏮ ⏯ ⏭, "Atualizar lista", caixa de atalhos, "Iniciar com o sistema".
+- **Barra de volume** desenhada: trilha clara até o volume, apagada depois, bolinha para arrastar. Alto-falante à esquerda e a porcentagem à direita.
+- **Barra de tempo**: o mesmo desenho, porém **mais fina** (trilha 4 px, bolinha 12 px; a de volume tem 6 e 18), com o tempo atual à esquerda e a duração à direita (`1:23` … `3:45`). Assim o usuário não confunde as duas. Apagada com `--:--` quando o app não informa o tempo.
+- **Ícones de mídia** (⏮ ⏯ ⏭ e o alto-falante) desenhados em código, não com caracteres de fonte: os caracteres saíam pequenos, fora do centro ou coloridos (emoji) no menu.
 - **Textos do programa em português.** O README principal é em inglês, com o PT-BR ao lado.
