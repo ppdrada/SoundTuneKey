@@ -21,8 +21,8 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Segurar o atalho de volume repete | ✅ | ✅ |
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | Teclas de mídia do próprio Mac (F7/F8/F9), que controlam o app que está tocando |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | — (F7 do Mac) |
-| Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify e Música (apagados nos outros apps) |
-| Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify e Música |
+| Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
+| Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
@@ -50,7 +50,8 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 4. ✅ Ícone na barra de menus + download universal
 5. ✅ Iniciar com o Mac + lembrar o último app e os volumes
 6. ✅ Botões ⏮ ⏯ ⏭ e barra de tempo, na janela e no topo do menu da barra
-7. Depois: só o que o usuário pedir.
+7. ✅ Mídia dos vídeos do Chrome (JavaScript pelo AppleScript), com o botão "Como ligar" para a opção do Chrome
+8. Depois: só o que o usuário pedir.
 
 **Ideias em aberto (não fazer sem perguntar)**
 - Aviso na tela (OSD) ao apertar um atalho: perguntado várias vezes no Windows, nunca respondido.

@@ -1,8 +1,9 @@
 import AppKit
 
 /// Controles de mídia de um app específico. O macOS não tem API pública para isso (o
-/// MediaRemote é privado), então fala direto, por AppleScript, com os players que aceitam:
-/// Spotify e Música. Na primeira vez o macOS pergunta se o Sound Tune Key pode controlá-los.
+/// MediaRemote é privado), então fala direto, por AppleScript, com quem aceita: Spotify e
+/// Música pelos comandos de player, e o Chrome executando JavaScript no vídeo da aba (veja
+/// `ChromeMedia`). Na primeira vez o macOS pergunta se o Sound Tune Key pode controlá-los.
 @MainActor
 enum MediaPlayer {
     enum Command { case playPause, next, previous, restart }
@@ -26,11 +27,12 @@ enum MediaPlayer {
     ]
 
     static func supports(_ bundleID: String) -> Bool {
-        players.contains { $0.bundleID == bundleID }
+        players.contains { $0.bundleID == bundleID } || bundleID == ChromeMedia.bundleID
     }
 
     /// Tempo da música atual, ou nil se o app não é suportado, está fechado ou sem música.
     static func status(of bundleID: String) throws -> Status? {
+        if bundleID == ChromeMedia.bundleID { return isRunning(bundleID) ? try ChromeMedia.status() : nil }
         guard let player = player(bundleID) else { return nil }
         let result = try run("""
             tell application id "\(bundleID)"
@@ -45,6 +47,10 @@ enum MediaPlayer {
     }
 
     static func send(_ command: Command, to bundleID: String) throws {
+        if bundleID == ChromeMedia.bundleID {
+            if isRunning(bundleID) { try ChromeMedia.send(command) }
+            return
+        }
         guard player(bundleID) != nil else { return }
         let action = switch command {
         case .playPause: "playpause"
@@ -56,14 +62,21 @@ enum MediaPlayer {
     }
 
     static func seek(_ bundleID: String, to seconds: Double) throws {
+        if bundleID == ChromeMedia.bundleID {
+            if isRunning(bundleID) { try ChromeMedia.seek(to: seconds) }
+            return
+        }
         guard player(bundleID) != nil else { return }
         try run("tell application id \"\(bundleID)\" to set player position to \(Int(seconds.rounded()))")
     }
 
-    /// Só fala com o player se ele já estiver aberto: o AppleScript abriria o app.
+    /// Só fala com o app se ele já estiver aberto: o AppleScript abriria o app.
+    private static func isRunning(_ bundleID: String) -> Bool {
+        !NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).isEmpty
+    }
+
     private static func player(_ bundleID: String) -> Player? {
-        guard let player = players.first(where: { $0.bundleID == bundleID }),
-              !NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).isEmpty else { return nil }
+        guard let player = players.first(where: { $0.bundleID == bundleID }), isRunning(bundleID) else { return nil }
         return player
     }
 
@@ -71,7 +84,7 @@ enum MediaPlayer {
     private static var compiled: [String: NSAppleScript] = [:]
 
     @discardableResult
-    private static func run(_ source: String) throws -> NSAppleEventDescriptor {
+    static func run(_ source: String) throws -> NSAppleEventDescriptor {
         let script = compiled[source] ?? {
             let script = NSAppleScript(source: source)!
             compiled[source] = script
@@ -80,7 +93,8 @@ enum MediaPlayer {
         var error: NSDictionary?
         let result = script.executeAndReturnError(&error)
         if let error {
-            throw MediaError(code: error[NSAppleScript.errorNumber] as? Int ?? 0)
+            throw MediaError(code: error[NSAppleScript.errorNumber] as? Int ?? 0,
+                             message: error[NSAppleScript.errorMessage] as? String ?? "")
         }
         return result
     }
@@ -88,10 +102,22 @@ enum MediaPlayer {
 
 struct MediaError: LocalizedError {
     let code: Int
+    var message = ""
+
+    /// Erros que o usuário resolve num ajuste: vale mostrar mesmo sem ele ter clicado em nada.
+    var needsUserAction: Bool { code == -1743 || isChromeJavaScriptOff }
+
+    /// O Chrome recusa JavaScript vindo do AppleScript até o usuário ligar a opção.
+    var isChromeJavaScriptOff: Bool { message.contains("JavaScript") }
+
+    // nomes exatos do menu do Chrome em português
+    static let chromeJavaScriptOffMessage =
+        "No Chrome, na barra de menus do Mac: Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple."
 
     var errorDescription: String? {
+        if isChromeJavaScriptOff { return Self.chromeJavaScriptOffMessage }
         // -1743: o usuário não deixou (ou ainda não respondeu) o controle do app
-        code == -1743
+        return code == -1743
             ? "Libere o controle em Ajustes do Sistema → Privacidade e Segurança → Automação."
             : "O player não respondeu (erro \(code))."
     }

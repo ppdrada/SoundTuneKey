@@ -93,7 +93,9 @@ The program remembers the last app you picked and the volume of each app. The vo
 
 The **Iniciar com o Mac** (Start with Mac) checkbox at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify** and **Music**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps, such as Chrome, they are greyed out.
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
+
+> ℹ️ **Chrome:** turn on, once in each Chrome profile, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** (View → Developer → Allow JavaScript from Apple Events) in the Mac menu bar while Chrome is in front. Until then, Sound Tune Key shows a warning with a **Como ligar** (How to turn it on) button that lists the steps and brings Chrome to the front. Chrome's volume works without it. In Chrome, ⏭ and the double ⏮ switch videos on YouTube.
 
 #### ⚠️ macOS warning on first run
 
@@ -127,5 +129,5 @@ To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command
 
 - **Swift / SwiftUI** — native Mac app
 - **Core Audio process taps** — per-app volume control
-- **AppleScript** — play/pause, next, previous and the time bar for Spotify and Music
+- **AppleScript** — play/pause, next, previous and the time bar for Spotify and Music, and for Chrome videos through JavaScript
 - **Carbon `RegisterEventHotKey`** — global keyboard hotkeys

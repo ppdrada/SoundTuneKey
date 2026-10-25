@@ -93,7 +93,9 @@ O programa lembra o último app escolhido e o volume de cada app. O volume vale 
 
 A caixinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
-Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify** e o **Música**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, como o Chrome, eles ficam apagados.
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
+
+> ℹ️ **Chrome:** ligue uma vez, em cada perfil do Chrome, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** na barra de menus do Mac, com o Chrome na frente. Enquanto não estiver ligado, o Sound Tune Key mostra um aviso com o botão **Como ligar**, que mostra os passos e traz o Chrome para a frente. O volume do Chrome funciona mesmo sem isso. No Chrome, o ⏭ e o ⏮ duplo trocam de vídeo no YouTube.
 
 #### ⚠️ Aviso do macOS na primeira vez
 
@@ -127,5 +129,5 @@ Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramen
 
 - **Swift / SwiftUI** — aplicativo nativo para Mac
 - **Core Audio process taps** — controle de volume por aplicativo
-- **AppleScript** — pausar, próxima, anterior e a barra de tempo no Spotify e no Música
+- **AppleScript** — pausar, próxima, anterior e a barra de tempo no Spotify e no Música, e nos vídeos do Chrome por JavaScript
 - **Carbon `RegisterEventHotKey`** — atalhos globais de teclado

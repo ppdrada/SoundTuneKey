@@ -35,6 +35,8 @@ final class AppModel: ObservableObject {
     /// Quem está mostrando o tempo da música (janela, menu); o tempo só é lido enquanto alguém mostra.
     private var mediaViewers: Set<String> = []
     private var lastPreviousPress = Date.distantPast
+    /// Aviso de mídia na tela (permissão, opção do Chrome), para tirar quando voltar a funcionar.
+    private var mediaErrorShown: String?
 
     init() {
         selectedBundleID = defaults.string(forKey: Keys.lastApp)
@@ -150,9 +152,18 @@ final class AppModel: ObservableObject {
         let status: MediaPlayer.Status?
         do {
             status = try MediaPlayer.status(of: bundleID)
+            // só um tempo lido de verdade prova que o ajuste (permissão, opção do Chrome) foi
+            // resolvido; "nada encontrado agora" não apaga o aviso, senão ele pisca
+            if status != nil {
+                if let shown = mediaErrorShown, errorMessage == shown { errorMessage = nil }
+                mediaErrorShown = nil
+            }
         } catch {
             status = nil
-            if let error = error as? MediaError, error.code == -1743 { errorMessage = error.localizedDescription }
+            if let error = error as? MediaError, error.needsUserAction {
+                errorMessage = error.localizedDescription
+                mediaErrorShown = errorMessage
+            }
         }
         if status != mediaStatus { mediaStatus = status }
     }

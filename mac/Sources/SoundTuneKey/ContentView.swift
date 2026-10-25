@@ -100,6 +100,13 @@ struct ContentView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.mutedText)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true) // as duas linhas, sem cortar
+
+                if error == MediaError.chromeJavaScriptOffMessage {
+                    Button("Como ligar") { ChromeMedia.showSetup() }
+                        .controlSize(.small)
+                        .pointerCursor()
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
