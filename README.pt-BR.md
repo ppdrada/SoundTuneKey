@@ -55,9 +55,41 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Sair** — encerra o programa
 
+## 🍎 macOS
+
+A versão para Mac fica na pasta [`mac/`](mac). Por enquanto ela lista os apps que estão tocando som e muda o volume do app escolhido, pela janela ou pelos atalhos.
+
+### Requisitos
+
+- macOS 14.2 ou mais novo
+- Ferramentas de linha de comando do Xcode (`xcode-select --install`) para compilar
+
+### Atalhos
+
+| Atalho | Função |
+|---|---|
+| `⌘ + ⌥ + ↑` | 🔊 Aumenta o volume do app selecionado (segurar repete) |
+| `⌘ + ⌥ + ↓` | 🔉 Diminui o volume do app selecionado (segurar repete) |
+
+### Como usar
+
+1. Compile o app: `mac/build-app.sh` (ele cria `mac/build/SoundTuneKey.app`).
+2. Abra o `SoundTuneKey.app` e selecione o app que você quer controlar.
+3. Na primeira vez que você mudar um volume, o macOS pede a permissão de **Gravação de áudio do sistema**: aceite. É assim que o Sound Tune Key muda o volume de um app só.
+
+O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, todos os apps voltam ao volume normal.
+
 ## 🛠️ Tecnologias
+
+**Windows**
 
 - **C# / .NET** — aplicativo nativo para Windows
 - **Windows Core Audio (WASAPI)** — controle de volume por aplicativo
 - **Windows Media Controls (SMTC)** — pausar, próxima e anterior
 - **Win32 `RegisterHotKey`** — atalhos globais de teclado
+
+**macOS**
+
+- **Swift / SwiftUI** — aplicativo nativo para Mac
+- **Core Audio process taps** — controle de volume por aplicativo
+- **Carbon `RegisterEventHotKey`** — atalhos globais de teclado

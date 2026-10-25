@@ -55,9 +55,41 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - **Iniciar com o Windows** — start the program automatically, already in the tray, when the PC boots
 - **Sair** — quit the program
 
+## 🍎 macOS
+
+The Mac version lives in the [`mac/`](mac) folder. For now it lists the apps playing sound and changes the volume of the selected app, from the window or with hotkeys.
+
+### Requirements
+
+- macOS 14.2 or later
+- Xcode Command Line Tools (`xcode-select --install`) to build it
+
+### Hotkeys
+
+| Hotkey | Action |
+|---|---|
+| `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
+| `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
+
+### How to use
+
+1. Build the app: `mac/build-app.sh` (it creates `mac/build/SoundTuneKey.app`).
+2. Open `SoundTuneKey.app` and select the app you want to control.
+3. The first time you change a volume, macOS asks for **System Audio Recording** permission: allow it. That is how Sound Tune Key changes the volume of one app only.
+
+The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume.
+
 ## 🛠️ Built with
+
+**Windows**
 
 - **C# / .NET** — native Windows app
 - **Windows Core Audio (WASAPI)** — per-app volume control
 - **Windows Media Controls (SMTC)** — play/pause, next and previous
 - **Win32 `RegisterHotKey`** — global keyboard hotkeys
+
+**macOS**
+
+- **Swift / SwiftUI** — native Mac app
+- **Core Audio process taps** — per-app volume control
+- **Carbon `RegisterEventHotKey`** — global keyboard hotkeys
