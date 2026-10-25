@@ -33,16 +33,21 @@ public static class WindowsStartup
     /// <summary>Se a pessoa moveu o .exe de pasta, atualiza o caminho salvo.</summary>
     public static void RefreshPath()
     {
-        if (IsEnabled)
+        // a versão de teste (Debug) não toma o lugar do .exe de verdade: senão o Windows passa a
+        // abrir o "dotnet" ao ligar, e o Gerenciador de Tarefas perde o fornecedor "ppdrada"
+        if (IsEnabled && !RunningFromDotnet)
             SetEnabled(true);
     }
+
+    // no Debug o programa roda como "dotnet SoundTuneKey.dll" (veja o .csproj)
+    private static bool RunningFromDotnet =>
+        Path.GetFileName(Environment.ProcessPath!).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase);
 
     private static string Command()
     {
         var exe = Environment.ProcessPath!;
 
-        // no Debug o programa roda como "dotnet SoundTuneKey.dll" (veja o .csproj)
-        if (Path.GetFileName(exe).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+        if (RunningFromDotnet)
         {
             var dll = Path.Combine(AppContext.BaseDirectory, typeof(WindowsStartup).Assembly.GetName().Name + ".dll");
             return $"\"{exe}\" \"{dll}\" {TrayArgument}";
