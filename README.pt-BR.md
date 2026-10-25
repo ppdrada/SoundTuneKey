@@ -86,7 +86,9 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 3. Selecione na lista o aplicativo que você quer controlar.
 4. Na primeira vez que você mudar um volume, o macOS pede a permissão de **Gravação de áudio do sistema**: aceite. É assim que o Sound Tune Key muda o volume de um app só.
 
-O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, todos os apps voltam ao volume normal.
+O programa lembra o último app escolhido e o volume de cada app. O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, os apps voltam ao volume normal até você abrir de novo.
+
+A caixinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
 #### ⚠️ Aviso do macOS na primeira vez
 
@@ -99,6 +101,7 @@ Fechar a janela não encerra o programa: ele continua no ícone da barra de menu
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — troca o app controlado sem abrir a janela
 - **Atalhos** — mostra a lista de atalhos
+- **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
 - **Sair** — encerra o programa
 
 Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramentas de linha de comando do Xcode: `xcode-select --install`).

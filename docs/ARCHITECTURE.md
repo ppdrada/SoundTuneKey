@@ -41,6 +41,7 @@ docs/               este arquivo e o PRD
 | `ContentView.swift` / `VolumeBar.swift` / `Theme.swift` | Janela em SwiftUI no mesmo visual do Windows. |
 | `MenuBarIcon.swift` | Ícone da barra de menus desenhado em código a partir das coordenadas do `icon.svg` (imagem "template"). |
 | `Shortcuts.swift` | Lista de atalhos mostrada na janela e no menu. |
+| `LoginItem.swift` | "Iniciar com o Mac" pelo `SMAppService.mainApp` (macOS 13+; aparece em Ajustes → Geral → Itens de Início). Aberto pelo login (evento de abertura com `keyAELaunchedAsLogInItem`) ou com `--tray`, o app começa escondido na barra de menus. |
 | `Resources/Info.plist` | Bundle `com.ppdrada.SoundTuneKey`, mínimo 14.2, texto da permissão de áudio (`NSAudioCaptureUsageDescription`). |
 | `build-app.sh` | Compila e monta o `.app` (veja abaixo). |
 
@@ -49,7 +50,7 @@ docs/               este arquivo e o PRD
 2. Um **dispositivo agregado privado** (saída padrão + o tap) recebe esse som.
 3. Um IOProc copia o som da entrada para a saída multiplicado pelo volume.
 
-Em 100% não existe captura: o app toca direto. A captura é refeita quando mudam os processos do app ou a saída padrão (fone, por exemplo). Se o Sound Tune Key fechar, o macOS desfaz tudo e o app volta ao volume normal. O volume ainda não fica salvo.
+Em 100% não existe captura: o app toca direto. A captura é refeita quando mudam os processos do app ou a saída padrão (fone, por exemplo). Se o Sound Tune Key fechar, o macOS desfaz tudo e o app volta ao volume normal. O último app (`lastApp`) e os volumes (`volumes`) ficam no `UserDefaults` e são aplicados de novo quando o app abre.
 
 **Compilar e distribuir:**
 - `mac/build-app.sh` gera `mac/build/SoundTuneKey.app`. Só precisa das ferramentas de linha de comando do Xcode.
@@ -69,5 +70,6 @@ Em 100% não existe captura: o app toca direto. A captura é refeita quando muda
 | Atalho global "rouba" a combinação | Os dois | `⌘⌥↑/↓` deixa de funcionar em outros apps (alguns editores usam) enquanto o Sound Tune Key está aberto. `⌘⌥←/→` foi evitado porque troca de abas nos navegadores. |
 | Outra instância segura os atalhos | Os dois | Ao testar atalhos, feche as outras cópias do app antes. |
 | Teclas de mídia do Mac | Mac | F7/F8/F9 controlam o app que está tocando agora (o macOS decide), não necessariamente o app escolhido. |
-| Volume não persiste | Mac | Fechou o app, os volumes voltam a 100%. Fica resolvido na etapa de lembrar as configurações. |
+| Volume só vale com o app aberto | Mac | Fechou o Sound Tune Key, os apps voltam a 100% até ele abrir de novo (os volumes ficam salvos). |
+| Iniciar com o Mac guarda o lugar do app | Mac | O `SMAppService` registra o `.app` onde ele está. Se o usuário mover o app depois de ligar a caixinha, é preciso desligar e ligar de novo. Por isso o README pede para mover para Aplicativos antes. |
 | Captura refeita quando os processos mudam | Mac | O Chrome cria e fecha processos com frequência; cada mudança refaz a captura e pode dar um pequeno corte no som. |

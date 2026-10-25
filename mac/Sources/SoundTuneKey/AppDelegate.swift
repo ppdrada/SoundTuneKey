@@ -11,12 +11,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private var statusItem: NSStatusItem!
     private let appsMenu = NSMenu()
     private var selectionWatch: AnyCancellable?
+    private lazy var startAtLoginItem = item("Iniciar com o Mac", #selector(toggleStartAtLogin))
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = makeMainMenu()
         setupWindow()
         setupStatusItem()
-        showWindow()
+        // aberto pelo "Iniciar com o Mac": fica só na barra de menus, como o --tray do Windows
+        if LoginItem.launchedHidden {
+            NSApp.setActivationPolicy(.accessory)
+        } else {
+            showWindow()
+        }
     }
 
     /// Abrir o app de novo (Finder, Spotlight, Dock) com a janela escondida mostra a janela.
@@ -71,10 +77,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         apps.submenu = appsMenu
         menu.addItem(apps)
         menu.addItem(item("Atalhos", #selector(showShortcuts)))
+        menu.addItem(startAtLoginItem)
         menu.addItem(.separator())
         menu.addItem(item("Sair", #selector(quit)))
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
         appsMenu.delegate = self
+        menu.delegate = self
         statusItem.menu = menu
 
         // o app pode ser escolhido na janela ou no menu; a dica do ícone acompanha os dois
@@ -82,7 +90,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
-        guard menu === appsMenu else { return }
+        guard menu === appsMenu else {
+            // menu principal: a caixinha acompanha a da janela e os Ajustes do Sistema
+            model.refreshStartsAtLogin()
+            startAtLoginItem.state = model.startsAtLogin ? .on : .off
+            return
+        }
         menu.removeAllItems()
         model.refresh()
 
@@ -118,6 +131,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         alert.icon = NSApp.applicationIconImage
         NSApp.activate()
         alert.runModal()
+    }
+
+    @objc private func toggleStartAtLogin() {
+        model.setStartsAtLogin(!model.startsAtLogin)
     }
 
     @objc private func quit() {
