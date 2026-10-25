@@ -73,9 +73,10 @@ public class MainForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
-        // tamanho fixo: sem redimensionar nem maximizar (minimizar manda para a bandeja)
+        // tamanho fixo e só o X: ele já esconde na bandeja, como o minimizar faria
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
+        MinimizeBox = false;
 
         BackColor = Theme.Background;
         ForeColor = Theme.Text;
