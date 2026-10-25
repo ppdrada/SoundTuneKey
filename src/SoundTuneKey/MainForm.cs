@@ -42,6 +42,7 @@ public class MainForm : Form
     ];
 
     private const int VolumeStep = 5; // % por toque no atalho
+    private const int VolumeColumnWidth = 80;
     private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
 
     private DateTime _lastPreviousPress = DateTime.MinValue;
@@ -69,7 +70,7 @@ public class MainForm : Form
         _startHidden = startHidden;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(448, 500);
+        ClientSize = new Size(411, 458); // na tela: 413 x 490 com a barra de título
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
@@ -87,8 +88,9 @@ public class MainForm : Form
         _startWithWindows.FlatAppearance.BorderColor = Theme.Border;
         _startWithWindows.FlatAppearance.CheckedBackColor = Theme.Raised;
 
-        _list.Columns.Add("Aplicativo", 330);
-        _list.Columns.Add("Volume", 100);
+        _list.Columns.Add("Aplicativo", 0);
+        _list.Columns.Add("Volume", VolumeColumnWidth);
+        _list.Resize += (_, _) => FitColumns();
 
         var volumeRow = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 6, 0, 6) };
         volumeRow.Controls.Add(_volume);
@@ -225,6 +227,14 @@ public class MainForm : Form
     }
 
     private void SelectApp(string processName) => LoadApps(select: processName);
+
+    // A coluna "Aplicativo" ocupa todo o espaço que sobra, para a linha ir até a borda da lista.
+    // ClientSize já desconta a barra de rolagem quando ela aparece, então não surge rolagem horizontal.
+    private void FitColumns()
+    {
+        if (_list.Columns.Count == 2)
+            _list.Columns[0].Width = Math.Max(100, _list.ClientSize.Width - VolumeColumnWidth);
+    }
 
     // Aberto com --tray: prepara tudo mas não mostra a janela. Como Load e Shown só disparam
     // quando a janela aparece, a lista e os atalhos são iniciados aqui.
@@ -402,6 +412,7 @@ public class MainForm : Form
         }
 
         _list.EndUpdate();
+        FitColumns(); // a barra de rolagem pode ter aparecido ou sumido
         _loadingList = false;
         ShowSelected();
     }
