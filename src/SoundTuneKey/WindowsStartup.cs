@@ -43,7 +43,10 @@ public static class WindowsStartup
 
         // no Debug o programa roda como "dotnet SoundTuneKey.dll" (veja o .csproj)
         if (Path.GetFileName(exe).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-            return $"\"{exe}\" \"{typeof(WindowsStartup).Assembly.Location}\" {TrayArgument}";
+        {
+            var dll = Path.Combine(AppContext.BaseDirectory, typeof(WindowsStartup).Assembly.GetName().Name + ".dll");
+            return $"\"{exe}\" \"{dll}\" {TrayArgument}";
+        }
 
         return $"\"{exe}\" {TrayArgument}";
     }
