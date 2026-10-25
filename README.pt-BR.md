@@ -65,6 +65,8 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 
 O programa lembra o último app escolhido da próxima vez que for aberto.
 
+Abaixo da barra de volume 🔈, a janela também tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita): arraste para ir para outro trecho da música ou do vídeo. Embaixo dela, os botões **⏮ ⏯ ⏭** fazem o mesmo que os atalhos. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
+
 #### ⚠️ Aviso do Windows na primeira vez
 
 O `.exe` ainda não tem assinatura digital, então o Windows pode mostrar **"O Windows protegeu o computador"**. Para abrir, clique em **Mais informações** → **Executar assim mesmo**. Isso só é preciso na primeira vez.
@@ -75,6 +77,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — troca o app controlado sem abrir a janela
+- **⏮ ⏯ ⏭** — anterior, pausar/continuar e próxima, numa linha só; o menu fica aberto para clicar mais de uma vez
 - **Atalhos** — mostra a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Sair** — encerra o programa
@@ -114,7 +117,7 @@ Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramen
 
 - **C# / .NET** — aplicativo nativo para Windows
 - **Windows Core Audio (WASAPI)** — controle de volume por aplicativo
-- **Windows Media Controls (SMTC)** — pausar, próxima e anterior
+- **Windows Media Controls (SMTC)** — pausar, próxima, anterior e a barra de tempo da música
 - **Win32 `RegisterHotKey`** — atalhos globais de teclado
 
 ### macOS

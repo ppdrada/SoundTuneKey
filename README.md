@@ -65,6 +65,8 @@ The hotkeys are also listed inside the app, in the window and in the **Atalhos**
 
 The program remembers the last app you picked the next time it opens.
 
+Below the 🔈 volume bar, the window also has the track's **time bar** (current time on the left, length on the right): drag it to jump to another part of the song or video. Under it, the **⏮ ⏯ ⏭** buttons do the same as the hotkeys. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
+
 #### ⚠️ Windows warning on first run
 
 The `.exe` is not digitally signed yet, so Windows may show **"Windows protected your PC"**. To open it, click **More info** → **Run anyway**. You only need to do this once.
@@ -75,6 +77,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — switch the controlled app without opening the window
+- **⏮ ⏯ ⏭** — previous, play/pause and next, in one row; the menu stays open so you can click more than once
 - **Atalhos** (Hotkeys) — show the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Sair** (Quit) — quit the program
@@ -114,7 +117,7 @@ To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command
 
 - **C# / .NET** — native Windows app
 - **Windows Core Audio (WASAPI)** — per-app volume control
-- **Windows Media Controls (SMTC)** — play/pause, next and previous
+- **Windows Media Controls (SMTC)** — play/pause, next, previous and the track time bar
 - **Win32 `RegisterHotKey`** — global keyboard hotkeys
 
 ### macOS
