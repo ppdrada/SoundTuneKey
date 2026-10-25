@@ -99,7 +99,14 @@ Under "Controlando" (Controlling), the window has the track **time bar** (curren
 
 #### ⚠️ macOS warning on first run
 
-The app is not notarized by Apple, so the first time macOS says it could not verify it. Click **Done**, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only need to do this once.
+The app is not notarized by Apple, so the first time macOS says it **could not verify that the app is free of malware**. To open it:
+
+1. Move `SoundTuneKey.app` to the **Applications** folder first (so you don't have to allow it again after moving it).
+2. Open the app. In the warning, click **OK** / **Done** — **not** "Move to Trash".
+3. Go to **System Settings → Privacy & Security** and scroll down to **Security**.
+4. Next to the message about "SoundTuneKey", click **Open Anyway** and confirm with your password or Touch ID.
+
+The **Open Anyway** button only shows up right after you try to open the app: if it is not there, open the app again and go back to Settings. You only need to do this once.
 
 #### 🖥️ Menu bar
 
