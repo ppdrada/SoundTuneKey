@@ -6,7 +6,7 @@ Controle o áudio de **um aplicativo específico** direto pelo teclado.
 
 Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qualquer outro que esteja tocando som — e use atalhos globais para ajustar o volume, pausar ou trocar de música. O volume do resto do PC não é alterado.
 
-[![Baixar SoundTuneKey.exe](https://img.shields.io/badge/Baixar-SoundTuneKey.exe-1DB954?style=for-the-badge&logo=windows)](https://github.com/ppdrada/SoundTuneKey/releases/latest/download/SoundTuneKey.exe)
+[![Baixar SoundTuneKey.exe](https://img.shields.io/badge/Baixar-SoundTuneKey.exe-1DB954?style=for-the-badge&logo=windows)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe)
 
 ---
 
@@ -34,7 +34,7 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 
 ## 🚀 Como usar
 
-1. Clique em **Baixar SoundTuneKey.exe** acima (ou veja todas as versões em [Releases](https://github.com/ppdrada/SoundTuneKey/releases)).
+1. Clique em **Baixar SoundTuneKey.exe** acima.
 2. Abra o programa.
 3. Selecione na lista o aplicativo que você quer controlar.
 4. Pronto! Use os atalhos acima, inclusive dentro do jogo.
