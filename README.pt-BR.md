@@ -61,7 +61,3 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - **Windows Core Audio (WASAPI)** — controle de volume por aplicativo
 - **Windows Media Controls (SMTC)** — pausar, próxima e anterior
 - **Win32 `RegisterHotKey`** — atalhos globais de teclado
-
----
-
-> 🚧 **Em desenvolvimento.**

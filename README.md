@@ -61,7 +61,3 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - **Windows Core Audio (WASAPI)** — per-app volume control
 - **Windows Media Controls (SMTC)** — play/pause, next and previous
 - **Win32 `RegisterHotKey`** — global keyboard hotkeys
-
----
-
-> 🚧 **Work in progress.**
