@@ -69,7 +69,7 @@ public class MainForm : Form
         _startHidden = startHidden;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(448, 560);
+        ClientSize = new Size(448, 500);
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 

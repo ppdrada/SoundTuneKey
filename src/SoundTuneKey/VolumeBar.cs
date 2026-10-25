@@ -3,13 +3,13 @@ using System.Drawing.Drawing2D;
 namespace SoundTuneKey;
 
 /// <summary>
-/// Barra de volume no estilo do ícone: barrinhas que vão crescendo, claras até o volume atual
-/// e apagadas depois. Clique ou arraste para mudar; setas do teclado também funcionam.
+/// Slider de volume no tema escuro: trilha clara até o volume atual e apagada depois, com uma
+/// bolinha para segurar e arrastar. Clicar na trilha e as setas do teclado também funcionam.
 /// </summary>
 public class VolumeBar : Control
 {
-    private const int Bars = 20;
-    private const int Gap = 4;
+    private const int TrackHeight = 6;
+    private const int ThumbSize = 18;
 
     private int _value;
 
@@ -47,20 +47,27 @@ public class VolumeBar : Control
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        float barWidth = (Width - Gap * (Bars - 1)) / (float)Bars;
-        int lit = (int)Math.Round(_value / 100f * Bars);
+        // a trilha começa e termina meia bolinha para dentro, para a bolinha caber nas pontas
+        float left = ThumbSize / 2f;
+        float width = Width - ThumbSize;
+        float centerY = Height / 2f;
+        float thumbX = left + width * _value / 100f;
 
-        for (int i = 0; i < Bars; i++)
+        var track = new RectangleF(left, centerY - TrackHeight / 2f, width, TrackHeight);
+        using (var rest = new SolidBrush(Enabled ? Theme.Inactive : Theme.Border))
+        using (var restPath = Rounded(track, TrackHeight / 2f))
+            g.FillPath(rest, restPath);
+
+        if (Enabled && thumbX > left)
         {
-            // altura cresce da esquerda para a direita, como no ícone
-            float height = Height * (0.3f + 0.7f * (i + 1) / Bars);
-            var rect = new RectangleF(i * (barWidth + Gap), Height - height, barWidth, height);
-
-            var color = !Enabled ? Theme.Border : i < lit ? Theme.Text : Theme.Inactive;
-            using var brush = new SolidBrush(color);
-            using var path = Rounded(rect, Math.Min(3f, barWidth / 2));
-            g.FillPath(brush, path);
+            var filled = track with { Width = thumbX - left };
+            using var fill = new SolidBrush(Theme.Text);
+            using var fillPath = Rounded(filled, Math.Min(TrackHeight / 2f, filled.Width / 2));
+            g.FillPath(fill, fillPath);
         }
+
+        using var thumb = new SolidBrush(Enabled ? Theme.Text : Theme.Inactive);
+        g.FillEllipse(thumb, thumbX - ThumbSize / 2f, centerY - ThumbSize / 2f, ThumbSize, ThumbSize);
 
         if (Focused)
             ControlPaint.DrawFocusRectangle(g, ClientRectangle, Theme.Text, Theme.Background);
@@ -105,7 +112,11 @@ public class VolumeBar : Control
     protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
     protected override void OnLostFocus(EventArgs e) { base.OnLostFocus(e); Invalidate(); }
 
-    private void SetFromMouse(int x) => SetByUser((int)Math.Round(Math.Clamp(x / (float)Width, 0f, 1f) * 100));
+    private void SetFromMouse(int x)
+    {
+        float fraction = (x - ThumbSize / 2f) / (Width - ThumbSize);
+        SetByUser((int)Math.Round(Math.Clamp(fraction, 0f, 1f) * 100));
+    }
 
     private void SetByUser(int value)
     {
