@@ -13,16 +13,7 @@ public class MainForm : Form
 
     private readonly Button _refresh = new() { Text = "Atualizar lista", Dock = DockStyle.Bottom, Height = 36 };
 
-    private readonly TrackBar _volume = new()
-    {
-        Dock = DockStyle.Fill,
-        Minimum = 0,
-        Maximum = 100,
-        TickFrequency = 10,
-        SmallChange = 5,
-        LargeChange = 10,
-        Enabled = false,
-    };
+    private readonly VolumeBar _volume = new() { Dock = DockStyle.Fill, Enabled = false };
 
     private readonly Label _volumeLabel = new()
     {
@@ -51,6 +42,7 @@ public class MainForm : Form
     ];
 
     private const int VolumeStep = 5; // % por toque no atalho
+    private const int VolumeColumnWidth = 80;
     private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
 
     private DateTime _lastPreviousPress = DateTime.MinValue;
@@ -78,18 +70,33 @@ public class MainForm : Form
         _startHidden = startHidden;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(480, 560);
+        ClientSize = new Size(411, 458); // na tela: 413 x 490 com a barra de título
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
-        _list.Columns.Add("Aplicativo", 340);
-        _list.Columns.Add("Volume", 100);
+        // tamanho fixo e só o X: ele já esconde na bandeja, como o minimizar faria
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        MaximizeBox = false;
+        MinimizeBox = false;
 
-        var volumeRow = new Panel { Dock = DockStyle.Fill };
+        BackColor = Theme.Background;
+        ForeColor = Theme.Text;
+        HandleCreated += (_, _) => Theme.UseDarkTitleBar(this);
+        Theme.Apply(_list);
+        Theme.Apply(_refresh);
+        _startWithWindows.FlatStyle = FlatStyle.Flat;
+        _startWithWindows.FlatAppearance.BorderColor = Theme.Border;
+        _startWithWindows.FlatAppearance.CheckedBackColor = Theme.Raised;
+
+        _list.Columns.Add("Aplicativo", 0);
+        _list.Columns.Add("Volume", VolumeColumnWidth);
+        _list.Resize += (_, _) => FitColumns();
+
+        var volumeRow = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 6, 0, 6) };
         volumeRow.Controls.Add(_volume);
         volumeRow.Controls.Add(_volumeLabel);
 
-        var volumePanel = new Panel { Dock = DockStyle.Bottom, Height = 76, Padding = new Padding(8, 4, 8, 4) };
+        var volumePanel = new Panel { Dock = DockStyle.Bottom, Height = 84, Padding = new Padding(10, 6, 10, 6) };
         volumePanel.Controls.Add(volumeRow);
         volumePanel.Controls.Add(_selectedLabel);
 
@@ -123,7 +130,8 @@ public class MainForm : Form
         SetupTray();
     }
 
-    private static GroupBox BuildShortcutsBox()
+    // Painel em vez de GroupBox: a borda do GroupBox não aceita cores do tema escuro.
+    private static Panel BuildShortcutsBox()
     {
         var table = new TableLayoutPanel
         {
@@ -137,17 +145,25 @@ public class MainForm : Form
         foreach (var (keys, action) in Shortcuts)
         {
             table.Controls.Add(new Label { Text = keys, AutoSize = true, Font = new Font(Control.DefaultFont, FontStyle.Bold) });
-            table.Controls.Add(new Label { Text = action, AutoSize = true });
+            table.Controls.Add(new Label { Text = action, AutoSize = true, ForeColor = Theme.MutedText });
         }
 
-        var box = new GroupBox
+        var title = new Label
         {
             Text = "Atalhos (funcionam com qualquer janela na frente)",
+            Dock = DockStyle.Top,
+            Height = 22,
+            ForeColor = Theme.MutedText,
+        };
+
+        var box = new Panel
+        {
             Dock = DockStyle.Bottom,
-            Height = 28 + Shortcuts.Length * 18,
-            Padding = new Padding(8, 4, 8, 4),
+            Height = 34 + Shortcuts.Length * 18,
+            Padding = new Padding(10, 6, 10, 4),
         };
         box.Controls.Add(table);
+        box.Controls.Add(title);
         return box;
     }
 
@@ -173,6 +189,8 @@ public class MainForm : Form
         menu.Items.Add(startupItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Sair", null, (_, _) => ExitApp());
+        Theme.Apply(menu);
+        Theme.Apply(appsMenu.DropDown);
 
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
         menu.Opening += (_, _) =>
@@ -209,6 +227,14 @@ public class MainForm : Form
     }
 
     private void SelectApp(string processName) => LoadApps(select: processName);
+
+    // A coluna "Aplicativo" ocupa todo o espaço que sobra, para a linha ir até a borda da lista.
+    // ClientSize já desconta a barra de rolagem quando ela aparece, então não surge rolagem horizontal.
+    private void FitColumns()
+    {
+        if (_list.Columns.Count == 2)
+            _list.Columns[0].Width = Math.Max(100, _list.ClientSize.Width - VolumeColumnWidth);
+    }
 
     // Aberto com --tray: prepara tudo mas não mostra a janela. Como Load e Shown só disparam
     // quando a janela aparece, a lista e os atalhos são iniciados aqui.
@@ -386,6 +412,7 @@ public class MainForm : Form
         }
 
         _list.EndUpdate();
+        FitColumns(); // a barra de rolagem pode ter aparecido ou sumido
         _loadingList = false;
         ShowSelected();
     }
