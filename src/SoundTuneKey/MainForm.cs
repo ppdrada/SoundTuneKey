@@ -82,9 +82,8 @@ public class MainForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
-        _list.Columns.Add("Aplicativo", 220);
-        _list.Columns.Add("Volume", 80);
-        _list.Columns.Add("Status", 140);
+        _list.Columns.Add("Aplicativo", 340);
+        _list.Columns.Add("Volume", 100);
 
         var volumeRow = new Panel { Dock = DockStyle.Fill };
         volumeRow.Controls.Add(_volume);
@@ -377,7 +376,6 @@ public class MainForm : Form
         {
             var item = new ListViewItem(app.DisplayName) { Tag = app };
             item.SubItems.Add(FormatVolume(app.Volume));
-            item.SubItems.Add(app.IsPlaying ? "🔊 Tocando" : "Silencioso");
             _list.Items.Add(item);
 
             if (app.ProcessName == selectedName)
