@@ -40,6 +40,16 @@ public class MainForm : Form
         TextAlign = ContentAlignment.MiddleLeft,
     };
 
+    // mostrado na janela e no menu da bandeja, para quem não leu o README
+    private static readonly (string Keys, string Action)[] Shortcuts =
+    [
+        ("Ctrl + Alt + ↑", "Aumenta o volume"),
+        ("Ctrl + Alt + ↓", "Diminui o volume"),
+        ("Ctrl + Alt + P", "Pausar / continuar"),
+        ("Ctrl + Alt + →", "Próxima música"),
+        ("Ctrl + Alt + ←", "Volta ao começo (2x rápido: música anterior)"),
+    ];
+
     private const int VolumeStep = 5; // % por toque no atalho
     private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
 
@@ -68,7 +78,7 @@ public class MainForm : Form
         _startHidden = startHidden;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(480, 420);
+        ClientSize = new Size(480, 560);
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
@@ -87,6 +97,7 @@ public class MainForm : Form
         Controls.Add(_list);
         Controls.Add(volumePanel);
         Controls.Add(_refresh);
+        Controls.Add(BuildShortcutsBox());
         Controls.Add(_startWithWindows);
 
         WindowsStartup.RefreshPath();
@@ -113,6 +124,42 @@ public class MainForm : Form
         SetupTray();
     }
 
+    private static GroupBox BuildShortcutsBox()
+    {
+        var table = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = Shortcuts.Length,
+        };
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+
+        foreach (var (keys, action) in Shortcuts)
+        {
+            table.Controls.Add(new Label { Text = keys, AutoSize = true, Font = new Font(Control.DefaultFont, FontStyle.Bold) });
+            table.Controls.Add(new Label { Text = action, AutoSize = true });
+        }
+
+        var box = new GroupBox
+        {
+            Text = "Atalhos (funcionam com qualquer janela na frente)",
+            Dock = DockStyle.Bottom,
+            Height = 28 + Shortcuts.Length * 18,
+            Padding = new Padding(8, 4, 8, 4),
+        };
+        box.Controls.Add(table);
+        return box;
+    }
+
+    private static void ShowShortcutsDialog()
+    {
+        var lines = Shortcuts.Select(s => $"{s.Keys}    {s.Action}");
+        MessageBox.Show(
+            string.Join("\n", lines) + "\n\nOs atalhos controlam o app escolhido em Aplicativos.",
+            "Sound Tune Key — Atalhos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
     private void SetupTray()
     {
         var appsMenu = new ToolStripMenuItem("Aplicativos");
@@ -123,6 +170,7 @@ public class MainForm : Form
         var menu = new ContextMenuStrip();
         menu.Items.Add("Abrir", null, (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
+        menu.Items.Add("Atalhos", null, (_, _) => ShowShortcutsDialog());
         menu.Items.Add(startupItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Sair", null, (_, _) => ExitApp());
