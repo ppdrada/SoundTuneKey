@@ -6,7 +6,7 @@ Controle o áudio de **um aplicativo específico** direto pelo teclado.
 
 Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qualquer outro que esteja tocando som — e use atalhos globais para ajustar o volume, pausar ou trocar de música. O volume do resto do computador não é alterado.
 
-[![Baixar SoundTuneKey.exe](https://img.shields.io/badge/Baixar-SoundTuneKey.exe-1DB954?style=for-the-badge&logo=windows)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe)
+[![Baixar para Windows](https://img.shields.io/badge/Windows-Baixar_.exe-1DB954?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe) [![Baixar para macOS](https://img.shields.io/badge/macOS-Baixar_.zip-1DB954?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey-mac.zip)
 
 ---
 
@@ -19,8 +19,8 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 
 ### macOS
 
-- macOS 14.2 ou mais novo
-- Ferramentas de linha de comando do Xcode (`xcode-select --install`) para compilar
+- macOS 14.2 ou mais novo, em Macs com chip Apple ou Intel
+- Não precisa instalar nada: é só descompactar e abrir.
 
 ---
 
@@ -58,7 +58,7 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 
 ### Windows
 
-1. Clique em **Baixar SoundTuneKey.exe** acima.
+1. Clique em **Windows · Baixar .exe** acima.
 2. Abra o programa.
 3. Selecione na lista o aplicativo que você quer controlar.
 4. Pronto! Use os atalhos acima, inclusive dentro do jogo.
@@ -81,11 +81,27 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 
 ### macOS
 
-1. Compile o app: `mac/build-app.sh` (ele cria `mac/build/SoundTuneKey.app`).
-2. Abra o `SoundTuneKey.app` e selecione o app que você quer controlar.
-3. Na primeira vez que você mudar um volume, o macOS pede a permissão de **Gravação de áudio do sistema**: aceite. É assim que o Sound Tune Key muda o volume de um app só.
+1. Clique em **macOS · Baixar .zip** acima e abra o `.zip` para descompactar.
+2. Mova o `SoundTuneKey.app` para a pasta **Aplicativos** e abra.
+3. Selecione na lista o aplicativo que você quer controlar.
+4. Na primeira vez que você mudar um volume, o macOS pede a permissão de **Gravação de áudio do sistema**: aceite. É assim que o Sound Tune Key muda o volume de um app só.
 
 O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, todos os apps voltam ao volume normal.
+
+#### ⚠️ Aviso do macOS na primeira vez
+
+O app não é autenticado pela Apple, então na primeira vez o macOS diz que não conseguiu verificá-lo. Clique em **OK**, vá em **Ajustes do Sistema → Privacidade e Segurança**, role até o fim e clique em **Abrir Mesmo Assim**. Isso só é preciso na primeira vez.
+
+#### 🖥️ Barra de menus
+
+Fechar a janela não encerra o programa: ele continua no ícone da barra de menus (perto do Wi-Fi) e os atalhos seguem funcionando. Para mudar o ícone de lugar, segure **⌘** e arraste. Clique no ícone para:
+
+- **Abrir** — mostra a janela de novo
+- **Aplicativos** — troca o app controlado sem abrir a janela
+- **Atalhos** — mostra a lista de atalhos
+- **Sair** — encerra o programa
+
+Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramentas de linha de comando do Xcode: `xcode-select --install`).
 
 ---
 
