@@ -65,7 +65,7 @@ The hotkeys are also listed inside the app, in the window and in the **Atalhos**
 
 The program remembers the last app you picked the next time it opens.
 
-Below the 🔈 volume bar, the window also has the track's **time bar** (current time on the left, length on the right): drag it to jump to another part of the song or video. Under it, the **⏮ ⏯ ⏭** buttons do the same as the hotkeys. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
 
 #### ⚠️ Windows warning on first run
 
@@ -78,7 +78,6 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — switch the controlled app without opening the window
-- **⏮ ⏯ ⏭** — previous, play/pause and next, in one row; the menu stays open so you can click more than once
 - **Atalhos** (Hotkeys) — show the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Sair** (Quit) — quit the program
@@ -104,6 +103,7 @@ The app is not notarized by Apple, so the first time macOS says it could not ver
 
 Closing the window does not quit the program: it stays in the menu bar icon (next to Wi-Fi) and the hotkeys keep working. To move the icon, hold **⌘** and drag it. The program is in Portuguese; click the icon for:
 
+- At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — switch the controlled app without opening the window
 - **Atalhos** (Hotkeys) — show the hotkey list

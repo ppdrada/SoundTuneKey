@@ -70,32 +70,104 @@ public static class MediaIcons
         : [new(x + w, y), new(x, y + h / 2), new(x + w, y + h)];
 }
 
-/// <summary>Botão escuro com um <see cref="MediaGlyph"/> desenhado no centro.</summary>
-public class MediaButton : Button
+/// <summary>
+/// Botão de mídia como no Mac: só o ícone, com mãozinha, um círculo claro que aparece aos
+/// poucos ao passar o mouse e o ícone encolhendo um pouco ao clicar.
+/// </summary>
+public class MediaButton : Control
 {
+    private const float PressedScale = 0.82f;
+    private const float Speed = 0.25f; // quanto da animação anda a cada quadro (~60 por segundo)
+
     private readonly MediaGlyph _glyph;
     private readonly float _glyphSize;
+    private readonly System.Windows.Forms.Timer _animation = new() { Interval = 16 };
+
+    private bool _hovered, _pressed;
+    private float _hover;       // 0 = sem círculo, 1 = círculo inteiro
+    private float _scale = 1f;  // tamanho do ícone
 
     public MediaButton(MediaGlyph glyph, float glyphSize)
     {
         _glyph = glyph;
         _glyphSize = glyphSize;
-        Theme.Apply(this);
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
+                 ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
+        SetStyle(ControlStyles.Selectable, false);
+        Cursor = Cursors.Hand;
+        _animation.Tick += (_, _) => Animate();
     }
 
     protected override void OnPaint(PaintEventArgs e)
     {
-        base.OnPaint(e); // fundo e borda do tema; o texto fica vazio
-        MediaIcons.Draw(e.Graphics, _glyph, ClientRectangle, _glyphSize, Enabled ? Theme.Text : Theme.Inactive);
+        var g = e.Graphics;
+        g.Clear(BackColor);
+
+        if (_hover > 0.01f)
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            float d = Math.Min(Math.Min(Width, Height) - 2, _glyphSize * 2.6f);
+            using var circle = new SolidBrush(Color.FromArgb((int)(_hover * 255), Theme.Selection));
+            g.FillEllipse(circle, (Width - d) / 2f, (Height - d) / 2f, d, d);
+        }
+
+        MediaIcons.Draw(g, _glyph, ClientRectangle, _glyphSize * _scale, Enabled ? Theme.Text : Theme.Inactive);
+    }
+
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hovered = true; _animation.Start(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hovered = _pressed = false; _animation.Start(); }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+        base.OnMouseDown(e);
+        if (e.Button == MouseButtons.Left) { _pressed = true; _animation.Start(); }
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+        base.OnMouseUp(e);
+        _pressed = false;
+        _animation.Start();
+    }
+
+    protected override void OnEnabledChanged(EventArgs e)
+    {
+        base.OnEnabledChanged(e);
+        Cursor = Enabled ? Cursors.Hand : Cursors.Default;
+        Invalidate();
+    }
+
+    private void Animate()
+    {
+        float hoverTarget = _hovered && Enabled ? 1f : 0f;
+        float scaleTarget = _pressed && Enabled ? PressedScale : 1f;
+        _hover += (hoverTarget - _hover) * Speed * 2;
+        _scale += (scaleTarget - _scale) * Speed * 2;
+
+        if (Math.Abs(_hover - hoverTarget) < 0.01f && Math.Abs(_scale - scaleTarget) < 0.005f)
+        {
+            _hover = hoverTarget;
+            _scale = scaleTarget;
+            _animation.Stop();
+        }
+        Invalidate();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            _animation.Dispose();
+        base.Dispose(disposing);
     }
 }
 
-/// <summary>Ícone fixo, sem clique (o alto-falante ao lado da barra de volume).</summary>
+/// <summary>Ícone fixo, sem clique, encostado à esquerda (o alto-falante ao lado da barra de volume).</summary>
 public class GlyphLabel(MediaGlyph glyph, float glyphSize) : Control
 {
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
-        MediaIcons.Draw(e.Graphics, glyph, ClientRectangle, glyphSize, Theme.MutedText);
+        var box = new Rectangle(0, 0, (int)Math.Ceiling(glyphSize) + 2, Height);
+        MediaIcons.Draw(e.Graphics, glyph, box, glyphSize, Theme.MutedText);
     }
 }
