@@ -22,6 +22,8 @@
     <string>14.2</string>
     <key>NSAudioCaptureUsageDescription</key>
     <string>O Sound Tune Key captura o som do app escolhido para mudar o volume só dele.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>O Sound Tune Key controla o Spotify e o Música para pausar, trocar de música e mostrar o tempo da música.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

@@ -29,7 +29,7 @@ docs/               este arquivo e o PRD
 
 - **Botões ⏮ ⏯ ⏭**: chamam o mesmo código dos atalhos (`⏮` = `PreviousPressed`, com o toque duplo). `BuildMediaRow` monta a linha e é usada duas vezes: na janela e, dentro de um `ToolStripControlHost`, no menu da bandeja. Clicar nos botões do menu **não fecha o menu**, de propósito (dá para clicar duas vezes no ⏮).
 - **Barra de tempo**: o SMTC não avisa quando a música anda, então um timer de 500 ms lê `GetTimelineProperties()` **só com a janela visível**. A posição informada vale para `LastUpdatedTime`; se está tocando, soma o tempo passado desde então. Arrastando, só o texto muda; o pulo (`TryChangePlaybackPositionAsync`, em ticks a partir de `StartTime`) acontece ao **soltar o mouse** (ou na hora, pelas setas do teclado). Testado com o Opera GX tocando vídeo.
-- **No Mac (próxima etapa)**: não há API pública para controlar a mídia de um app específico (o `MediaRemote` é privado). Caminhos a avaliar: AppleScript para Spotify/Music (`player position`, `playpause`, `next track`), as teclas de mídia do sistema para os outros apps, ou o `MediaRemote` privado (arriscado). Manter o mesmo visual: barra de tempo mais fina com os tempos nas pontas, alto-falante ao lado do volume, ícones desenhados.
+- **No Mac**: veja "Botões de mídia e barra de tempo no Mac" abaixo.
 
 **Compilar e distribuir:**
 - Debug: `dotnet run --project src/SoundTuneKey` (sem apphost, veja os riscos).
@@ -48,6 +48,9 @@ docs/               este arquivo e o PRD
 | `ContentView.swift` / `VolumeBar.swift` / `Theme.swift` | Janela em SwiftUI no mesmo visual do Windows. |
 | `MenuBarIcon.swift` | Ícone da barra de menus desenhado em código a partir das coordenadas do `icon.svg` (imagem "template"). |
 | `Shortcuts.swift` | Lista de atalhos mostrada na janela e no menu. |
+| `MediaPlayer.swift` | Controles de mídia por AppleScript (`NSAppleScript`, scripts compilados uma vez) para o **Spotify** e o **Música**: estado, posição e duração (o Spotify dá a duração em ms), `playpause`, `next track`, `previous track`, `set player position`. Só fala com o player se ele já estiver aberto (o AppleScript abriria o app). |
+| `MediaIcons.swift` | Ícones ⏮ ⏯ ⏭ e alto-falante desenhados com `Canvas`, nas mesmas formas do `MediaIcons.cs`; `MediaButton` com mãozinha, círculo ao passar o mouse e encolhimento ao clicar; `pointerCursor()` para qualquer item clicável. |
+| `MenuMediaRow.swift` | Primeira linha do menu da barra (um `NSHostingView` dentro do `NSMenuItem`): tempo, ⏮ ⏯ ⏭ e volume, em cores do sistema (o menu segue claro/escuro). Clicar não fecha o menu. |
 | `LoginItem.swift` | "Iniciar com o Mac" pelo `SMAppService.mainApp` (macOS 13+; aparece em Ajustes → Geral → Itens de Início). Aberto pelo login (evento de abertura com `keyAELaunchedAsLogInItem`) ou com `--tray`, o app começa escondido na barra de menus. |
 | `Resources/Info.plist` | Bundle `com.ppdrada.SoundTuneKey`, mínimo 14.2, texto da permissão de áudio (`NSAudioCaptureUsageDescription`). |
 | `build-app.sh` | Compila e monta o `.app` (veja abaixo). |
@@ -58,6 +61,8 @@ docs/               este arquivo e o PRD
 3. Um IOProc copia o som da entrada para a saída multiplicado pelo volume.
 
 Em 100% não existe captura: o app toca direto. A captura é refeita quando mudam os processos do app ou a saída padrão (fone, por exemplo). Se o Sound Tune Key fechar, o macOS desfaz tudo e o app volta ao volume normal. O último app (`lastApp`) e os volumes (`volumes`) ficam no `UserDefaults` e são aplicados de novo quando o app abre.
+
+**Botões de mídia e barra de tempo no Mac:** não há API pública para controlar a mídia de um app específico (o `MediaRemote` é privado e foi fechado para apps de terceiros), então o Sound Tune Key fala por AppleScript com o Spotify e o Música; nos outros apps os botões ficam apagados e o tempo em `--:--`. Como no Windows, o tempo é lido a cada 0,5 s **só enquanto a janela ou o menu estão à mostra** (timer no modo `.common`, para andar com o menu aberto); arrastando, só o texto muda e o pulo acontece ao soltar. O ⏮ tem o toque duplo (1 s). O `Info.plist` tem o `NSAppleEventsUsageDescription`; sem ele o macOS recusa os comandos sem perguntar.
 
 **Compilar e distribuir:**
 - `mac/build-app.sh` gera `mac/build/SoundTuneKey.app`. Só precisa das ferramentas de linha de comando do Xcode.
@@ -79,4 +84,5 @@ Em 100% não existe captura: o app toca direto. A captura é refeita quando muda
 | Teclas de mídia do Mac | Mac | F7/F8/F9 controlam o app que está tocando agora (o macOS decide), não necessariamente o app escolhido. |
 | Volume só vale com o app aberto | Mac | Fechou o Sound Tune Key, os apps voltam a 100% até ele abrir de novo (os volumes ficam salvos). |
 | Iniciar com o Mac guarda o lugar do app | Mac | O `SMAppService` registra o `.app` onde ele está. Se o usuário mover o app depois de ligar a caixinha, é preciso desligar e ligar de novo. Por isso o README pede para mover para Aplicativos antes. |
+| Mídia só no Spotify e no Música | Mac | Os outros players não aceitam AppleScript para isso. Na primeira vez o macOS pede a permissão de **Automação** (controlar o Spotify/Música); se o usuário negar, o erro -1743 vira um aviso na janela para liberar em Privacidade e Segurança → Automação. Testar sempre pelo `SoundTuneKey.app`: rodar o AppleScript num programa de teste pede a permissão em nome do Terminal/Claude. |
 | Captura refeita quando os processos mudam | Mac | O Chrome cria e fecha processos com frequência; cada mudança refaz a captura e pode dar um pequeno corte no som. |
