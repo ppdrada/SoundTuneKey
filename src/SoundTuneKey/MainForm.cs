@@ -40,6 +40,10 @@ public class MainForm : Form
         TextAlign = ContentAlignment.MiddleLeft,
     };
 
+    private const int VolumeStep = 5; // % por toque no atalho
+
+    private readonly GlobalHotkeys _hotkeys = new();
+
     public MainForm()
     {
         Text = "Sound Tune Key";
@@ -67,6 +71,37 @@ public class MainForm : Form
         _list.SelectedIndexChanged += (_, _) => ShowSelected();
         _volume.Scroll += (_, _) => ApplyVolume();
         Load += (_, _) => LoadApps();
+        Shown += (_, _) => RegisterHotkeys();
+        FormClosed += (_, _) => _hotkeys.Dispose();
+    }
+
+    private void RegisterHotkeys()
+    {
+        const HotkeyModifiers ctrlAlt = HotkeyModifiers.Control | HotkeyModifiers.Alt;
+        var failed = new List<string>();
+
+        // sem NoRepeat: segurar a tecla continua mudando o volume
+        if (!_hotkeys.Register(ctrlAlt, Keys.Up, () => ChangeVolume(+VolumeStep)))
+            failed.Add("Ctrl + Alt + ↑");
+        if (!_hotkeys.Register(ctrlAlt, Keys.Down, () => ChangeVolume(-VolumeStep)))
+            failed.Add("Ctrl + Alt + ↓");
+
+        if (failed.Count > 0)
+        {
+            MessageBox.Show(
+                $"Não foi possível usar: {string.Join(", ", failed)}.\n\n" +
+                "Outro programa já usa esse atalho (por exemplo, um script do AutoHotkey). Feche-o e abra o Sound Tune Key de novo.",
+                "Sound Tune Key", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    private void ChangeVolume(int delta)
+    {
+        if (SelectedApp is null)
+            return;
+
+        _volume.Value = Math.Clamp(_volume.Value + delta, _volume.Minimum, _volume.Maximum);
+        ApplyVolume();
     }
 
     private AudioApp? SelectedApp => _list.SelectedItems.Count > 0 ? (AudioApp)_list.SelectedItems[0].Tag! : null;
