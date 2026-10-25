@@ -86,7 +86,9 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 3. Select the app you want to control from the list.
 4. The first time you change a volume, macOS asks for **System Audio Recording** permission: allow it. That is how Sound Tune Key changes the volume of one app only.
 
-The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume.
+The program remembers the last app you picked and the volume of each app. The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume until you open it again.
+
+The **Iniciar com o Mac** (Start with Mac) checkbox at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
 
 #### ⚠️ macOS warning on first run
 
@@ -99,6 +101,7 @@ Closing the window does not quit the program: it stays in the menu bar icon (nex
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — switch the controlled app without opening the window
 - **Atalhos** (Hotkeys) — show the hotkey list
+- **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
 - **Sair** (Quit) — quit the program
 
 To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command Line Tools: `xcode-select --install`).

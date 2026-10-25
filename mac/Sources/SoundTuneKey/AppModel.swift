@@ -6,9 +6,19 @@ import CoreAudio
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var apps: [AudioApp] = []
-    @Published var selectedBundleID: String?
+    @Published var selectedBundleID: String? {
+        didSet { defaults.set(selectedBundleID, forKey: Keys.lastApp) }
+    }
     @Published private(set) var volumes: [String: Float] = [:]
     @Published private(set) var errorMessage: String?
+    @Published private(set) var startsAtLogin = LoginItem.isEnabled
+
+    /// O último app e os volumes ficam salvos, para os atalhos já valerem quando o Mac liga.
+    private let defaults = UserDefaults.standard
+    private enum Keys {
+        static let lastApp = "lastApp"
+        static let volumes = "volumes"
+    }
 
     /// Uma captura por app com volume abaixo de 100%. Em 100% o app toca direto, sem captura.
     private var taps: [String: AppVolumeTap] = [:]
@@ -18,6 +28,8 @@ final class AppModel: ObservableObject {
     private var hotkeys: GlobalHotkeys?
 
     init() {
+        selectedBundleID = defaults.string(forKey: Keys.lastApp)
+        volumes = (defaults.dictionary(forKey: Keys.volumes) as? [String: Double] ?? [:]).mapValues { Float($0) }
         refresh()
         // Reler a lista a cada segundo é mais simples que ouvir cada processo, e barato.
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -54,12 +66,34 @@ final class AppModel: ObservableObject {
     func setVolume(_ volume: Float, for bundleID: String) {
         let volume = min(max(volume, 0), 1)
         volumes[bundleID] = volume
+        defaults.set(volumes.mapValues { Double($0) }, forKey: Keys.volumes)
         failed.remove(bundleID)
         if let tap = taps[bundleID], volume < 1 {
             tap.setVolume(volume)
         } else {
             syncTaps()
         }
+    }
+
+    // MARK: - Iniciar com o Mac
+
+    /// Relê do sistema: o usuário também pode desligar em Ajustes do Sistema.
+    func refreshStartsAtLogin() {
+        startsAtLogin = LoginItem.isEnabled
+    }
+
+    func setStartsAtLogin(_ enabled: Bool) {
+        do {
+            try LoginItem.setEnabled(enabled)
+            errorMessage = nil
+        } catch {
+            errorMessage = "Não foi possível mudar o Iniciar com o Mac: \(error.localizedDescription)"
+        }
+        if enabled && LoginItem.needsApproval {
+            errorMessage = "Libere o Sound Tune Key em Ajustes do Sistema → Geral → Itens de Início."
+            LoginItem.openSettings()
+        }
+        refreshStartsAtLogin()
     }
 
     func refresh() {

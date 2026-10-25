@@ -40,11 +40,22 @@ struct ContentView: View {
             Divider().overlay(Theme.border)
 
             ShortcutsBox()
+
+            Divider().overlay(Theme.border)
+
+            Toggle("Iniciar com o Mac", isOn: Binding(get: { model.startsAtLogin },
+                                                     set: { model.setStartsAtLogin($0) }))
+                .toggleStyle(.checkbox)
+                .font(.system(size: 12))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
         }
         .frame(width: 411, height: 458)
         .background(Theme.background)
         .foregroundStyle(Theme.text)
         .preferredColorScheme(.dark)
+        .onAppear { model.refreshStartsAtLogin() }
     }
 
     private var volumePanel: some View {

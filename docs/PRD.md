@@ -23,8 +23,8 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | — (F7 do Mac) |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
 | Lista de atalhos dentro do app | ✅ | ✅ |
-| Iniciar com o sistema | ✅ | ⏳ próxima etapa |
-| Lembrar o último app | ✅ | ⏳ próxima etapa (junto com os volumes) |
+| Iniciar com o sistema (abre escondido) | ✅ | ✅ |
+| Lembrar o último app | ✅ | ✅ (e o volume de cada app) |
 | Download direto pelo README | ✅ `.exe` único | ✅ `.zip` universal (chip Apple e Intel) |
 
 ## O que não faz (de propósito)
@@ -46,7 +46,7 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 2. ✅ Volume por app + atalhos `⌘⌥↑/↓`
 3. ✅ Caixa de atalhos na janela, README por sistema
 4. ✅ Ícone na barra de menus + download universal
-5. ⏳ Iniciar com o Mac + lembrar o último app e os volumes
+5. ✅ Iniciar com o Mac + lembrar o último app e os volumes
 6. Depois: só o que o usuário pedir.
 
 **Ideias em aberto (não fazer sem perguntar)**
