@@ -41,6 +41,9 @@ public class MainForm : Form
     };
 
     private const int VolumeStep = 5; // % por toque no atalho
+    private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
+
+    private DateTime _lastPreviousPress = DateTime.MinValue;
 
     private readonly GlobalHotkeys _hotkeys = new();
 
@@ -86,6 +89,15 @@ public class MainForm : Form
         if (!_hotkeys.Register(ctrlAlt, Keys.Down, () => ChangeVolume(-VolumeStep)))
             failed.Add("Ctrl + Alt + ↓");
 
+        // com NoRepeat: segurar a tecla não pula várias músicas
+        const HotkeyModifiers ctrlAltOnce = ctrlAlt | HotkeyModifiers.NoRepeat;
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.P, () => SendMedia(MediaCommand.PlayPause)))
+            failed.Add("Ctrl + Alt + P");
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.Right, () => SendMedia(MediaCommand.Next)))
+            failed.Add("Ctrl + Alt + →");
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.Left, PreviousPressed))
+            failed.Add("Ctrl + Alt + ←");
+
         if (failed.Count > 0)
         {
             MessageBox.Show(
@@ -102,6 +114,36 @@ public class MainForm : Form
 
         _volume.Value = Math.Clamp(_volume.Value + delta, _volume.Minimum, _volume.Maximum);
         ApplyVolume();
+    }
+
+    // Um toque: volta para o começo da música. Dois toques em menos de 1 s: música anterior.
+    private void PreviousPressed()
+    {
+        var now = DateTime.UtcNow;
+        bool doublePress = now - _lastPreviousPress < DoublePressWindow;
+
+        // depois de um toque duplo, o próximo toque começa a contagem de novo
+        _lastPreviousPress = doublePress ? DateTime.MinValue : now;
+
+        SendMedia(doublePress ? MediaCommand.Previous : MediaCommand.Restart);
+    }
+
+    private async void SendMedia(MediaCommand command)
+    {
+        var app = SelectedApp;
+        if (app is null)
+            return;
+
+        try
+        {
+            // false = o app não tem controles de mídia (ex.: Discord); nesse caso não faz nada
+            await MediaControls.SendAsync(app.ProcessName, command);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            // um atalho nunca deve derrubar o programa
+            System.Diagnostics.Debug.WriteLine($"Falha no comando de mídia {command}: {ex}");
+        }
     }
 
     private AudioApp? SelectedApp => _list.SelectedItems.Count > 0 ? (AudioApp)_list.SelectedItems[0].Tag! : null;
