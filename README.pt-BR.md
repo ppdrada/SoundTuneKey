@@ -22,7 +22,7 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + ↓` | 🔉 Diminui o volume do app selecionado |
 | `Ctrl + Alt + P` | ⏯️ Pausar / continuar |
 | `Ctrl + Alt + →` | ⏭️ Próxima música |
-| `Ctrl + Alt + ←` | ⏮️ Música anterior |
+| `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 
 > ℹ️ Pausar e trocar de música dependem de o app expor controles de mídia ao Windows (Spotify e abas do Chrome expõem). Apps sem esse suporte, como o Discord, podem ser controlados apenas no volume.
 

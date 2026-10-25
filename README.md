@@ -22,7 +22,7 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + ↓` | 🔉 Volume down for the selected app |
 | `Ctrl + Alt + P` | ⏯️ Play / pause |
 | `Ctrl + Alt + →` | ⏭️ Next track |
-| `Ctrl + Alt + ←` | ⏮️ Previous track |
+| `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 
 > ℹ️ Play/pause and track skipping depend on the app exposing media controls to Windows (Spotify and Chrome tabs do). Apps without that support, such as Discord, can only have their volume controlled.
 
