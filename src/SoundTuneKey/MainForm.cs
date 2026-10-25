@@ -18,6 +18,7 @@ public class MainForm : Form
         Text = "Sound Tune Key";
         ClientSize = new Size(480, 360);
         StartPosition = FormStartPosition.CenterScreen;
+        Icon = AppIcon.Load();
 
         _list.Columns.Add("Aplicativo", 220);
         _list.Columns.Add("Volume", 80);

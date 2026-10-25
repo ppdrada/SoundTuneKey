@@ -13,4 +13,8 @@
     <PackageReference Include="NAudio.Wasapi" Version="3.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\assets\icon\icon.ico" LogicalName="SoundTuneKey.icon.ico" />
+  </ItemGroup>
+
 </Project>
