@@ -69,7 +69,7 @@ public class MainForm : Form
         _startHidden = startHidden;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(480, 560);
+        ClientSize = new Size(448, 560);
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
@@ -86,7 +86,7 @@ public class MainForm : Form
         _startWithWindows.FlatAppearance.BorderColor = Theme.Border;
         _startWithWindows.FlatAppearance.CheckedBackColor = Theme.Raised;
 
-        _list.Columns.Add("Aplicativo", 360);
+        _list.Columns.Add("Aplicativo", 330);
         _list.Columns.Add("Volume", 100);
 
         var volumeRow = new Panel { Dock = DockStyle.Fill, Padding = new Padding(0, 6, 0, 6) };
