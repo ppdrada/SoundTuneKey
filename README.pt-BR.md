@@ -99,7 +99,14 @@ Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo at
 
 #### ⚠️ Aviso do macOS na primeira vez
 
-O app não é autenticado pela Apple, então na primeira vez o macOS diz que não conseguiu verificá-lo. Clique em **OK**, vá em **Ajustes do Sistema → Privacidade e Segurança**, role até o fim e clique em **Abrir Mesmo Assim**. Isso só é preciso na primeira vez.
+O app não é autenticado pela Apple, então na primeira vez o macOS diz que **não pôde verificar se o app está livre de malware**. Para abrir:
+
+1. Mova o `SoundTuneKey.app` para a pasta **Aplicativos** antes (assim não precisa liberar de novo depois de mover).
+2. Abra o app. No aviso, clique em **OK** / **Concluído** — **não** clique em "Mover para o Lixo".
+3. Vá em **Ajustes do Sistema → Privacidade e Segurança** e role até a parte **Segurança**.
+4. Na mensagem sobre o "SoundTuneKey", clique em **Abrir Mesmo Assim** e confirme com a sua senha ou o Touch ID.
+
+O botão **Abrir Mesmo Assim** só aparece logo depois de você tentar abrir o app: se não estiver lá, abra o app de novo e volte nos Ajustes. Isso só é preciso na primeira vez.
 
 #### 🖥️ Barra de menus
 
