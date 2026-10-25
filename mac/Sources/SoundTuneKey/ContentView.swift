@@ -36,6 +36,10 @@ struct ContentView: View {
             Divider().overlay(Theme.border)
 
             volumePanel
+
+            Divider().overlay(Theme.border)
+
+            ShortcutsBox()
         }
         .frame(width: 411, height: 458)
         .background(Theme.background)
@@ -63,10 +67,6 @@ struct ContentView: View {
                     .frame(width: 44, alignment: .trailing)
             }
 
-            Text("⌘⌥↑ / ⌘⌥↓  volume ±5% (funciona com qualquer janela na frente)")
-                .font(.system(size: 11))
-                .foregroundStyle(Theme.mutedText)
-
             if let error = model.errorMessage {
                 Text(error)
                     .font(.system(size: 11))
@@ -77,6 +77,39 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
+    }
+}
+
+/// Lista de atalhos embaixo da janela, como na versão Windows. Pausar e trocar de música
+/// ficam com as teclas de mídia do próprio teclado do Mac.
+private struct ShortcutsBox: View {
+    private static let shortcuts: [(keys: String, action: String)] = [
+        ("⌘ ⌥ ↑", "Aumenta o volume"),
+        ("⌘ ⌥ ↓", "Diminui o volume"),
+        ("F8  ⏯", "Pausar / continuar"),
+        ("F9  ⏭", "Próxima música"),
+        ("F7  ⏮", "Música anterior"),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Atalhos (funcionam com qualquer janela na frente)")
+                .foregroundStyle(Theme.mutedText)
+                .padding(.bottom, 2)
+            ForEach(Self.shortcuts, id: \.keys) { shortcut in
+                HStack(spacing: 0) {
+                    Text(shortcut.keys)
+                        .fontWeight(.semibold)
+                        .frame(width: 90, alignment: .leading)
+                    Text(shortcut.action)
+                        .foregroundStyle(Theme.mutedText)
+                }
+            }
+        }
+        .font(.system(size: 12))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
     }
 }
 
