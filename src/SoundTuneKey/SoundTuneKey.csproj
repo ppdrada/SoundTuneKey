@@ -12,6 +12,24 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>..\..\assets\icon\icon.ico</ApplicationIcon>
+
+    <!-- aparece nas Propriedades do .exe e nos avisos de segurança do Windows -->
+    <Version>0.1.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Product>Sound Tune Key</Product>
+    <AssemblyTitle>Sound Tune Key</AssemblyTitle>
+    <Authors>ppdrada</Authors>
+    <Copyright>© 2026 ppdrada</Copyright>
+  </PropertyGroup>
+
+  <!-- dotnet publish -c Release: um único .exe que roda sem instalar o .NET -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
