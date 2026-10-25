@@ -65,7 +65,7 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 
 O programa lembra o último app escolhido da próxima vez que for aberto.
 
-Abaixo da barra de volume 🔈, a janela também tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita): arraste para ir para outro trecho da música ou do vídeo. Embaixo dela, os botões **⏮ ⏯ ⏭** fazem o mesmo que os atalhos. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
 
 #### ⚠️ Aviso do Windows na primeira vez
 
@@ -75,9 +75,9 @@ O `.exe` ainda não tem assinatura digital, então o Windows pode mostrar **"O W
 
 Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. Clique com o botão direito no ícone para:
 
+- No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — troca o app controlado sem abrir a janela
-- **⏮ ⏯ ⏭** — anterior, pausar/continuar e próxima, numa linha só; o menu fica aberto para clicar mais de uma vez
 - **Atalhos** — mostra a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Sair** — encerra o programa

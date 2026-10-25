@@ -16,7 +16,8 @@ docs/               este arquivo e o PRD
 |---|---|
 | `AudioApps.cs` | Lista as sessões de áudio do dispositivo de saída padrão (NAudio / WASAPI) e junta as do mesmo processo numa linha (o Chrome tem várias). `SetVolume` muda o volume de todas as sessões do processo. |
 | `MediaControls.cs` | Play/pause, próxima, anterior e voltar ao começo pelos controles de mídia do Windows (SMTC), casando a sessão de mídia (`SourceAppUserModelId`) com o nome do processo. `GetTimelineAsync` lê posição e duração; `SeekAsync` pula para um tempo. |
-| `MediaIcons.cs` | Ícones ⏮ ⏯ ⏭ e alto-falante desenhados com `Graphics`; `MediaButton` (botão com ícone) e `GlyphLabel` (ícone sem clique). |
+| `MediaIcons.cs` | Ícones ⏮ ⏯ ⏭ e alto-falante desenhados com `Graphics`; `MediaButton` (só o ícone, mãozinha, círculo ao passar o mouse e encolhimento ao clicar, animados por um timer de 16 ms) e `GlyphLabel` (ícone sem clique). |
+| `PlayerPanel.cs` | Mini player: tempo, ⏮ ⏯ ⏭ e volume. Duas instâncias: na janela e no topo do menu da bandeja. Só mostra e avisa (eventos); o estado fica na `MainForm`, que atualiza as duas. |
 | `GlobalHotkeys.cs` | `RegisterHotKey` numa janela invisível; avisa se outro programa já usa o atalho. |
 | `MainForm.cs` | Janela, lista, barra, bandeja e menu, toque duplo no `←`, abertura escondida com `--tray`. O app escolhido fica no campo `_current`, não na lista. |
 | `VolumeBar.cs` / `Theme.cs` | Barra desenhada (usada no volume e, mais fina, no tempo: `TrackHeight`, `ThumbSize`, `Maximum`, evento `Released` ao soltar o mouse) e tema escuro (título escuro via DWM, ListView e menus desenhados). |
@@ -27,8 +28,8 @@ docs/               este arquivo e o PRD
 
 ### Botões de mídia e barra de tempo
 
-- **Botões ⏮ ⏯ ⏭**: chamam o mesmo código dos atalhos (`⏮` = `PreviousPressed`, com o toque duplo). `BuildMediaRow` monta a linha e é usada duas vezes: na janela e, dentro de um `ToolStripControlHost`, no menu da bandeja. Clicar nos botões do menu **não fecha o menu**, de propósito (dá para clicar duas vezes no ⏮).
-- **Barra de tempo**: o SMTC não avisa quando a música anda, então um timer de 500 ms lê `GetTimelineProperties()` **só com a janela visível**. A posição informada vale para `LastUpdatedTime`; se está tocando, soma o tempo passado desde então. Arrastando, só o texto muda; o pulo (`TryChangePlaybackPositionAsync`, em ticks a partir de `StartTime`) acontece ao **soltar o mouse** (ou na hora, pelas setas do teclado). Testado com o Opera GX tocando vídeo.
+- **Botões ⏮ ⏯ ⏭**: chamam o mesmo código dos atalhos (`⏮` = `PreviousPressed`, com o toque duplo). Ficam no `PlayerPanel`, usado na janela e, dentro de um `ToolStripControlHost`, no topo do menu da bandeja. Clicar no mini player do menu **não fecha o menu**, de propósito (dá para clicar duas vezes no ⏮).
+- **Barra de tempo**: o SMTC não avisa quando a música anda, então um timer de 500 ms lê `GetTimelineProperties()` **só com a janela visível ou o menu da bandeja aberto**. A posição informada vale para `LastUpdatedTime`; se está tocando, soma o tempo passado desde então. Arrastando, só o texto muda; o pulo (`TryChangePlaybackPositionAsync`, em ticks a partir de `StartTime`) acontece ao **soltar o mouse** (ou na hora, pelas setas do teclado). Testado com o Opera GX tocando vídeo.
 - **No Mac**: veja "Botões de mídia e barra de tempo no Mac" abaixo.
 
 **Compilar e distribuir:**
