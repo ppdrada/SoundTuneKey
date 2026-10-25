@@ -49,6 +49,36 @@ public static class AudioApps
         return apps.Values.OrderByDescending(a => a.IsPlaying).ThenBy(a => a.DisplayName).ToList();
     }
 
+    /// <summary>
+    /// Define o volume (0 a 1) de todas as sessões do app. O volume geral do Windows não muda.
+    /// Retorna false se o app não tem mais nenhuma sessão de áudio.
+    /// </summary>
+    public static bool SetVolume(string processName, float volume)
+    {
+        volume = Math.Clamp(volume, 0f, 1f);
+
+        using var enumerator = new MMDeviceEnumerator();
+        using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+        var sessions = device.AudioSessionManager.Sessions;
+
+        bool found = false;
+        for (int i = 0; i < sessions.Count; i++)
+        {
+            var session = sessions[i];
+            if (session.IsSystemSoundsSession)
+                continue;
+
+            var process = TryGetProcess((int)session.GetProcessID);
+            if (process is null || !process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            session.SimpleAudioVolume.Volume = volume;
+            found = true;
+        }
+
+        return found;
+    }
+
     private static Process? TryGetProcess(int pid)
     {
         try { return Process.GetProcessById(pid); }
