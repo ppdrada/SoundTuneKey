@@ -1,10 +1,10 @@
-# 🎧 Sound Tune Key
+# <img src="assets/icon/icon.png" alt="Sound Tune Key logo" width="36"> Sound Tune Key
 
 🇺🇸 **English** | 🇧🇷 [Português](README.pt-BR.md)
 
 Control the audio of **one specific app** straight from your keyboard.
 
-Pick the app you want to control — Spotify, Google Chrome, Discord or anything else that is playing sound — and use global hotkeys to change its volume, pause it or skip tracks. The rest of your PC's volume stays untouched.
+Pick the app you want to control — Spotify, Google Chrome, Discord or anything else that is playing sound — and use global hotkeys to change its volume, pause it or skip tracks. The rest of your computer's volume stays untouched.
 
 [![Download SoundTuneKey.exe](https://img.shields.io/badge/Download-SoundTuneKey.exe-1DB954?style=for-the-badge&logo=windows)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe)
 
@@ -12,12 +12,21 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 
 ## 💻 Requirements
 
+### Windows
+
 - Windows 10 or 11
 - Nothing to install: it is a single `.exe`.
+
+### macOS
+
+- macOS 14.2 or later
+- Xcode Command Line Tools (`xcode-select --install`) to build it
 
 ---
 
 ## ⌨️ Hotkeys
+
+### Windows
 
 | Hotkey | Action |
 |---|---|
@@ -29,10 +38,25 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 
 > ℹ️ Play/pause and track skipping depend on the app exposing media controls to Windows (Spotify and Chrome tabs do). Apps without that support, such as Discord, can only have their volume controlled.
 
-The hotkeys are also listed inside the app, in the window and in the **Atalhos** item of the tray icon.
+The hotkeys are also listed inside the app, in the window and in the **Atalhos** (Hotkeys) item of the tray icon.
 
+### macOS
+
+| Hotkey | Action |
+|---|---|
+| `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
+| `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
+| `F8` | ⏯️ Play / pause |
+| `F9` | ⏭️ Next track |
+| `F7` | ⏮️ Previous track |
+
+> ℹ️ Play/pause and track skipping use the Mac keyboard's own media keys, which control the app that is playing right now. The hotkeys are also listed inside the app, at the bottom of the window.
+
+---
 
 ## 🚀 How to use
+
+### Windows
 
 1. Click **Download SoundTuneKey.exe** above.
 2. Open the program.
@@ -41,37 +65,21 @@ The hotkeys are also listed inside the app, in the window and in the **Atalhos**
 
 The program remembers the last app you picked the next time it opens.
 
-### ⚠️ Windows warning on first run
+#### ⚠️ Windows warning on first run
 
 The `.exe` is not digitally signed yet, so Windows may show **"Windows protected your PC"**. To open it, click **More info** → **Run anyway**. You only need to do this once.
 
-### 🖥️ System tray
+#### 🖥️ System tray
 
-Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. Right-click the icon for:
+Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program is in Portuguese; right-click the icon for:
 
-- **Abrir** — show the window again
-- **Aplicativos** — switch the controlled app without opening the window
-- **Atalhos** — show the hotkey list
-- **Iniciar com o Windows** — start the program automatically, already in the tray, when the PC boots
-- **Sair** — quit the program
+- **Abrir** (Open) — show the window again
+- **Aplicativos** (Apps) — switch the controlled app without opening the window
+- **Atalhos** (Hotkeys) — show the hotkey list
+- **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
+- **Sair** (Quit) — quit the program
 
-## 🍎 macOS
-
-The Mac version lives in the [`mac/`](mac) folder. For now it lists the apps playing sound and changes the volume of the selected app, from the window or with hotkeys.
-
-### Requirements
-
-- macOS 14.2 or later
-- Xcode Command Line Tools (`xcode-select --install`) to build it
-
-### Hotkeys
-
-| Hotkey | Action |
-|---|---|
-| `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
-| `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
-
-### How to use
+### macOS
 
 1. Build the app: `mac/build-app.sh` (it creates `mac/build/SoundTuneKey.app`).
 2. Open `SoundTuneKey.app` and select the app you want to control.
@@ -79,16 +87,18 @@ The Mac version lives in the [`mac/`](mac) folder. For now it lists the apps pla
 
 The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume.
 
+---
+
 ## 🛠️ Built with
 
-**Windows**
+### Windows
 
 - **C# / .NET** — native Windows app
 - **Windows Core Audio (WASAPI)** — per-app volume control
 - **Windows Media Controls (SMTC)** — play/pause, next and previous
 - **Win32 `RegisterHotKey`** — global keyboard hotkeys
 
-**macOS**
+### macOS
 
 - **Swift / SwiftUI** — native Mac app
 - **Core Audio process taps** — per-app volume control
