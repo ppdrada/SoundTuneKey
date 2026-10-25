@@ -51,8 +51,22 @@ public class MainForm : Form
     private bool _exiting;       // true só quando o usuário escolhe "Sair" na bandeja
     private bool _trayTipShown;  // o aviso "continua rodando" aparece uma vez só
 
-    public MainForm()
+    private readonly CheckBox _startWithWindows = new()
     {
+        Text = "Iniciar com o Windows",
+        Dock = DockStyle.Bottom,
+        Height = 28,
+        Padding = new Padding(8, 0, 0, 0),
+    };
+
+    private readonly AppSettings _settings = AppSettings.Load();
+    private bool _startHidden;        // aberto pelo Windows com --tray: começa só na bandeja
+    private bool _hotkeysRegistered;
+
+    public MainForm(bool startHidden = false)
+    {
+        _startHidden = startHidden;
+
         Text = "Sound Tune Key";
         ClientSize = new Size(480, 420);
         StartPosition = FormStartPosition.CenterScreen;
@@ -73,9 +87,14 @@ public class MainForm : Form
         Controls.Add(_list);
         Controls.Add(volumePanel);
         Controls.Add(_refresh);
+        Controls.Add(_startWithWindows);
+
+        WindowsStartup.RefreshPath();
+        _startWithWindows.Checked = WindowsStartup.IsEnabled;
+        _startWithWindows.CheckedChanged += (_, _) => WindowsStartup.SetEnabled(_startWithWindows.Checked);
 
         _refresh.Click += (_, _) => LoadApps();
-        _list.SelectedIndexChanged += (_, _) => ShowSelected();
+        _list.SelectedIndexChanged += (_, _) => OnListSelectionChanged();
         _volume.Scroll += (_, _) => ApplyVolume();
         Load += (_, _) => LoadApps();
         Shown += (_, _) => RegisterHotkeys();
@@ -97,15 +116,23 @@ public class MainForm : Form
     private void SetupTray()
     {
         var appsMenu = new ToolStripMenuItem("Aplicativos");
+        var startupItem = new ToolStripMenuItem("Iniciar com o Windows") { CheckOnClick = true };
+        // o checkbox da janela grava no registro; os dois ficam sempre iguais
+        startupItem.Click += (_, _) => _startWithWindows.Checked = startupItem.Checked;
 
         var menu = new ContextMenuStrip();
         menu.Items.Add("Abrir", null, (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
+        menu.Items.Add(startupItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Sair", null, (_, _) => ExitApp());
 
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
-        menu.Opening += (_, _) => FillAppsMenu(appsMenu);
+        menu.Opening += (_, _) =>
+        {
+            FillAppsMenu(appsMenu);
+            startupItem.Checked = _startWithWindows.Checked;
+        };
 
         _tray.Icon = Icon;
         _tray.ContextMenuStrip = menu;
@@ -134,14 +161,22 @@ public class MainForm : Form
         }
     }
 
-    private void SelectApp(string processName)
+    private void SelectApp(string processName) => LoadApps(select: processName);
+
+    // Aberto com --tray: prepara tudo mas não mostra a janela. Como Load e Shown só disparam
+    // quando a janela aparece, a lista e os atalhos são iniciados aqui.
+    protected override void SetVisibleCore(bool value)
     {
-        LoadApps();
+        if (_startHidden)
+        {
+            _startHidden = false;
+            CreateHandle();
+            LoadApps();
+            RegisterHotkeys();
+            value = false;
+        }
 
-        foreach (ListViewItem item in _list.Items)
-            item.Selected = ((AudioApp)item.Tag!).ProcessName == processName;
-
-        ShowSelected();
+        base.SetVisibleCore(value);
     }
 
     // O X e o minimizar só escondem a janela: os atalhos continuam funcionando.
@@ -183,6 +218,11 @@ public class MainForm : Form
 
     private void RegisterHotkeys()
     {
+        // quando começa escondido, o Shown ainda dispara na primeira vez que a janela é aberta
+        if (_hotkeysRegistered)
+            return;
+        _hotkeysRegistered = true;
+
         const HotkeyModifiers ctrlAlt = HotkeyModifiers.Control | HotkeyModifiers.Alt;
         var failed = new List<string>();
 
@@ -212,7 +252,7 @@ public class MainForm : Form
 
     private void ChangeVolume(int delta)
     {
-        if (SelectedApp is null)
+        if (AppForHotkey() is null)
             return;
 
         _volume.Value = Math.Clamp(_volume.Value + delta, _volume.Minimum, _volume.Maximum);
@@ -233,7 +273,7 @@ public class MainForm : Form
 
     private async void SendMedia(MediaCommand command)
     {
-        var app = SelectedApp;
+        var app = AppForHotkey();
         if (app is null)
             return;
 
@@ -249,15 +289,41 @@ public class MainForm : Form
         }
     }
 
-    private AudioApp? SelectedApp => _list.SelectedItems.Count > 0 ? (AudioApp)_list.SelectedItems[0].Tag! : null;
+    // O app controlado fica guardado aqui, e não só na seleção do ListView: quando o programa
+    // abre escondido (--tray) a lista nunca foi exibida e não mantém a seleção.
+    private AudioApp? _current;
+    private bool _loadingList; // ignora os eventos de seleção enquanto a lista é recriada
 
-    private void LoadApps()
+    private AudioApp? SelectedApp => _current;
+
+    private void OnListSelectionChanged()
     {
-        // mantém o mesmo app selecionado depois de atualizar
-        var selectedName = SelectedApp?.ProcessName;
+        if (_loadingList)
+            return;
 
+        _current = _list.SelectedItems.Count > 0 ? (AudioApp)_list.SelectedItems[0].Tag! : null;
+        ShowSelected();
+    }
+
+    // Se o app salvo ainda não tocava quando o programa abriu (ex.: Spotify aberto depois do
+    // Windows), o atalho atualiza a lista e tenta selecioná-lo de novo.
+    private AudioApp? AppForHotkey()
+    {
+        if (SelectedApp is null && _settings.LastApp is not null)
+            LoadApps();
+
+        return SelectedApp;
+    }
+
+    private void LoadApps(string? select = null)
+    {
+        // mantém o mesmo app selecionado depois de atualizar; na primeira vez, usa o último app salvo
+        var selectedName = select ?? _current?.ProcessName ?? _settings.LastApp;
+
+        _loadingList = true;
         _list.BeginUpdate();
         _list.Items.Clear();
+        _current = null;
 
         foreach (var app in AudioApps.List())
         {
@@ -267,10 +333,14 @@ public class MainForm : Form
             _list.Items.Add(item);
 
             if (app.ProcessName == selectedName)
+            {
                 item.Selected = true;
+                _current = app;
+            }
         }
 
         _list.EndUpdate();
+        _loadingList = false;
         ShowSelected();
     }
 
@@ -285,6 +355,12 @@ public class MainForm : Form
             _volumeLabel.Text = "—";
             _tray.Text = "Sound Tune Key";
             return;
+        }
+
+        if (_settings.LastApp != app.ProcessName)
+        {
+            _settings.LastApp = app.ProcessName;
+            _settings.Save();
         }
 
         _selectedLabel.Text = $"Controlando: {app.DisplayName}";
@@ -307,10 +383,17 @@ public class MainForm : Form
             return;
         }
 
-        var item = _list.SelectedItems[0];
-        item.Tag = app with { Volume = volume };
-        item.SubItems[1].Text = FormatVolume(volume);
+        _current = app with { Volume = volume };
         _volumeLabel.Text = FormatVolume(volume);
+
+        foreach (ListViewItem item in _list.Items)
+        {
+            if (((AudioApp)item.Tag!).ProcessName != app.ProcessName)
+                continue;
+
+            item.Tag = _current;
+            item.SubItems[1].Text = FormatVolume(volume);
+        }
     }
 
     private static string FormatVolume(float volume) => $"{Math.Round(volume * 100)}%";
