@@ -10,6 +10,8 @@
     <UseAppHost Condition="'$(Configuration)' == 'Debug'">false</UseAppHost>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
+    <!-- desenha nítido em cada monitor, mesmo com escalas diferentes (100% num, 125% no outro) -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>..\..\assets\icon\icon.ico</ApplicationIcon>
 

@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 
 namespace SoundTuneKey;
 
@@ -106,12 +106,13 @@ public class MediaButton : Control
         if (_hover > 0.01f)
         {
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            float d = Math.Min(Math.Min(Width, Height) - 2, _glyphSize * 2.6f);
+            float glyphSize = _glyphSize * Theme.Scale(this);
+            float d = Math.Min(Math.Min(Width, Height) - 2, glyphSize * 2.6f);
             using var circle = new SolidBrush(Color.FromArgb((int)(_hover * 255), Theme.Selection));
             g.FillEllipse(circle, (Width - d) / 2f, (Height - d) / 2f, d, d);
         }
 
-        MediaIcons.Draw(g, _glyph, ClientRectangle, _glyphSize * _scale, Enabled ? Theme.Text : Theme.Inactive);
+        MediaIcons.Draw(g, _glyph, ClientRectangle, _glyphSize * Theme.Scale(this) * _scale, Enabled ? Theme.Text : Theme.Inactive);
     }
 
     protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hovered = true; _animation.Start(); }
@@ -167,7 +168,8 @@ public class GlyphLabel(MediaGlyph glyph, float glyphSize) : Control
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
-        var box = new Rectangle(0, 0, (int)Math.Ceiling(glyphSize) + 2, Height);
-        MediaIcons.Draw(e.Graphics, glyph, box, glyphSize, Theme.MutedText);
+        float size = glyphSize * Theme.Scale(this);
+        var box = new Rectangle(0, 0, (int)Math.Ceiling(size) + 2, Height);
+        MediaIcons.Draw(e.Graphics, glyph, box, size, Theme.MutedText);
     }
 }

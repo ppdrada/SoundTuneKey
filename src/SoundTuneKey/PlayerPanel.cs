@@ -29,7 +29,11 @@ public sealed class PlayerPanel : Panel
     private readonly ToolTip _toolTip = new();
     private readonly float _glyphSize;
 
-    public PlayerPanel(Color background, float glyphSize, int buttonHeight)
+    /// <summary>Escala da tela quando o mini player está no menu da bandeja; null na janela.</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    public float? MenuScale { get; set; }
+
+    public PlayerPanel(Color background, float glyphSize, int buttonHeight, Padding padding)
     {
         _glyphSize = glyphSize;
         BackColor = background;
@@ -62,8 +66,9 @@ public sealed class PlayerPanel : Panel
         Controls.Add(volumeRow);
         Controls.Add(buttonRow);
         Controls.Add(timeRow);
-        _contentHeight = timeRow.Height + buttonRow.Height + volumeRow.Height;
-        Height = Padding.Vertical + _contentHeight;
+        // altura em pixels de 100%; em telas ampliadas a janela aumenta tudo junto (AutoScaleMode.Dpi)
+        Padding = padding;
+        Height = padding.Vertical + timeRow.Height + buttonRow.Height + volumeRow.Height;
 
         _timeline.Scroll += (_, _) =>
         {
@@ -73,15 +78,6 @@ public sealed class PlayerPanel : Panel
         };
         _timeline.Released += (_, _) => SeekRequested?.Invoke(TimeSpan.FromSeconds(_timeline.Value));
         _volume.Scroll += (_, _) => VolumeChanged?.Invoke(_volume.Value);
-    }
-
-    private readonly int _contentHeight;
-
-    // o Padding vem depois do construtor (new PlayerPanel(...) { Padding = ... }): a altura acompanha
-    protected override void OnPaddingChanged(EventArgs e)
-    {
-        base.OnPaddingChanged(e);
-        Height = Padding.Vertical + _contentHeight;
     }
 
     /// <summary>Liga os botões e a barra de volume quando há um app escolhido.</summary>

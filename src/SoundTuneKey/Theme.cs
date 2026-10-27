@@ -14,6 +14,31 @@ public static class Theme
     public static readonly Color MutedText = ColorTranslator.FromHtml("#9A9AA0");
     public static readonly Color Inactive = ColorTranslator.FromHtml("#4A4A50");   // barras apagadas do ícone
 
+    /// <summary>Quanto a tela do controle está ampliada (1 = 100%, 1,25 = 125%).</summary>
+    public static float Scale(Control control)
+    {
+        // dentro do menu da bandeja o Windows não informa a escala certa: o mini player guarda a dele
+        for (var parent = control.Parent; parent is not null; parent = parent.Parent)
+            if (parent is PlayerPanel { MenuScale: float menuScale })
+                return menuScale;
+
+        return control.DeviceDpi / 96f;
+    }
+
+    /// <summary>A mesma escala, mas do monitor onde está o ponto (ex.: onde o mouse clicou).</summary>
+    public static float ScaleAt(Point point)
+    {
+        const uint MONITOR_DEFAULTTONEAREST = 2, MDT_EFFECTIVE_DPI = 0;
+        var monitor = MonitorFromPoint(point, MONITOR_DEFAULTTONEAREST);
+        return GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, out uint dpi, out _) == 0 ? dpi / 96f : 1f;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromPoint(Point point, uint flags);
+
+    [DllImport("shcore.dll")]
+    private static extern int GetDpiForMonitor(IntPtr monitor, uint type, out uint dpiX, out uint dpiY);
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
 

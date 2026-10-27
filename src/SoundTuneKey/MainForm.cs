@@ -14,16 +14,12 @@ public class MainForm : Form
     private readonly Button _refresh = new() { Text = "Atualizar lista", Dock = DockStyle.Bottom, Height = 36 };
 
     // o mesmo mini player na janela e no topo do menu da bandeja
-    private readonly PlayerPanel _player = new(Theme.Background, glyphSize: 16f, buttonHeight: 44)
+    private readonly PlayerPanel _player = new(Theme.Background, glyphSize: 16f, buttonHeight: 44, new Padding(10, 0, 10, 14))
     {
         Dock = DockStyle.Bottom,
-        Padding = new Padding(10, 0, 10, 14),
     };
 
-    private readonly PlayerPanel _trayPlayer = new(Theme.Raised, glyphSize: 13f, buttonHeight: 36)
-    {
-        Padding = new Padding(10, 8, 10, 12),
-    };
+    private readonly PlayerPanel _trayPlayer = new(Theme.Raised, glyphSize: 13f, buttonHeight: 36, new Padding(10, 8, 10, 12));
 
     private readonly Label _selectedLabel = new()
     {
@@ -72,6 +68,12 @@ public class MainForm : Form
     {
         _startHidden = startHidden;
 
+        // tudo abaixo é medido em pixels de 100%; o Windows aumenta junto em telas a 125%, 150%...
+        // e de novo quando a janela muda para um monitor com outra escala
+        SuspendLayout();
+        AutoScaleDimensions = new SizeF(96f, 96f);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         Text = "Sound Tune Key";
         ClientSize = new Size(411, 500); // igual ao Mac; mais alta que antes para a lista não encolher
         StartPosition = FormStartPosition.CenterScreen;
@@ -94,6 +96,8 @@ public class MainForm : Form
         _list.Columns.Add("Aplicativo", 0);
         _list.Columns.Add("Volume", VolumeColumnWidth);
         _list.Resize += (_, _) => FitColumns();
+        // a lista amplia as colunas sozinha ao mudar de escala; sem isso sobra uma rolagem horizontal
+        _list.DpiChangedAfterParent += (_, _) => BeginInvoke(FitColumns);
 
         // Dock = Bottom: o último adicionado fica embaixo de tudo
         Controls.Add(_list);
@@ -138,6 +142,7 @@ public class MainForm : Form
         };
 
         SetupTray();
+        ResumeLayout(false);
     }
 
     // O Windows não avisa quando a música anda: o tempo é lido duas vezes por segundo, mas só
@@ -257,7 +262,8 @@ public class MainForm : Form
 
         // No topo, como no mini player do Spotify e no Mac: tempo, ⏮ ⏯ ⏭ e volume.
         // Clicar nele não fecha o menu, então dá para voltar duas vezes ou pular várias.
-        _trayPlayer.Width = 260;
+        _trayPlayer.Width = 260; // em pixels de 100%
+        _trayPlayer.MenuScale = 1f;
         var playerItem = new ToolStripControlHost(_trayPlayer)
         {
             AutoSize = false,
@@ -282,6 +288,17 @@ public class MainForm : Form
         {
             FillAppsMenu(appsMenu);
             startupItem.Checked = _startWithWindows.Checked;
+
+            // o menu não amplia o que está dentro dele como a janela faz: o mini player acompanha a escala da tela
+            float scale = Theme.ScaleAt(Cursor.Position); // o menu abre onde o ícone foi clicado
+            float current = _trayPlayer.MenuScale ?? 1f;
+            if (scale != current)
+            {
+                _trayPlayer.Scale(new SizeF(scale / current, scale / current));
+                _trayPlayer.MenuScale = scale;
+                playerItem.Size = _trayPlayer.Size;
+                _trayPlayer.Font = new Font(DefaultFont.FontFamily, DefaultFont.Size * scale);
+            }
             AppForHotkey(); // pode achar o último app, se ele abriu depois do Sound Tune Key
             _trayMenuOpen = true;
             UpdateTimelineTimer();
@@ -325,8 +342,17 @@ public class MainForm : Form
     // ClientSize já desconta a barra de rolagem quando ela aparece, então não surge rolagem horizontal.
     private void FitColumns()
     {
-        if (_list.Columns.Count == 2)
-            _list.Columns[0].Width = Math.Max(100, _list.ClientSize.Width - VolumeColumnWidth);
+        if (_list.Columns.Count != 2)
+            return;
+
+        int volumeWidth = (int)(VolumeColumnWidth * Theme.Scale(_list));
+        _list.Columns[1].Width = volumeWidth;
+        _list.Columns[0].Width = Math.Max(100, _list.ClientSize.Width - volumeWidth);
+
+        // as colunas cabem certinho, mas depois de mudar de escala a lista vazia guarda a rolagem
+        // horizontal de antes do ajuste; ela nunca é necessária aqui
+        if (_list.IsHandleCreated)
+            ShowScrollBar(_list.Handle, SB_HORZ, false);
     }
 
     // Aberto com --tray: prepara tudo mas não mostra a janela. Como Load e Shown só disparam
@@ -562,6 +588,11 @@ public class MainForm : Form
             item.SubItems[1].Text = FormatVolume(volume);
         }
     }
+
+    private const int SB_HORZ = 0;
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowScrollBar(IntPtr hWnd, int bar, bool show);
 
     private static int Percent(float volume) => (int)Math.Round(volume * 100);
 
