@@ -46,11 +46,11 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 |---|---|
 | `⌘ + ⌥ + ↑` | 🔊 Aumenta o volume do app selecionado (segurar repete) |
 | `⌘ + ⌥ + ↓` | 🔉 Diminui o volume do app selecionado (segurar repete) |
-| `F8` | ⏯️ Pausar / continuar |
-| `F9` | ⏭️ Próxima música |
-| `F7` | ⏮️ Música anterior |
+| `⌃ + ⌥ + P` | ⏯️ Pausar / continuar |
+| `⌃ + ⌥ + →` | ⏭️ Próxima música |
+| `⌃ + ⌥ + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 
-> ℹ️ Pausar e trocar de música usam as teclas de mídia do próprio teclado do Mac, que controlam o app que está tocando agora. Os atalhos também aparecem dentro do programa, embaixo da janela.
+> ℹ️ `⌃` é a tecla Control e `⌥` é a Option. Os atalhos de mídia controlam o app escolhido quando ele é o **Spotify**, o **Música** ou um vídeo no **Google Chrome**; as teclas de mídia do próprio Mac (F7/F8/F9) continuam valendo para o app que estiver tocando. Os atalhos também aparecem dentro do programa, embaixo da janela.
 
 ---
 

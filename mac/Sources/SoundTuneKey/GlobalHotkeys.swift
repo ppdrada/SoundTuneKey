@@ -82,6 +82,10 @@ final class GlobalHotkeys {
 
 extension GlobalHotkeys.Hotkey {
     static let commandOption = UInt32(cmdKey | optionKey)
+    static let controlOption = UInt32(controlKey | optionKey)
     static let upArrow = UInt32(kVK_UpArrow)
     static let downArrow = UInt32(kVK_DownArrow)
+    static let leftArrow = UInt32(kVK_LeftArrow)
+    static let rightArrow = UInt32(kVK_RightArrow)
+    static let pKey = UInt32(kVK_ANSI_P)
 }

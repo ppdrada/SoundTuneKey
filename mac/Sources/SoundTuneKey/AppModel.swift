@@ -57,9 +57,14 @@ final class AppModel: ObservableObject {
         hotkeys = GlobalHotkeys([
             Hotkey(keyCode: Hotkey.upArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: 0.05) },
             Hotkey(keyCode: Hotkey.downArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: -0.05) },
+            // mídia com ⌃⌥ (as mesmas teclas do Ctrl+Alt do Windows): ⌘⌥←/→ troca de aba nos navegadores
+            Hotkey(keyCode: Hotkey.pKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaPlayPause() },
+            Hotkey(keyCode: Hotkey.rightArrow, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaNext() },
+            Hotkey(keyCode: Hotkey.leftArrow, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaPrevious() },
         ])
-        if hotkeys?.failed.isEmpty == false {
-            errorMessage = "Outro programa já usa ⌘⌥↑ ou ⌘⌥↓; o atalho não vai funcionar."
+        if let failed = hotkeys?.failed, !failed.isEmpty {
+            let names = failed.map { Shortcuts.name(of: $0) }.joined(separator: ", ")
+            errorMessage = "Outro programa já usa \(names); esse atalho não vai funcionar."
         }
     }
 

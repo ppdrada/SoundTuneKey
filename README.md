@@ -46,11 +46,11 @@ The hotkeys are also listed inside the app, in the window and in the **Atalhos**
 |---|---|
 | `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
 | `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
-| `F8` | ⏯️ Play / pause |
-| `F9` | ⏭️ Next track |
-| `F7` | ⏮️ Previous track |
+| `⌃ + ⌥ + P` | ⏯️ Play / pause |
+| `⌃ + ⌥ + →` | ⏭️ Next track |
+| `⌃ + ⌥ + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 
-> ℹ️ Play/pause and track skipping use the Mac keyboard's own media keys, which control the app that is playing right now. The hotkeys are also listed inside the app, at the bottom of the window.
+> ℹ️ `⌃` is Control and `⌥` is Option. The media hotkeys control the selected app when it is **Spotify**, **Music** or a video in **Google Chrome**; the Mac's own media keys (F7/F8/F9) keep working for whatever app is playing. The hotkeys are also listed inside the app, at the bottom of the window.
 
 ---
 

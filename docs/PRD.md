@@ -19,8 +19,8 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Lista os apps com som, quem está tocando | ✅ | ✅ |
 | Volume só do app escolhido (barra + atalhos) | ✅ `Ctrl+Alt+↑/↓` | ✅ `⌘⌥↑/↓` |
 | Segurar o atalho de volume repete | ✅ | ✅ |
-| Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | Teclas de mídia do próprio Mac (F7/F8/F9), que controlam o app que está tocando |
-| `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | — (F7 do Mac) |
+| Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | ✅ `⌃⌥P/→/←` (app escolhido: Spotify, Música e vídeos do Chrome); F7/F8/F9 do Mac continuam valendo |
+| `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
@@ -33,7 +33,6 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 
 - **Não mexe no volume geral** do sistema nem no de outros apps.
 - **Não separa abas ou atalhos do Chrome**: o atalho do YouTube Music instalado pelo Chrome é o Chrome para o sistema (veja os riscos em `ARCHITECTURE.md`). Quem quiser separar usa outro navegador para ele.
-- **Sem atalhos de mídia próprios no Mac**: o teclado do Mac já tem as teclas de mídia. Isso foi escolha do usuário.
 - **Sem assinatura de código paga** (certificado no Windows, conta Apple Developer no Mac): o app é grátis, então o usuário libera o aviso de segurança na primeira vez.
 - **Sem instalador**: um `.exe` no Windows, um `.app` dentro de um `.zip` no Mac.
 
@@ -51,7 +50,8 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 5. ✅ Iniciar com o Mac + lembrar o último app e os volumes
 6. ✅ Botões ⏮ ⏯ ⏭ e barra de tempo, na janela e no topo do menu da barra
 7. ✅ Mídia dos vídeos do Chrome (JavaScript pelo AppleScript), com o botão "Como ligar" para a opção do Chrome
-8. Depois: só o que o usuário pedir.
+8. Atalhos de mídia `⌃⌥P/→/←` (escritos no PC Windows: falta compilar e testar no Mac)
+9. Depois: só o que o usuário pedir.
 
 **Ideias em aberto (não fazer sem perguntar)**
 - Aviso na tela (OSD) ao apertar um atalho: perguntado várias vezes no Windows, nunca respondido.
