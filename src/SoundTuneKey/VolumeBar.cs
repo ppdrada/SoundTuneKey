@@ -71,26 +71,27 @@ public class VolumeBar : Control
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
         // a trilha começa e termina meia bolinha para dentro, para a bolinha caber nas pontas
-        float left = ThumbSize / 2f;
-        float width = Width - ThumbSize;
+        float thumbSize = ThumbSize * Theme.Scale(this), trackHeight = TrackHeight * Theme.Scale(this);
+        float left = thumbSize / 2f;
+        float width = Width - thumbSize;
         float centerY = Height / 2f;
         float thumbX = left + width * _value / _maximum;
 
-        var track = new RectangleF(left, centerY - TrackHeight / 2f, width, TrackHeight);
+        var track = new RectangleF(left, centerY - trackHeight / 2f, width, trackHeight);
         using (var rest = new SolidBrush(Enabled ? Theme.Inactive : Theme.Border))
-        using (var restPath = Rounded(track, TrackHeight / 2f))
+        using (var restPath = Rounded(track, trackHeight / 2f))
             g.FillPath(rest, restPath);
 
         if (Enabled && thumbX > left)
         {
             var filled = track with { Width = thumbX - left };
             using var fill = new SolidBrush(Theme.Text);
-            using var fillPath = Rounded(filled, Math.Min(TrackHeight / 2f, filled.Width / 2));
+            using var fillPath = Rounded(filled, Math.Min(trackHeight / 2f, filled.Width / 2));
             g.FillPath(fill, fillPath);
         }
 
         using var thumb = new SolidBrush(Enabled ? Theme.Text : Theme.Inactive);
-        g.FillEllipse(thumb, thumbX - ThumbSize / 2f, centerY - ThumbSize / 2f, ThumbSize, ThumbSize);
+        g.FillEllipse(thumb, thumbX - thumbSize / 2f, centerY - thumbSize / 2f, thumbSize, thumbSize);
 
         if (Focused)
             ControlPaint.DrawFocusRectangle(g, ClientRectangle, Theme.Text, Theme.Background);
@@ -147,7 +148,8 @@ public class VolumeBar : Control
 
     private void SetFromMouse(int x)
     {
-        float fraction = (x - ThumbSize / 2f) / (Width - ThumbSize);
+        float thumbSize = ThumbSize * Theme.Scale(this);
+        float fraction = (x - thumbSize / 2f) / (Width - thumbSize);
         SetByUser((int)Math.Round(Math.Clamp(fraction, 0f, 1f) * _maximum));
     }
 
