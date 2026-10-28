@@ -48,6 +48,14 @@ public static class Theme
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
     private static extern int SetWindowTheme(IntPtr hwnd, string? appName, string? idList);
 
+    /// <summary>Cantos arredondados do Windows 11 numa janela sem borda; no Windows 10 ficam retos.</summary>
+    public static void UseRoundCorners(Form form)
+    {
+        const int DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2;
+        int round = DWMWCP_ROUND;
+        DwmSetWindowAttribute(form.Handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref round, sizeof(int));
+    }
+
     /// <summary>Barra de título escura (Windows 10 20H1+ e Windows 11).</summary>
     public static void UseDarkTitleBar(Form form)
     {

@@ -35,10 +35,11 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + P` | ⏯️ Play / pause |
 | `Ctrl + Alt + →` | ⏭️ Next track |
 | `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
+| `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
 
 > ℹ️ Play/pause and track skipping depend on the app exposing media controls to Windows (Spotify and Chrome tabs do). Apps without that support, such as Discord, can only have their volume controlled.
 
-The hotkeys are also listed inside the app, in the window and in the **Atalhos** (Hotkeys) item of the tray icon.
+The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the bottom of the window, or the **Atalhos** item of the tray icon, to open a small window with the list. **Sobre** (About), next to it, shows the version, the author and the GitHub link.
 
 ### macOS
 
@@ -65,7 +66,7 @@ The hotkeys are also listed inside the app, in the window and in the **Atalhos**
 
 The program remembers the last app you picked the next time it opens.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. Click the 🔈 speaker to mute or unmute; changing the volume also unmutes. Right-click any app in the list for **Mudo** (Mute), checked while that app is muted; it does not change the controlled app. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
 
 #### ⚠️ Windows warning on first run
 
@@ -77,11 +78,13 @@ If Windows blocks it **with no "Run anyway" button**, the PC has **Smart App Con
 
 Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program is in Portuguese; right-click the icon for:
 
-- At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
+- **Sound Tune Key**, at the very top with the app icon — opens **Sobre** (About): version, author, the GitHub link and a button to check for updates
+- Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — switch the controlled app without opening the window
-- **Atalhos** (Hotkeys) — show the hotkey list
+- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
+- **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
+- **Verificar atualizações...** (Check for updates...) — says whether there is a newer version and opens the download
 - **Sair** (Quit) — quit the program
 
 ### macOS
@@ -116,8 +119,8 @@ Closing the window does not quit the program: it stays in the menu bar icon (nex
 
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — switch the controlled app without opening the window
-- **Atalhos** (Hotkeys) — show the hotkey list
+- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
+- **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
 - **Sair** (Quit) — quit the program
 
