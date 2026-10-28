@@ -71,6 +71,8 @@ Under "Controlando" (Controlling), the window has the track **time bar** (curren
 
 The `.exe` is not digitally signed yet, so Windows may show **"Windows protected your PC"**. To open it, click **More info** → **Run anyway**. You only need to do this once.
 
+If Windows blocks it **with no "Run anyway" button**, the PC has **Smart App Control** turned on. It blocks every program without a paid digital signature, and there is no way to allow just one program. The only way to open Sound Tune Key there is to turn it off in **Windows Security → App & browser control → Smart App Control settings → Off**. Windows does not let you turn it back on without reinstalling the system, so decide carefully. Most PCs already have it off.
+
 #### 🖥️ System tray
 
 Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program is in Portuguese; right-click the icon for:

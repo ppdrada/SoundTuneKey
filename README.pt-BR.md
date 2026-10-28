@@ -71,6 +71,8 @@ Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo at
 
 O `.exe` ainda não tem assinatura digital, então o Windows pode mostrar **"O Windows protegeu o computador"**. Para abrir, clique em **Mais informações** → **Executar assim mesmo**. Isso só é preciso na primeira vez.
 
+Se o Windows bloquear **sem o botão "Executar assim mesmo"**, o PC está com o **Controle Inteligente de Aplicativos** ligado. Ele bloqueia todo programa sem assinatura digital paga, e não dá para liberar só um programa. A única forma de abrir o Sound Tune Key nesse PC é desligá-lo em **Segurança do Windows → Controle de aplicativos e do navegador → Configurações do Controle Inteligente de Aplicativos → Desativado**. O Windows não deixa ligar de novo sem reinstalar o sistema, então pense bem antes. Na maioria dos PCs ele já vem desligado.
+
 #### 🖥️ Bandeja do Windows
 
 Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. Clique com o botão direito no ícone para:
