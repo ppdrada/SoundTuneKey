@@ -11,6 +11,7 @@ public sealed class PlayerPanel : Panel
     public event Action? NextClicked;
     public event Action<TimeSpan>? SeekRequested;
     public event Action<int>? VolumeChanged; // 0 a 100
+    public event Action? MuteClicked;
 
     private const int LabelWidth = 46;
 
@@ -26,6 +27,7 @@ public sealed class PlayerPanel : Panel
     private readonly VolumeBar _volume = new() { Dock = DockStyle.Fill, Enabled = false };
     private readonly Label _elapsed, _duration, _volumeText;
     private readonly List<MediaButton> _buttons = [];
+    private readonly MediaButton _speaker;
     private readonly ToolTip _toolTip = new();
     private readonly float _glyphSize;
 
@@ -56,10 +58,15 @@ public sealed class PlayerPanel : Panel
         buttonRow.Controls.Add(Button(MediaGlyph.PlayPause, "Pausar / continuar", () => PlayPauseClicked?.Invoke()));
         buttonRow.Controls.Add(Button(MediaGlyph.Next, "Próxima música", () => NextClicked?.Invoke()));
 
-        // alto-falante: deixa claro que a barra de baixo é o volume, e não o tempo da música
+        // alto-falante: deixa claro que a barra de baixo é o volume, e não o tempo da música;
+        // clicar nele liga e desliga o mudo. Fica à esquerda, alinhado com o tempo de cima.
+        _speaker = Button(MediaGlyph.Speaker, "Mudo / volta o som (Ctrl + Alt + M)", () => MuteClicked?.Invoke());
+        _speaker.Dock = DockStyle.Left;
+        _speaker.Width = 30;
         var volumeRow = new Panel { Dock = DockStyle.Top, Height = 28 };
         volumeRow.Controls.Add(_volume);
-        volumeRow.Controls.Add(new GlyphLabel(MediaGlyph.Speaker, glyphSize) { Dock = DockStyle.Left, Width = LabelWidth });
+        volumeRow.Controls.Add(new Panel { Dock = DockStyle.Left, Width = LabelWidth - 30 });
+        volumeRow.Controls.Add(_speaker);
         volumeRow.Controls.Add(_volumeText);
 
         // Dock = Top: o último adicionado fica em cima
@@ -81,7 +88,7 @@ public sealed class PlayerPanel : Panel
     }
 
     /// <summary>Liga os botões e a barra de volume quando há um app escolhido.</summary>
-    public void SetApp(int? volumePercent)
+    public void SetApp(int? volumePercent, bool muted = false)
     {
         bool hasApp = volumePercent is not null;
         foreach (var button in _buttons)
@@ -90,7 +97,8 @@ public sealed class PlayerPanel : Panel
         _volume.Enabled = hasApp;
         if (volumePercent is int percent)
             _volume.Value = percent;
-        _volumeText.Text = hasApp ? $"{volumePercent}%" : "—";
+        _volumeText.Text = !hasApp ? "—" : muted ? "mudo" : $"{volumePercent}%";
+        _speaker.Glyph = hasApp && muted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker;
     }
 
     /// <summary>null = o app não informa o tempo (ex.: Discord): a barra fica apagada.</summary>

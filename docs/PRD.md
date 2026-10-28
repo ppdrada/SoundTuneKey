@@ -21,9 +21,11 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Segurar o atalho de volume repete | ✅ | ✅ |
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | ✅ `⌃⌥P/→/←` (app escolhido: Spotify, Música e vídeos do Chrome); F7/F8/F9 do Mac continuam valendo |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
+| Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | Ainda não |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
+| "Verificar atualizações..." e "Sobre" (versão, autor, GitHub) no menu, com janelinha de cantos arredondados | ✅ | Ainda não |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
 | Lembrar o último app | ✅ | ✅ (e o volume de cada app) |
@@ -73,7 +75,7 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 | Apagado | `#4A4A50` |
 
 - **Janela de tamanho fixo** (411 × 500 de área útil nos dois), só com o botão de fechar. De cima para baixo:
-  - Windows: lista de apps (nome, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume, "Atualizar lista", caixa de atalhos, "Iniciar com o Windows". Mesma ordem do Mac e do mini player da bandeja.
+  - Windows: lista de apps (nome, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume, "Atualizar lista", rodapé com "Iniciar com o Windows", "Atalhos" e "Sobre". "Atalhos" e "Sobre" abrem janelinhas sem barra de título e com cantos arredondados (no rodapé e no menu da bandeja). Mesma ordem do Mac e do mini player da bandeja.
   - Mac: lista de apps (nome, tocando/parado, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume, caixa de atalhos, "Iniciar com o Mac". O volume fica **embaixo** dos botões (pedido do usuário), na mesma ordem da linha do menu da barra. A lista se atualiza sozinha, sem botão.
 - **Itens clicáveis** (nos dois): mãozinha do mouse em cima; os botões ⏮ ⏯ ⏭ são só o ícone, mostram um círculo claro ao passar o mouse e encolhem um pouco ao clicar (animados).
 - **Barra de volume** desenhada: trilha clara até o volume, apagada depois, bolinha para arrastar. Alto-falante à esquerda e a porcentagem à direita.

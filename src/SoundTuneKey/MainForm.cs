@@ -2,7 +2,7 @@
 
 public class MainForm : Form
 {
-    private readonly ListView _list = new()
+    private readonly AppList _list = new()
     {
         Dock = DockStyle.Fill,
         View = View.Details,
@@ -30,16 +30,6 @@ public class MainForm : Form
         TextAlign = ContentAlignment.MiddleLeft,
     };
 
-    // mostrado na janela e no menu da bandeja, para quem não leu o README
-    private static readonly (string Keys, string Action)[] Shortcuts =
-    [
-        ("Ctrl + Alt + ↑", "Aumenta o volume"),
-        ("Ctrl + Alt + ↓", "Diminui o volume"),
-        ("Ctrl + Alt + P", "Pausar / continuar"),
-        ("Ctrl + Alt + →", "Próxima música"),
-        ("Ctrl + Alt + ←", "Volta ao começo (2x rápido: música anterior)"),
-    ];
-
     private const int VolumeStep = 5; // % por toque no atalho
     private const int VolumeColumnWidth = 80;
     private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
@@ -55,8 +45,7 @@ public class MainForm : Form
     private readonly CheckBox _startWithWindows = new()
     {
         Text = "Iniciar com o Windows",
-        Dock = DockStyle.Bottom,
-        Height = 28,
+        Dock = DockStyle.Fill,
         Padding = new Padding(8, 0, 0, 0),
     };
 
@@ -75,7 +64,8 @@ public class MainForm : Form
         AutoScaleMode = AutoScaleMode.Dpi;
 
         Text = "Sound Tune Key";
-        ClientSize = new Size(411, 500); // igual ao Mac; mais alta que antes para a lista não encolher
+        // a lista fica do mesmo tamanho de antes; com os atalhos abertos a janela volta aos 500 de altura
+        ClientSize = new Size(411, 340); // os atalhos ficam numa janelinha à parte (ShortcutsWindow)
         StartPosition = FormStartPosition.CenterScreen;
         Icon = AppIcon.Load();
 
@@ -104,8 +94,7 @@ public class MainForm : Form
         Controls.Add(_selectedLabel);
         Controls.Add(_player);
         Controls.Add(_refresh);
-        Controls.Add(BuildShortcutsBox());
-        Controls.Add(_startWithWindows);
+        Controls.Add(BuildFooter());
 
         WindowsStartup.RefreshPath();
         _startWithWindows.Checked = WindowsStartup.IsEnabled;
@@ -113,6 +102,7 @@ public class MainForm : Form
 
         _refresh.Click += (_, _) => LoadApps();
         _list.SelectedIndexChanged += (_, _) => OnListSelectionChanged();
+        SetupListMenu();
         foreach (var player in new[] { _player, _trayPlayer })
         {
             player.PreviousClicked += PreviousPressed;
@@ -120,6 +110,7 @@ public class MainForm : Form
             player.NextClicked += () => SendMedia(MediaCommand.Next);
             player.SeekRequested += Seek;
             player.VolumeChanged += SetVolume;
+            player.MuteClicked += ToggleMute;
         }
 
         // mãozinha em tudo que é clicável, como no Mac
@@ -208,49 +199,42 @@ public class MainForm : Form
         }
     }
 
-    // Painel em vez de GroupBox: a borda do GroupBox não aceita cores do tema escuro.
-    private static Panel BuildShortcutsBox()
+    // Rodapé: "Iniciar com o Windows" à esquerda; "Atalhos" e "Sobre" à direita.
+    private Panel BuildFooter()
     {
-        var table = new TableLayoutPanel
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 2,
-            RowCount = Shortcuts.Length,
-        };
-        table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
-        table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-
-        foreach (var (keys, action) in Shortcuts)
-        {
-            table.Controls.Add(new Label { Text = keys, AutoSize = true, Font = new Font(Control.DefaultFont, FontStyle.Bold) });
-            table.Controls.Add(new Label { Text = action, AutoSize = true, ForeColor = Theme.MutedText });
-        }
-
-        var title = new Label
-        {
-            Text = "Atalhos (funcionam com qualquer janela na frente)",
-            Dock = DockStyle.Top,
-            Height = 22,
-            ForeColor = Theme.MutedText,
-        };
-
-        var box = new Panel
-        {
-            Dock = DockStyle.Bottom,
-            Height = 34 + Shortcuts.Length * 18,
-            Padding = new Padding(10, 6, 10, 4),
-        };
-        box.Controls.Add(table);
-        box.Controls.Add(title);
-        return box;
+        var footer = new Panel { Dock = DockStyle.Bottom, Height = 28, Padding = new Padding(0, 0, 8, 0) };
+        footer.Controls.Add(_startWithWindows);
+        footer.Controls.Add(FooterLink("Atalhos", ShowShortcutsWindow));
+        footer.Controls.Add(FooterLink("Sobre", () => ShowAboutWindow(checkNow: false)));
+        return footer;
     }
 
-    private static void ShowShortcutsDialog()
+    private static LinkLabel FooterLink(string text, Action action)
     {
-        var lines = Shortcuts.Select(s => $"{s.Keys}    {s.Action}");
-        MessageBox.Show(
-            string.Join("\n", lines) + "\n\nOs atalhos controlam o app escolhido em Aplicativos.",
-            "Sound Tune Key — Atalhos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        var link = new LinkLabel
+        {
+            Text = text,
+            Dock = DockStyle.Right,
+            AutoSize = true,
+            Padding = new Padding(8, 6, 0, 0),
+            LinkBehavior = LinkBehavior.HoverUnderline,
+            LinkColor = Theme.MutedText,
+            ActiveLinkColor = Theme.Text,
+        };
+        link.LinkClicked += (_, _) => action();
+        return link;
+    }
+
+    private ShortcutsWindow? _shortcutsWindow; // uma janela só, mesmo clicando várias vezes
+
+    private void ShowShortcutsWindow()
+    {
+        if (_shortcutsWindow is null || _shortcutsWindow.IsDisposed)
+        {
+            _shortcutsWindow = new ShortcutsWindow();
+            _shortcutsWindow.Show();
+        }
+        _shortcutsWindow.Activate();
     }
 
     private void SetupTray()
@@ -271,13 +255,19 @@ public class MainForm : Form
             Margin = Padding.Empty,
         };
 
+        // no topo, como no Discord: o nome com o ícone, que abre o "Sobre"
+        var aboutItem = new ToolStripMenuItem("Sound Tune Key", new Icon(Icon!, 16, 16).ToBitmap(), (_, _) => ShowAboutWindow(checkNow: false));
+
         var menu = new ContextMenuStrip();
+        menu.Items.Add(aboutItem);
+        menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(playerItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Abrir", null, (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
-        menu.Items.Add("Atalhos", null, (_, _) => ShowShortcutsDialog());
+        menu.Items.Add("Atalhos", null, (_, _) => ShowShortcutsWindow());
         menu.Items.Add(startupItem);
+        menu.Items.Add("Verificar atualizações...", null, (_, _) => ShowAboutWindow(checkNow: true));
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Sair", null, (_, _) => ExitApp());
         Theme.Apply(menu);
@@ -330,13 +320,62 @@ public class MainForm : Form
         foreach (var app in apps)
         {
             var label = app.IsPlaying ? $"{app.DisplayName}  🔊" : app.DisplayName;
+            if (app.IsMuted)
+                label += "  (mudo)";
             var item = new ToolStripMenuItem(label) { Checked = app.ProcessName == selectedName };
-            item.Click += (_, _) => SelectApp(app.ProcessName);
+            // clicar no nome escolhe o app, como antes; o submenu só tem o mudo
+            item.Click += (_, _) =>
+            {
+                SelectApp(app.ProcessName);
+                _tray.ContextMenuStrip?.Close(); // item com submenu não fecha o menu sozinho
+            };
+            item.DropDownItems.Add(MuteItem(app));
+            Theme.Apply(item.DropDown);
             appsMenu.DropDownItems.Add(item);
         }
     }
 
+    // "Mudo", marcado quando o app está mudo: no submenu da bandeja e no botão direito da lista
+    private ToolStripMenuItem MuteItem(AudioApp app)
+    {
+        var mute = new ToolStripMenuItem("Mudo") { Checked = app.IsMuted };
+        mute.Click += (_, _) => SetMute(app, !app.IsMuted);
+        return mute;
+    }
+
+    private void SetupListMenu()
+    {
+        var menu = new ContextMenuStrip();
+        Theme.Apply(menu);
+        // monta na hora, com o app que está embaixo do mouse; fora de um app, não abre
+        menu.Opening += (_, e) =>
+        {
+            menu.Items.Clear();
+            var item = _list.GetItemAt(_list.PointToClient(Cursor.Position).X, _list.PointToClient(Cursor.Position).Y);
+            if (item is null)
+            {
+                e.Cancel = true;
+                return;
+            }
+            menu.Items.Add(MuteItem((AudioApp)item.Tag!));
+            e.Cancel = false; // menu vazio já chega aqui marcado para não abrir
+        };
+        _list.ContextMenuStrip = menu;
+    }
+
     private void SelectApp(string processName) => LoadApps(select: processName);
+
+    private UpdateWindow? _aboutWindow; // uma janela só, mesmo clicando várias vezes
+
+    private void ShowAboutWindow(bool checkNow)
+    {
+        if (_aboutWindow is null || _aboutWindow.IsDisposed)
+        {
+            _aboutWindow = new UpdateWindow(checkNow);
+            _aboutWindow.Show();
+        }
+        _aboutWindow.Activate();
+    }
 
     // A coluna "Aplicativo" ocupa todo o espaço que sobra, para a linha ir até a borda da lista.
     // ClientSize já desconta a barra de rolagem quando ela aparece, então não surge rolagem horizontal.
@@ -432,6 +471,8 @@ public class MainForm : Form
             failed.Add("Ctrl + Alt + →");
         if (!_hotkeys.Register(ctrlAltOnce, Keys.Left, PreviousPressed))
             failed.Add("Ctrl + Alt + ←");
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.M, ToggleMute))
+            failed.Add("Ctrl + Alt + M");
 
         if (failed.Count > 0)
         {
@@ -520,7 +561,7 @@ public class MainForm : Form
         foreach (var app in AudioApps.List())
         {
             var item = new ListViewItem(app.DisplayName) { Tag = app };
-            item.SubItems.Add(FormatVolume(app.Volume));
+            item.SubItems.Add(FormatVolume(app));
             _list.Items.Add(item);
 
             if (app.ProcessName == selectedName)
@@ -539,8 +580,8 @@ public class MainForm : Form
     private void ShowSelected()
     {
         var app = SelectedApp;
-        _player.SetApp(app is null ? null : Percent(app.Volume));
-        _trayPlayer.SetApp(app is null ? null : Percent(app.Volume));
+        _player.SetApp(app is null ? null : Percent(app.Volume), app?.IsMuted ?? false);
+        _trayPlayer.SetApp(app is null ? null : Percent(app.Volume), app?.IsMuted ?? false);
         RefreshTimeline();
 
         if (app is null)
@@ -568,24 +609,53 @@ public class MainForm : Form
             return;
 
         float volume = percent / 100f;
-        if (!AudioApps.SetVolume(app.ProcessName, volume))
+        // mexer no volume tira o mudo, como no Windows e no celular
+        if (!AudioApps.SetVolume(app.ProcessName, volume) ||
+            (app.IsMuted && !AudioApps.SetMute(app.ProcessName, false)))
         {
             // o app fechou ou parou de usar áudio
             LoadApps();
             return;
         }
 
-        _current = app with { Volume = volume };
-        _player.SetApp(percent);
-        _trayPlayer.SetApp(percent);
+        ShowAppChange(app with { Volume = volume, IsMuted = false });
+    }
+
+    // Ctrl+Alt+M ou clique no alto-falante; o volume fica guardado e volta ao tirar o mudo
+    private void ToggleMute()
+    {
+        if (AppForHotkey() is { } app)
+            SetMute(app, !app.IsMuted);
+    }
+
+    // também vem do botão direito na lista e do submenu de cada app na bandeja (qualquer app)
+    private void SetMute(AudioApp app, bool muted)
+    {
+        if (!AudioApps.SetMute(app.ProcessName, muted))
+        {
+            LoadApps();
+            return;
+        }
+
+        ShowAppChange(app with { IsMuted = muted });
+    }
+
+    private void ShowAppChange(AudioApp app)
+    {
+        if (app.ProcessName == _current?.ProcessName)
+        {
+            _current = app;
+            _player.SetApp(Percent(app.Volume), app.IsMuted);
+            _trayPlayer.SetApp(Percent(app.Volume), app.IsMuted);
+        }
 
         foreach (ListViewItem item in _list.Items)
         {
             if (((AudioApp)item.Tag!).ProcessName != app.ProcessName)
                 continue;
 
-            item.Tag = _current;
-            item.SubItems[1].Text = FormatVolume(volume);
+            item.Tag = app;
+            item.SubItems[1].Text = FormatVolume(app);
         }
     }
 
@@ -596,7 +666,7 @@ public class MainForm : Form
 
     private static int Percent(float volume) => (int)Math.Round(volume * 100);
 
-    private static string FormatVolume(float volume) => $"{Percent(volume)}%";
+    private static string FormatVolume(AudioApp app) => app.IsMuted ? "mudo" : $"{Percent(app.Volume)}%";
 
     // o Windows limita o texto do ícone da bandeja a 127 caracteres
     private static string TrayText(string text) => text.Length <= 127 ? text : text[..126] + "…";

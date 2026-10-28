@@ -35,10 +35,11 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + P` | ⏯️ Pausar / continuar |
 | `Ctrl + Alt + →` | ⏭️ Próxima música |
 | `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
+| `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 
 > ℹ️ Pausar e trocar de música dependem de o app expor controles de mídia ao Windows (Spotify e abas do Chrome expõem). Apps sem esse suporte, como o Discord, podem ser controlados apenas no volume.
 
-Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** do ícone da bandeja.
+Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo da janela, ou no item **Atalhos** do ícone da bandeja, e abre uma janelinha com a lista. Ao lado, **Sobre** mostra a versão, o autor e o link do GitHub.
 
 ### macOS
 
@@ -65,7 +66,7 @@ Os atalhos também aparecem dentro do programa, na janela e no item **Atalhos** 
 
 O programa lembra o último app escolhido da próxima vez que for aberto.
 
-Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. Clique no alto-falante 🔈 para deixar mudo ou voltar o som; mexer no volume também tira o mudo. Com o botão direito em qualquer app da lista aparece **Mudo**, marcado quando aquele app está mudo; isso não troca o app controlado. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
 
 #### ⚠️ Aviso do Windows na primeira vez
 
@@ -77,11 +78,13 @@ Se o Windows bloquear **sem o botão "Executar assim mesmo"**, o PC está com o 
 
 Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. Clique com o botão direito no ícone para:
 
-- No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
+- **Sound Tune Key**, bem no topo com o ícone do app — abre o **Sobre**: versão, autor, o link do GitHub e um botão para verificar atualizações
+- Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — troca o app controlado sem abrir a janela
-- **Atalhos** — mostra a lista de atalhos
+- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem com "(mudo)"
+- **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
+- **Verificar atualizações...** — diz se tem versão nova e abre o download
 - **Sair** — encerra o programa
 
 ### macOS
@@ -116,8 +119,8 @@ Fechar a janela não encerra o programa: ele continua no ícone da barra de menu
 
 - No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — troca o app controlado sem abrir a janela
-- **Atalhos** — mostra a lista de atalhos
+- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem com "(mudo)"
+- **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
 - **Sair** — encerra o programa
 

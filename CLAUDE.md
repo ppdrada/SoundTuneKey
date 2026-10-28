@@ -28,7 +28,7 @@ Controla o volume (e a mídia) de **um app escolhido** por atalhos globais, sem 
 - Sem assinatura de código paga (escolha dele: grátis). O README explica como liberar o aviso de segurança.
 - Ao mudar o app, gerar de novo o binário de `download/` na mesma etapa:
   - Mac: `mac/build-app.sh zip`
-  - Windows (no PC Windows): `dotnet publish src/SoundTuneKey -c Release -o publish` e copiar o `.exe`.
+  - Windows (no PC Windows): `dotnet publish src/SoundTuneKey -c Release -o publish` e copiar o `.exe`. Ao publicar versão nova, subir juntos o `<Version>` do `.csproj` e o `download/version-windows.txt` (é ele que o "Verificar atualizações..." lê).
 
 ## README
 

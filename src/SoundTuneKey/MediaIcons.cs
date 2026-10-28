@@ -2,7 +2,7 @@
 
 namespace SoundTuneKey;
 
-public enum MediaGlyph { Previous, PlayPause, Next, Speaker }
+public enum MediaGlyph { Previous, PlayPause, Next, Speaker, SpeakerMuted }
 
 /// <summary>
 /// Ícones desenhados em vez de caracteres como ⏮: as fontes deixam esses símbolos pequenos,
@@ -45,7 +45,8 @@ public static class MediaIcons
                 break;
 
             case MediaGlyph.Speaker:
-                // caixa + cone, e duas ondas de som
+            case MediaGlyph.SpeakerMuted:
+                // caixa + cone; ao lado, duas ondas de som ou um X (mudo)
                 g.FillRectangle(brush, x, y + s * 0.34f, s * 0.2f, s * 0.32f);
                 g.FillPolygon(brush,
                 [
@@ -56,8 +57,16 @@ public static class MediaIcons
                 ]);
                 using (var pen = new Pen(color, Math.Max(1.5f, s * 0.09f)) { StartCap = LineCap.Round, EndCap = LineCap.Round })
                 {
-                    g.DrawArc(pen, x + s * 0.36f, y + s * 0.30f, s * 0.36f, s * 0.40f, -50, 100);
-                    g.DrawArc(pen, x + s * 0.30f, y + s * 0.12f, s * 0.66f, s * 0.76f, -50, 100);
+                    if (glyph == MediaGlyph.SpeakerMuted)
+                    {
+                        g.DrawLine(pen, x + s * 0.62f, y + s * 0.34f, x + s * 0.94f, y + s * 0.66f);
+                        g.DrawLine(pen, x + s * 0.94f, y + s * 0.34f, x + s * 0.62f, y + s * 0.66f);
+                    }
+                    else
+                    {
+                        g.DrawArc(pen, x + s * 0.36f, y + s * 0.30f, s * 0.36f, s * 0.40f, -50, 100);
+                        g.DrawArc(pen, x + s * 0.30f, y + s * 0.12f, s * 0.66f, s * 0.76f, -50, 100);
+                    }
                 }
                 break;
         }
@@ -79,7 +88,7 @@ public class MediaButton : Control
     private const float PressedScale = 0.82f;
     private const float Speed = 0.25f; // quanto da animação anda a cada quadro (~60 por segundo)
 
-    private readonly MediaGlyph _glyph;
+    private MediaGlyph _glyph;
     private readonly float _glyphSize;
     private readonly System.Windows.Forms.Timer _animation = new() { Interval = 16 };
 
@@ -96,6 +105,14 @@ public class MediaButton : Control
         SetStyle(ControlStyles.Selectable, false);
         Cursor = Cursors.Hand;
         _animation.Tick += (_, _) => Animate();
+    }
+
+    /// <summary>O ícone pode mudar (alto-falante normal ou mudo).</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    public MediaGlyph Glyph
+    {
+        get => _glyph;
+        set { _glyph = value; Invalidate(); }
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -159,17 +176,5 @@ public class MediaButton : Control
         if (disposing)
             _animation.Dispose();
         base.Dispose(disposing);
-    }
-}
-
-/// <summary>Ícone fixo, sem clique, encostado à esquerda (o alto-falante ao lado da barra de volume).</summary>
-public class GlyphLabel(MediaGlyph glyph, float glyphSize) : Control
-{
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        base.OnPaint(e);
-        float size = glyphSize * Theme.Scale(this);
-        var box = new Rectangle(0, 0, (int)Math.Ceiling(size) + 2, Height);
-        MediaIcons.Draw(e.Graphics, glyph, box, size, Theme.MutedText);
     }
 }

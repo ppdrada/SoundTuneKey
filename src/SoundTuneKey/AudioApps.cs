@@ -1,10 +1,11 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using NAudio.CoreAudioApi;
 
 namespace SoundTuneKey;
 
 /// <summary>Um app que tem pelo menos uma sessão de áudio no Windows.</summary>
-public record AudioApp(string ProcessName, string DisplayName, float Volume, bool IsPlaying);
+/// IsMuted: o mudo do próprio Windows para o app (o volume fica guardado e volta ao tirar o mudo).
+public record AudioApp(string ProcessName, string DisplayName, float Volume, bool IsPlaying, bool IsMuted);
 
 public static class AudioApps
 {
@@ -31,6 +32,7 @@ public static class AudioApps
 
             bool playing = session.State == NAudio.CoreAudioApi.Interfaces.AudioSessionState.AudioSessionStateActive;
             float volume = session.SimpleAudioVolume.Volume;
+            bool muted = session.SimpleAudioVolume.Mute;
 
             if (apps.TryGetValue(process.ProcessName, out var existing))
             {
@@ -38,11 +40,12 @@ public static class AudioApps
                 {
                     IsPlaying = existing.IsPlaying || playing,
                     Volume = Math.Max(existing.Volume, volume),
+                    IsMuted = existing.IsMuted && muted, // mudo só se todas as sessões estão mudas
                 };
             }
             else
             {
-                apps[process.ProcessName] = new AudioApp(process.ProcessName, FriendlyName(process), volume, playing);
+                apps[process.ProcessName] = new AudioApp(process.ProcessName, FriendlyName(process), volume, playing, muted);
             }
         }
 
@@ -56,7 +59,15 @@ public static class AudioApps
     public static bool SetVolume(string processName, float volume)
     {
         volume = Math.Clamp(volume, 0f, 1f);
+        return ForEachSession(processName, session => session.SimpleAudioVolume.Volume = volume);
+    }
 
+    /// <summary>Liga ou desliga o mudo de todas as sessões do app. Retorna false se o app não tem mais áudio.</summary>
+    public static bool SetMute(string processName, bool muted) =>
+        ForEachSession(processName, session => session.SimpleAudioVolume.Mute = muted);
+
+    private static bool ForEachSession(string processName, Action<AudioSessionControl> action)
+    {
         using var enumerator = new MMDeviceEnumerator();
         using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
         var sessions = device.AudioSessionManager.Sessions;
@@ -72,7 +83,7 @@ public static class AudioApps
             if (process is null || !process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            session.SimpleAudioVolume.Volume = volume;
+            action(session);
             found = true;
         }
 
