@@ -24,7 +24,7 @@ public sealed class PlayerPanel : Panel
         Maximum = 1,
     };
 
-    private readonly VolumeBar _volume = new() { Dock = DockStyle.Fill, Enabled = false };
+    private readonly VolumeBar _volume;
     private readonly Label _elapsed, _duration, _volumeText;
     private readonly List<MediaButton> _buttons = [];
     private readonly MediaButton _speaker;
@@ -36,8 +36,10 @@ public sealed class PlayerPanel : Panel
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public float? MenuScale { get; set; }
 
-    public PlayerPanel(Color background, float glyphSize, int buttonHeight, Padding padding)
+    /// <param name="volumeThumb">tamanho da bolinha da barra de volume (menor no menu da bandeja)</param>
+    public PlayerPanel(Color background, float glyphSize, int buttonHeight, Padding padding, int volumeThumb = 18)
     {
+        _volume = new() { Dock = DockStyle.Fill, Enabled = false, ThumbSize = volumeThumb, KeyStep = 1 }; // setas: 1% por vez, como o atalho
         _glyphSize = glyphSize;
         BackColor = background;
         _timeline.BackColor = _volume.BackColor = background;
@@ -78,12 +80,15 @@ public sealed class PlayerPanel : Panel
         volumeRow.Controls.Add(_volumeText);
 
         // Dock = Top: o último adicionado fica em cima
+        // um respiro entre os botões e a barra de volume
+        var gap = new Panel { Dock = DockStyle.Top, Height = 8 };
         Controls.Add(volumeRow);
+        Controls.Add(gap);
         Controls.Add(buttonRow);
         Controls.Add(timeRow);
         // altura em pixels de 100%; em telas ampliadas a janela aumenta tudo junto (AutoScaleMode.Dpi)
         Padding = padding;
-        Height = padding.Vertical + timeRow.Height + buttonRow.Height + volumeRow.Height;
+        Height = padding.Vertical + timeRow.Height + buttonRow.Height + gap.Height + volumeRow.Height;
 
         _timeline.Scroll += (_, _) =>
         {
@@ -105,8 +110,13 @@ public sealed class PlayerPanel : Panel
         _volume.Enabled = hasApp;
         if (volumePercent is int percent)
             _volume.Value = percent;
-        _volumeText.Text = !hasApp ? "—" : muted ? "mudo" : $"{volumePercent}%";
+        _volumeText.Text = hasApp ? $"{volumePercent}%" : "—";
         _speaker.Glyph = hasApp && muted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker;
+
+        // mudo: só o alto-falante fica vermelho; a barra fica apagada (o volume guardado continua aparecendo)
+        bool mutedNow = hasApp && muted;
+        _volume.Accent = mutedNow ? Theme.MutedBar : Theme.Text;
+        _speaker.Tint = mutedNow ? Theme.Mute : Theme.Text;
     }
 
     /// <summary>null = o app não informa o tempo (ex.: Discord): a barra fica apagada.</summary>

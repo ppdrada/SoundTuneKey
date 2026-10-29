@@ -122,6 +122,15 @@ public class MediaButton : Control
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public bool Filled { get; set; }
 
+    /// <summary>Cor do ícone (o alto-falante fica vermelho quando o app está mudo).</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    public Color Tint
+    {
+        get => _tint;
+        set { _tint = value; Invalidate(); }
+    }
+    private Color _tint = Theme.Text;
+
     /// <summary>O ícone pode mudar (alto-falante normal ou mudo; ▶ ou ‖).</summary>
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public MediaGlyph Glyph
@@ -156,7 +165,7 @@ public class MediaButton : Control
             g.FillEllipse(circle, (Width - d) / 2f, (Height - d) / 2f, d, d);
         }
 
-        MediaIcons.Draw(g, _glyph, ClientRectangle, _glyphSize * Theme.Scale(this) * _scale, Enabled ? Theme.Text : Theme.Inactive);
+        MediaIcons.Draw(g, _glyph, ClientRectangle, _glyphSize * Theme.Scale(this) * _scale, Enabled ? Tint : Theme.Inactive);
     }
 
     protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hovered = true; _animation.Start(); }

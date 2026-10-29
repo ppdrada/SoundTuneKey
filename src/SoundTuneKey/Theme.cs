@@ -12,6 +12,8 @@ public static class Theme
     public static readonly Color Selection = ColorTranslator.FromHtml("#3A3A40");
     public static readonly Color Text = ColorTranslator.FromHtml("#F2F2F2");       // barras claras do ícone
     public static readonly Color MutedText = ColorTranslator.FromHtml("#9A9AA0");
+    public static readonly Color Mute = ColorTranslator.FromHtml("#E5534B");      // app mudo: alto-falante e nome na lista em vermelho
+    public static readonly Color MutedBar = ColorTranslator.FromHtml("#6A6A70");  // barra de volume apagada enquanto o app está mudo
     public static readonly Color Inactive = ColorTranslator.FromHtml("#4A4A50");   // barras apagadas do ícone
 
     /// <summary>Quanto a tela do controle está ampliada (1 = 100%, 1,25 = 125%).</summary>
@@ -69,7 +71,7 @@ public static class Theme
         using var font = new Font(IconFont, 11f, GraphicsUnit.Pixel);
         using var brush = new SolidBrush(MutedText);
         using var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-        g.DrawString(glyph.ToString(), font, brush, new RectangleF(0, 0, 16, 16), center);
+        g.DrawString(glyph.ToString(), font, brush, new RectangleF(0, 2, 16, 16), center); // a fonte de ícones desenha o símbolo um pouco alto
         return bmp;
     }
 
@@ -125,7 +127,7 @@ public static class Theme
             e.Graphics.FillRectangle(back, e.Bounds);
 
             var textBounds = Rectangle.Inflate(e.Bounds, -6, 0);
-            TextRenderer.DrawText(e.Graphics, e.SubItem!.Text, list.Font, textBounds, Text,
+            TextRenderer.DrawText(e.Graphics, e.SubItem!.Text, list.Font, textBounds, (e.Item.Tag as AudioApp)?.IsMuted == true ? Mute : Text,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
         };
     }
@@ -174,31 +176,45 @@ public static class Theme
     // Texto, setinha do submenu e ✓ claros; o renderer padrão desenha esses detalhes em preto.
     private sealed class DarkMenuRenderer() : ToolStripProfessionalRenderer(new DarkMenuColors())
     {
-        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
-        {
-            e.TextColor = e.Item.Enabled ? Text : MutedText;
-            base.OnRenderItemText(e);
-        }
+        // O menu desenha a imagem antes do texto, e o texto fica um pouco acima do meio da linha.
+        // Para ícone e bolinha ficarem na altura do texto, a imagem só guarda a posição aqui e é
+        // desenhada depois, em OnRenderItemText, centrada no texto.
+        private readonly Dictionary<ToolStripItem, (Rectangle Rect, Image? Image)> _pendingImages = [];
 
         protected override void OnRenderItemImage(ToolStripItemImageRenderEventArgs e)
         {
-            if (e.Item is ToolStripMenuItem { Tag: DotTag } item)
+            if (e.Item is ToolStripMenuItem && (e.Image is not null || e.Item.Tag is DotTag))
             {
-                float s = Scale(e.ToolStrip!), d = RoundCheck.Dot * s;
-                var r = e.ImageRectangle;
-                RoundCheck.DrawDot(e.Graphics, new RectangleF(r.X + MenuIconInset * s + (r.Width - d) / 2, r.Y + (r.Height - d) / 2, d, d), item.Checked, s);
-                return;
-            }
-
-            if (e.Image is not null && e.Item is ToolStripMenuItem)
-            {
-                var r = e.ImageRectangle;
-                r.Y = (e.Item.Height - r.Height) / 2; // centrado na linha, como o texto
-                r.Offset((int)(MenuIconInset * Scale(e.ToolStrip!)), 0);
-                e.Graphics.DrawImage(e.Image, r);
+                _pendingImages[e.Item] = (e.ImageRectangle, e.Image);
                 return;
             }
             base.OnRenderItemImage(e);
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.TextColor = !e.Item.Enabled ? MutedText : e.Item.ForeColor == Mute ? Mute : Text;
+            // o menu põe o texto um pouco acima do meio, e o destaque parecia ter mais espaço embaixo
+            var textRect = e.TextRectangle;
+            textRect.Y = (e.Item.Height - textRect.Height) / 2;
+            e.TextRectangle = textRect;
+            base.OnRenderItemText(e);
+
+            if (!_pendingImages.Remove(e.Item, out var pending))
+                return;
+
+            float s = Scale(e.ToolStrip!), centerY = e.TextRectangle.Top + e.TextRectangle.Height / 2f;
+            float x = pending.Rect.X + MenuIconInset * s;
+            if (e.Item is ToolStripMenuItem { Tag: DotTag } item)
+            {
+                float d = RoundCheck.Dot * s;
+                RoundCheck.DrawDot(e.Graphics, new RectangleF(x + (pending.Rect.Width - d) / 2, centerY - d / 2, d, d), item.Checked, s);
+            }
+            else if (pending.Image is not null)
+            {
+                var r = pending.Rect;
+                e.Graphics.DrawImage(pending.Image, new RectangleF(x, centerY - r.Height / 2f, r.Width, r.Height));
+            }
         }
 
         // destaque do item sob o mouse: uma pílula com cantos arredondados, afastada das bordas

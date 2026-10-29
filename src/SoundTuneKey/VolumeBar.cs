@@ -1,4 +1,4 @@
-﻿using System.Drawing.Drawing2D;
+using System.Drawing.Drawing2D;
 
 namespace SoundTuneKey;
 
@@ -32,6 +32,15 @@ public class VolumeBar : Control
             Invalidate();
         }
     }
+
+    /// <summary>Cor da parte cheia e da bolinha (vermelha quando o app está mudo).</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    public Color Accent
+    {
+        get => _accent;
+        set { _accent = value; Invalidate(); }
+    }
+    private Color _accent = Theme.Text;
 
     /// <summary>True enquanto o botão do mouse está segurando a barra.</summary>
     public bool IsDragging { get; private set; }
@@ -85,12 +94,12 @@ public class VolumeBar : Control
         if (Enabled && thumbX > left)
         {
             var filled = track with { Width = thumbX - left };
-            using var fill = new SolidBrush(Theme.Text);
+            using var fill = new SolidBrush(Accent);
             using var fillPath = Rounded(filled, Math.Min(trackHeight / 2f, filled.Width / 2));
             g.FillPath(fill, fillPath);
         }
 
-        using var thumb = new SolidBrush(Enabled ? Theme.Text : Theme.Inactive);
+        using var thumb = new SolidBrush(Enabled ? Accent : Theme.Inactive);
         g.FillEllipse(thumb, thumbX - thumbSize / 2f, centerY - thumbSize / 2f, thumbSize, thumbSize);
 
         if (Focused)

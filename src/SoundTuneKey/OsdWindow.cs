@@ -104,30 +104,30 @@ public class OsdWindow : Form
         using var title = new Font("Segoe UI", 9.5f * scale); // a mesma fonte de antes, só um pouco maior
         using var big = new Font("Segoe UI", 9f * scale, FontStyle.Bold);
         float titleHeight = title.GetHeight(g);
-        using (var gray = new SolidBrush(Theme.MutedText))
+        using (var gray = new SolidBrush(muted ? Theme.Mute : Theme.MutedText)) // mudo: o nome fica vermelho, como na lista
             g.DrawString(appName, title, gray, new RectangleF(side, titleCenter - titleHeight / 2, size.Width - side * 2, titleHeight),
                 new StringFormat { Alignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap });
 
         MediaIcons.Draw(g, muted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker,
-            Rectangle.Round(new RectangleF(side, rowCenter - S(10), iconBox, S(20))), S(13), Theme.Text);
+            Rectangle.Round(new RectangleF(side, rowCenter - S(10), iconBox, S(20))), S(13), muted ? Theme.Mute : Theme.Text);
 
         float barHeight = S(6);
         var track = new RectangleF(reserve, rowCenter - barHeight / 2, size.Width - reserve * 2, barHeight);
         using (var rest = new SolidBrush(Theme.Inactive))
         using (var restPath = Rounded(track, track.Height / 2))
             g.FillPath(rest, restPath);
-        if (!muted && volumePercent > 0)
+        if (volumePercent > 0)
         {
             var filled = track with { Width = track.Width * volumePercent / 100f };
-            using var fill = new SolidBrush(Theme.Text);
+            using var fill = new SolidBrush(muted ? Theme.MutedBar : Theme.Text);
             using var fillPath = Rounded(filled, Math.Min(track.Height / 2, filled.Width / 2));
             g.FillPath(fill, fillPath);
         }
 
         // desenhado num ponto (sem retângulo), encostado na margem direita: o texto nunca é cortado
-        string label = muted ? "Mudo" : $"{volumePercent}%";
+        string label = $"{volumePercent}%";
         var labelSize = g.MeasureString(label, big, PointF.Empty, StringFormat.GenericTypographic);
-        using (var text = new SolidBrush(Theme.Text))
+        using (var text = new SolidBrush(muted ? Theme.MutedText : Theme.Text)) // mudo: o número fica apagado, como a barra
             g.DrawString(label, big, text, size.Width - side - labelSize.Width, rowCenter - labelSize.Height / 2, StringFormat.GenericTypographic);
 
         return bmp;

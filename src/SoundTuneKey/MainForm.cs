@@ -19,7 +19,7 @@ public class MainForm : Form
         Dock = DockStyle.Bottom,
     };
 
-    private readonly PlayerPanel _trayPlayer = new(Theme.Raised, glyphSize: 13f, buttonHeight: 36, new Padding(10, 8, 10, 12));
+    private readonly PlayerPanel _trayPlayer = new(Theme.Raised, glyphSize: 13f, buttonHeight: 36, new Padding(10, 8, 10, 12), volumeThumb: 14);
 
     private readonly Label _selectedLabel = new()
     {
@@ -29,7 +29,7 @@ public class MainForm : Form
         TextAlign = ContentAlignment.MiddleLeft,
     };
 
-    private const int VolumeStep = 5; // % por toque no atalho
+    private const int VolumeStep = 1; // % por toque no atalho (segurar a tecla repete)
     private const int VolumeColumnWidth = 80;
     private static readonly TimeSpan DoublePressWindow = TimeSpan.FromSeconds(1);
 
@@ -349,9 +349,9 @@ public class MainForm : Form
         foreach (var app in apps)
         {
             var label = app.IsPlaying ? $"{app.DisplayName}  🔊" : app.DisplayName;
-            if (app.IsMuted)
-                label += "  (mudo)";
             var item = new ToolStripMenuItem(label) { Checked = app.ProcessName == selectedName };
+            if (app.IsMuted)
+                item.ForeColor = Theme.Mute; // app mudo aparece em vermelho
             // clicar no nome escolhe o app, como antes; o submenu só tem o mudo
             item.Click += (_, _) =>
             {
@@ -709,6 +709,7 @@ public class MainForm : Form
 
             item.Tag = app;
             item.SubItems[1].Text = FormatVolume(app);
+            _list.RedrawItems(item.Index, item.Index, false); // redesenha a linha na hora: o nome muda de cor no mudo
         }
     }
 
@@ -719,7 +720,7 @@ public class MainForm : Form
 
     private static int Percent(float volume) => (int)Math.Round(volume * 100);
 
-    private static string FormatVolume(AudioApp app) => app.IsMuted ? "mudo" : $"{Percent(app.Volume)}%";
+    private static string FormatVolume(AudioApp app) => $"{Percent(app.Volume)}%"; // mudo: o vermelho já mostra
 
     // o Windows limita o texto do ícone da bandeja a 127 caracteres
     private static string TrayText(string text) => text.Length <= 127 ? text : text[..126] + "…";

@@ -38,7 +38,7 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
 | `Ctrl + Alt + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
 
-When you use the volume or mute hotkeys, a small notice shows the app, the volume and "Mudo" (Mute) at the bottom of the screen for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
+When you use the volume or mute hotkeys, a small notice shows the app and the volume at the bottom of the screen (when muted, the app name and the speaker turn red) for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
 
 > ℹ️ Play/pause and track skipping depend on the app exposing media controls to Windows (Spotify and Chrome tabs do). Apps without that support, such as Discord, can only have their volume controlled.
 
@@ -69,7 +69,7 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 
 The program remembers the last app you picked the next time it opens.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. Click the 🔈 speaker to mute or unmute; changing the volume also unmutes. Right-click any app in the list for **Mudo** (Mute), checked while that app is muted; it does not change the controlled app. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. Click the 🔈 speaker to mute or unmute (muted: red speaker, dimmed bar, app name in red in the list); changing the volume also unmutes. The hotkeys change the volume 1% at a time (hold to repeat). Right-click any app in the list for **Mudo** (Mute), checked while that app is muted; it does not change the controlled app. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
 
 #### ⚠️ Windows warning on first run
 
@@ -84,7 +84,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - **Sound Tune Key**, at the very top with the app icon — opens **Sobre** (About): version, author, the GitHub link and a button to check for updates
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
+- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Mostrar aviso na tela** (Show on-screen notice) — turn the volume/mute notice on or off
