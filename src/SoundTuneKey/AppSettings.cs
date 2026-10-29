@@ -8,6 +8,9 @@ public class AppSettings
     /// <summary>Nome do processo do último app escolhido (ex.: "Spotify").</summary>
     public string? LastApp { get; set; }
 
+    /// <summary>Aviso na tela ao usar os atalhos de volume e mudo (dá para desligar no menu da bandeja).</summary>
+    public bool ShowOsd { get; set; } = true;
+
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SoundTuneKey", "settings.json");
 

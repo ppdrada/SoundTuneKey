@@ -23,8 +23,7 @@ public class MainForm : Form
 
     private readonly Label _selectedLabel = new()
     {
-        Dock = DockStyle.Bottom,
-        Height = 34,
+        Dock = DockStyle.Fill,
         Padding = new Padding(8, 0, 0, 0),
         Text = "Selecione um app na lista",
         TextAlign = ContentAlignment.MiddleLeft,
@@ -42,11 +41,20 @@ public class MainForm : Form
     private bool _exiting;       // true só quando o usuário escolhe "Sair" na bandeja
     private bool _trayTipShown;  // o aviso "continua rodando" aparece uma vez só
 
-    private readonly CheckBox _startWithWindows = new()
+    private readonly RoundCheck _startWithWindows = new()
     {
         Text = "Iniciar com o Windows",
-        Dock = DockStyle.Fill,
-        Padding = new Padding(8, 0, 0, 0),
+        Dock = DockStyle.Left,
+        AutoSize = true,
+        Padding = new Padding(10, 0, 0, 0),
+    };
+
+    private readonly ToggleSwitch _showOsd = new()
+    {
+        Text = "Aviso na tela",
+        Dock = DockStyle.Right,
+        AutoSize = true,
+        Padding = new Padding(0, 0, 10, 0),
     };
 
     private readonly AppSettings _settings = AppSettings.Load();
@@ -79,9 +87,12 @@ public class MainForm : Form
         HandleCreated += (_, _) => Theme.UseDarkTitleBar(this);
         Theme.Apply(_list);
         Theme.Apply(_refresh);
-        _startWithWindows.FlatStyle = FlatStyle.Flat;
-        _startWithWindows.FlatAppearance.BorderColor = Theme.Border;
-        _startWithWindows.FlatAppearance.CheckedBackColor = Theme.Raised;
+        _showOsd.Checked = _settings.ShowOsd;
+        _showOsd.CheckedChanged += (_, _) =>
+        {
+            _settings.ShowOsd = _showOsd.Checked;
+            _settings.Save();
+        };
 
         _list.Columns.Add("Aplicativo", 0);
         _list.Columns.Add("Volume", VolumeColumnWidth);
@@ -91,7 +102,11 @@ public class MainForm : Form
 
         // Dock = Bottom: o último adicionado fica embaixo de tudo
         Controls.Add(_list);
-        Controls.Add(_selectedLabel);
+        // linha do "Controlando: <app>", com a caixinha do aviso na tela à direita
+        var selectedRow = new Panel { Dock = DockStyle.Bottom, Height = 34 };
+        selectedRow.Controls.Add(_selectedLabel);
+        selectedRow.Controls.Add(_showOsd);
+        Controls.Add(selectedRow);
         Controls.Add(_player);
         Controls.Add(_refresh);
         Controls.Add(BuildFooter());
@@ -114,7 +129,7 @@ public class MainForm : Form
         }
 
         // mãozinha em tudo que é clicável, como no Mac
-        _list.Cursor = _refresh.Cursor = _startWithWindows.Cursor = Cursors.Hand;
+        _list.Cursor = _refresh.Cursor = Cursors.Hand;
 
         _timelineTimer.Tick += (_, _) => RefreshTimeline();
         VisibleChanged += (_, _) => UpdateTimelineTimer();
@@ -129,6 +144,7 @@ public class MainForm : Form
         FormClosed += (_, _) =>
         {
             _hotkeys.Dispose();
+            _osd.Dispose();
             _tray.Dispose();
         };
 
@@ -202,7 +218,7 @@ public class MainForm : Form
     // Rodapé: "Iniciar com o Windows" à esquerda; "Atalhos" e "Sobre" à direita.
     private Panel BuildFooter()
     {
-        var footer = new Panel { Dock = DockStyle.Bottom, Height = 28, Padding = new Padding(0, 0, 8, 0) };
+        var footer = new Panel { Dock = DockStyle.Bottom, Height = 32, Padding = new Padding(0, 0, 10, 2) }; // margem para não encostar na borda
         footer.Controls.Add(_startWithWindows);
         footer.Controls.Add(FooterLink("Atalhos", ShowShortcutsWindow));
         footer.Controls.Add(FooterLink("Sobre", () => ShowAboutWindow(checkNow: false)));
@@ -241,6 +257,11 @@ public class MainForm : Form
     {
         var appsMenu = new ToolStripMenuItem("Aplicativos");
         var startupItem = new ToolStripMenuItem("Iniciar com o Windows") { CheckOnClick = true };
+        var osdItem = new ToolStripMenuItem("Mostrar aviso na tela") { CheckOnClick = true };
+        Theme.UseDot(startupItem);
+        Theme.UseDot(osdItem);
+        // a caixinha da janela salva a escolha; as duas ficam sempre iguais
+        osdItem.Click += (_, _) => _showOsd.Checked = osdItem.Checked;
         // o checkbox da janela grava no registro; os dois ficam sempre iguais
         startupItem.Click += (_, _) => _startWithWindows.Checked = startupItem.Checked;
 
@@ -263,14 +284,22 @@ public class MainForm : Form
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(playerItem);
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Abrir", null, (_, _) => ShowFromTray());
+        // em grupos, como no Windows 11: abrir/escolher, opções de liga/desliga, atualizar/sair
+        appsMenu.Image = Theme.MenuIcon('\uE8FD');
+        menu.Items.Add("Abrir", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
-        menu.Items.Add("Atalhos", null, (_, _) => ShowShortcutsWindow());
-        menu.Items.Add(startupItem);
-        menu.Items.Add("Verificar atualizações...", null, (_, _) => ShowAboutWindow(checkNow: true));
+        menu.Items.Add("Atalhos", Theme.MenuIcon('\uE765'), (_, _) => ShowShortcutsWindow());
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Sair", null, (_, _) => ExitApp());
+        menu.Items.Add(startupItem);
+        menu.Items.Add(osdItem);
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add("Verificar atualizações...", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
+        menu.Items.Add("Sair", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
         Theme.Apply(menu);
+        // o menu ignora a própria margem interna: o espaço em cima e embaixo vai no primeiro e no último item
+        aboutItem.Padding = aboutItem.Padding with { Top = aboutItem.Padding.Top + 4 };
+        var lastItem = menu.Items[^1];
+        lastItem.Padding = lastItem.Padding with { Bottom = lastItem.Padding.Bottom + 4 };
         Theme.Apply(appsMenu.DropDown);
 
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
@@ -278,6 +307,7 @@ public class MainForm : Form
         {
             FillAppsMenu(appsMenu);
             startupItem.Checked = _startWithWindows.Checked;
+            osdItem.Checked = _settings.ShowOsd;
 
             // o menu não amplia o que está dentro dele como a janela faz: o mini player acompanha a escala da tela
             float scale = Theme.ScaleAt(Cursor.Position); // o menu abre onde o ícone foi clicado
@@ -471,7 +501,7 @@ public class MainForm : Form
             failed.Add("Ctrl + Alt + →");
         if (!_hotkeys.Register(ctrlAltOnce, Keys.Left, PreviousPressed))
             failed.Add("Ctrl + Alt + ←");
-        if (!_hotkeys.Register(ctrlAltOnce, Keys.M, ToggleMute))
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.M, () => { ToggleMute(); ShowOsd(); }))
             failed.Add("Ctrl + Alt + M");
 
         if (failed.Count > 0)
@@ -490,6 +520,16 @@ public class MainForm : Form
             return;
 
         SetVolume(Math.Clamp(Percent(app.Volume) + delta, 0, 100));
+        ShowOsd();
+    }
+
+    private readonly OsdWindow _osd = new();
+
+    // aviso na tela só pelos atalhos: com a janela aberta, a barra já mostra o volume
+    private void ShowOsd()
+    {
+        if (_settings.ShowOsd && SelectedApp is { } app)
+            _osd.ShowVolume(app.DisplayName, Percent(app.Volume), app.IsMuted);
     }
 
     // Um toque: volta para o começo da música. Dois toques em menos de 1 s: música anterior.

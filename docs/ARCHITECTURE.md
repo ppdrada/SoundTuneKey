@@ -20,9 +20,11 @@ docs/               este arquivo e o PRD
 | `PlayerPanel.cs` | Mini player: tempo, ⏮ ⏯ ⏭ e volume. Duas instâncias: na janela e no topo do menu da bandeja. Só mostra e avisa (eventos); o estado fica na `MainForm`, que atualiza as duas. |
 | `GlobalHotkeys.cs` | `RegisterHotKey` numa janela invisível; avisa se outro programa já usa o atalho. |
 | `MainForm.cs` | Janela, lista, barra, bandeja e menu, toque duplo no `←`, abertura escondida com `--tray`. O app escolhido fica no campo `_current`, não na lista. |
-| `VolumeBar.cs` / `Theme.cs` | Barra desenhada (usada no volume e, mais fina, no tempo: `TrackHeight`, `ThumbSize`, `Maximum`, evento `Released` ao soltar o mouse) e tema escuro (título escuro via DWM, ListView e menus desenhados). |
+| `VolumeBar.cs` / `Theme.cs` (o menu da bandeja no estilo do Windows 11: cantos e destaque arredondados, ícones da fonte de ícones do Windows) | Barra desenhada (usada no volume e, mais fina, no tempo: `TrackHeight`, `ThumbSize`, `Maximum`, evento `Released` ao soltar o mouse) e tema escuro (título escuro via DWM, ListView e menus desenhados). |
 | `UpdateWindow.cs` | "Sobre" e "Verificar atualizações..." (a mesma janela; a segunda já procura ao abrir): versão, autor, link do GitHub. Janela sem borda, de cantos arredondados (`Theme.UseRoundCorners`), que lê `download/version-windows.txt` no GitHub e compara com a `Version` do `.csproj`. |
 | `ShortcutsWindow.cs` | Janelinha "Atalhos" (mesmo estilo do "Sobre") e a lista de atalhos mostrada nela. |
+| `OsdWindow.cs` | Aviso na tela dos atalhos de volume e mudo: janela `WS_EX_LAYERED` + `UpdateLayeredWindow` (transparência por pixel, borda lisa), `WS_EX_TRANSPARENT`/`NOACTIVATE` (não pega clique nem foco), no monitor da janela da frente, some em ~1,5 s. Liga/desliga na caixinha "Aviso na tela" (linha do "Controlando") ou em "Mostrar aviso na tela" na bandeja (`ShowOsd` no `settings.json`). |
+| `ToggleSwitch.cs` | Interruptor desenhado (trilha + bolinha que desliza) no lugar da caixinha de marcar; continua sendo um `CheckBox`. Usado no "Aviso na tela". `RoundCheck`, no mesmo arquivo, é a bolinha de marcar à esquerda do "Iniciar com o Windows"; no menu da bandeja, `Theme.UseDot` desenha a mesma bolinha nos itens de liga/desliga. |
 | `AppList.cs` | A lista de apps: o botão direito só abre o menu (Mudo) e não seleciona a linha, para não trocar o app controlado. |
 | `WindowsStartup.cs` | "Iniciar com o Windows": chave em `HKCU\...\Run` com `--tray`. |
 | `AppSettings.cs` | Último app em `%AppData%\SoundTuneKey\settings.json`. |
@@ -85,6 +87,7 @@ Em 100% não existe captura: o app toca direto. A captura é refeita quando muda
 | Chrome e atalhos de sites (YouTube Music) | Os dois | Todo o som do Chrome sai de um processo só, então um app instalado pelo Chrome não se separa do Chrome. Alternativa: outro navegador só para ele. |
 | Permissão "Gravação de áudio do sistema" | Mac | Sem ela, a captura não recebe som e o app fica mudo enquanto o volume estiver abaixo de 100%. Não há API pública para checar a permissão antes. |
 | Ícone escondido atrás do recorte da câmera | Mac | Ícone novo entra na ponta esquerda da barra; com a barra cheia, fica atrás do notch. Na primeira vez o app grava `NSStatusItem Preferred Position SoundTuneKey = 300` (perto do Wi-Fi). É uma chave **não documentada** da Apple; testada no macOS 26. |
+| Aviso na tela em tela cheia exclusiva | Windows | Jogos em tela cheia exclusiva não deixam nenhuma janela por cima; o aviso só aparece em janela/sem borda. |
 | Atalho global "rouba" a combinação | Os dois | `⌘⌥↑/↓` deixa de funcionar em outros apps (alguns editores usam) enquanto o Sound Tune Key está aberto. `⌘⌥←/→` foi evitado porque troca de abas nos navegadores. |
 | Outra instância segura os atalhos | Os dois | Ao testar atalhos, feche as outras cópias do app antes. |
 | Teclas de mídia do Mac | Mac | F7/F8/F9 controlam o app que está tocando agora (o macOS decide), não necessariamente o app escolhido. Por isso há `⌃⌥P/→/←`, que controlam o app escolhido (Spotify, Música e vídeos do Chrome). `⌃⌥` são as teclas do VoiceOver: com o VoiceOver ligado, esses atalhos podem se misturar com os dele. |

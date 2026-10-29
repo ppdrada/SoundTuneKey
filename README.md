@@ -37,6 +37,8 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 | `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
 
+When you use the volume or mute hotkeys, a small notice shows the app, the volume and "Mudo" (Mute) at the bottom of the screen for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
+
 > ℹ️ Play/pause and track skipping depend on the app exposing media controls to Windows (Spotify and Chrome tabs do). Apps without that support, such as Discord, can only have their volume controlled.
 
 The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the bottom of the window, or the **Atalhos** item of the tray icon, to open a small window with the list. **Sobre** (About), next to it, shows the version, the author and the GitHub link.
@@ -84,6 +86,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
+- **Mostrar aviso na tela** (Show on-screen notice) — turn the volume/mute notice on or off
 - **Verificar atualizações...** (Check for updates...) — says whether there is a newer version and opens the download
 - **Sair** (Quit) — quit the program
 
