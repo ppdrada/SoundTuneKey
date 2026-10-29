@@ -16,7 +16,7 @@ Controla o volume (e a mídia) de **um app escolhido** por atalhos globais, sem 
 
 ## Git e GitHub
 
-- `main` é protegida: tudo entra por PR, que **ele abre e junta pelo navegador**. O `gh` não está instalado; mande o link `https://github.com/ppdrada/SoundTuneKey/compare/main...<branch>?expand=1`.
+- `main` é protegida: tudo entra por PR, que **ele abre e junta pelo navegador**. No PC Windows o `gh` está instalado e logado como `ppdrada`: dá para abrir e juntar o PR daqui, quando ele pedir. Sem `gh`, mande o link `https://github.com/ppdrada/SoundTuneKey/compare/main...<branch>?expand=1`.
 - O remoto usa **SSH** (`git@github.com:ppdrada/SoundTuneKey.git`); a chave do Mac já entra como `ppdrada`.
 - Commits em inglês, terminando com `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (o usuário autorizou o Claude como Contributor **neste projeto**).
 - **Sem licença** no repositório (ele pode querer vender). Não adicionar sem perguntar.

@@ -22,6 +22,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | ✅ `⌃⌥P/→/←` (app escolhido: Spotify, Música e vídeos do Chrome); F7/F8/F9 do Mac continuam valendo |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
 | Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | Ainda não |
+| Aviso na tela (volume / mudo) ao usar os atalhos, sem tirar o foco | ✅ | Ainda não |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
@@ -56,7 +57,6 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 9. Depois: só o que o usuário pedir.
 
 **Ideias em aberto (não fazer sem perguntar)**
-- Aviso na tela (OSD) ao apertar um atalho: perguntado várias vezes no Windows, nunca respondido.
 - Programa em inglês além de português.
 
 ## Identidade visual

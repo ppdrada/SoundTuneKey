@@ -48,13 +48,31 @@ public static class Theme
     [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
     private static extern int SetWindowTheme(IntPtr hwnd, string? appName, string? idList);
 
-    /// <summary>Cantos arredondados do Windows 11 numa janela sem borda; no Windows 10 ficam retos.</summary>
-    public static void UseRoundCorners(Form form)
+    /// <summary>Cantos arredondados do Windows 11 (menores nos menus); no Windows 10 ficam retos.</summary>
+    public static void UseRoundCorners(Control window, bool small = false)
     {
-        const int DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2;
-        int round = DWMWCP_ROUND;
-        DwmSetWindowAttribute(form.Handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref round, sizeof(int));
+        const int DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2, DWMWCP_ROUNDSMALL = 3;
+        int round = small ? DWMWCP_ROUNDSMALL : DWMWCP_ROUND;
+        DwmSetWindowAttribute(window.Handle, DWMWA_WINDOW_CORNER_PREFERENCE, ref round, sizeof(int));
     }
+
+    /// <summary>
+    /// Ícone de menu com a fonte de ícones do próprio Windows (Segoe Fluent Icons no 11, MDL2 no 10),
+    /// na cor do texto secundário. Ex.: '' abrir, '' lista, '' teclado.
+    /// </summary>
+    public static Bitmap MenuIcon(char glyph)
+    {
+        var bmp = new Bitmap(16, 16);
+        using var g = Graphics.FromImage(bmp);
+        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+        using var font = new Font(IconFont, 11f, GraphicsUnit.Pixel);
+        TextRenderer.DrawText(g, glyph.ToString(), font, new Rectangle(0, 0, 16, 16), MutedText,
+            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        return bmp;
+    }
+
+    private static readonly string IconFont = FontFamily.Families.Any(f => f.Name == "Segoe Fluent Icons")
+        ? "Segoe Fluent Icons" : "Segoe MDL2 Assets";
 
     /// <summary>Barra de título escura (Windows 10 20H1+ e Windows 11).</summary>
     public static void UseDarkTitleBar(Form form)
@@ -117,12 +135,35 @@ public static class Theme
         button.FlatAppearance.MouseDownBackColor = Inactive;
     }
 
-    /// <summary>Menu da bandeja escuro.</summary>
+    /// <summary>Tag de um item de menu que é liga/desliga: aparece com a bolinha à esquerda em vez de ✓.</summary>
+    public const string DotTag = "dot";
+
+    /// <summary>Item marcável do menu com a bolinha do "Iniciar com o Windows" (veja <see cref="DotTag"/>).</summary>
+    public static void UseDot(ToolStripMenuItem item)
+    {
+        item.Tag = DotTag;
+        // uma imagem vazia faz o menu chamar OnRenderItemImage também quando o item está desmarcado
+        item.Image = new Bitmap(16, 16);
+    }
+
+    /// <summary>Menu da bandeja escuro, no estilo do Windows 11: cantos e destaque arredondados, linhas mais altas.</summary>
     public static void Apply(ToolStrip menu)
     {
         menu.Renderer = new DarkMenuRenderer();
         menu.BackColor = Raised;
         menu.ForeColor = Text;
+        if (menu is ToolStripDropDown dropDown)
+            dropDown.HandleCreated += (_, _) => UseRoundCorners(dropDown, small: true);
+
+        foreach (ToolStripItem item in menu.Items)
+            Space(item);
+        menu.ItemAdded += (_, e) => Space(e.Item!);
+
+        static void Space(ToolStripItem item)
+        {
+            if (item is ToolStripMenuItem)
+                item.Padding = new Padding(item.Padding.Left, 4, item.Padding.Right, 4);
+        }
     }
 
     // Texto, setinha do submenu e ✓ claros; o renderer padrão desenha esses detalhes em preto.
@@ -134,6 +175,40 @@ public static class Theme
             base.OnRenderItemText(e);
         }
 
+        protected override void OnRenderItemImage(ToolStripItemImageRenderEventArgs e)
+        {
+            if (e.Item is ToolStripMenuItem { Tag: DotTag } item)
+            {
+                float s = Scale(e.ToolStrip!), d = RoundCheck.Dot * s;
+                var r = e.ImageRectangle;
+                RoundCheck.DrawDot(e.Graphics, new RectangleF(r.X + (r.Width - d) / 2, r.Y + (r.Height - d) / 2, d, d), item.Checked, s);
+                return;
+            }
+            base.OnRenderItemImage(e);
+        }
+
+        // destaque do item sob o mouse: uma pílula com cantos arredondados, afastada das bordas
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+        {
+            if (!e.Item.Selected || !e.Item.Enabled || e.Item is ToolStripControlHost)
+                return;
+
+            float s = Scale(e.ToolStrip!);
+            var r = new RectangleF(6 * s, 1, e.Item.Width - 12 * s, e.Item.Height - 2);
+            using var path = new System.Drawing.Drawing2D.GraphicsPath();
+            float d = 8 * s;
+            path.AddArc(r.X, r.Y, d, d, 180, 90);
+            path.AddArc(r.Right - d, r.Y, d, d, 270, 90);
+            path.AddArc(r.Right - d, r.Bottom - d, d, d, 0, 90);
+            path.AddArc(r.X, r.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            var old = e.Graphics.SmoothingMode;
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using var brush = new SolidBrush(Selection);
+            e.Graphics.FillPath(brush, path);
+            e.Graphics.SmoothingMode = old;
+        }
+
         protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
         {
             e.ArrowColor = Text;
@@ -142,6 +217,9 @@ public static class Theme
 
         protected override void OnRenderItemCheck(ToolStripItemImageRenderEventArgs e)
         {
+            if (e.Item.Tag is DotTag)
+                return; // a bolinha já mostra se está marcado
+
             TextRenderer.DrawText(e.Graphics, "✓", e.Item.Font, e.ImageRectangle, Text,
                 TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
         }

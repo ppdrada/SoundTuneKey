@@ -37,6 +37,8 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 | `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 
+Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app, o volume ou "Mudo" embaixo da tela por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
+
 > ℹ️ Pausar e trocar de música dependem de o app expor controles de mídia ao Windows (Spotify e abas do Chrome expõem). Apps sem esse suporte, como o Discord, podem ser controlados apenas no volume.
 
 Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo da janela, ou no item **Atalhos** do ícone da bandeja, e abre uma janelinha com a lista. Ao lado, **Sobre** mostra a versão, o autor e o link do GitHub.
@@ -84,6 +86,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem com "(mudo)"
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
+- **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
 - **Verificar atualizações...** — diz se tem versão nova e abre o download
 - **Sair** — encerra o programa
 
