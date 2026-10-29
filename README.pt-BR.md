@@ -88,7 +88,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
-- **Verificar atualizações...** — diz se tem versão nova e abre o download
+- **Verificar atualizações...** — diz se tem versão nova; **Atualizar agora** baixa, troca o programa e reabre sozinho. O app também procura uma vez por dia: com versão nova, mostra uma notificação do Windows, o item **Atualizar para a versão…** no topo deste menu e uma faixa embaixo da janela
 - **Sair** — encerra o programa
 
 ### macOS

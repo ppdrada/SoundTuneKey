@@ -88,7 +88,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Mostrar aviso na tela** (Show on-screen notice) — turn the volume/mute notice on or off
-- **Verificar atualizações...** (Check for updates...) — says whether there is a newer version and opens the download
+- **Verificar atualizações...** (Check for updates...) — says whether there is a newer version; **Atualizar agora** (Update now) downloads it, swaps the program and reopens it by itself. The app also checks once a day: when there is a new version it shows a Windows notification, an **Atualizar para a versão…** item at the top of this menu and a strip at the bottom of the window
 - **Sair** (Quit) — quit the program
 
 ### macOS

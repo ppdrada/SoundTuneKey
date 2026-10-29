@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace SoundTuneKey;
 
@@ -28,6 +28,96 @@ public static class Updates
     public const string RepoUrl = "https://github.com/ppdrada/SoundTuneKey";
 
     public static void Open(string url) => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+
+    /// <summary>Argumento do .exe novo: espera o antigo (pelo id do processo) fechar antes de abrir.</summary>
+    public const string AfterUpdateArgument = "--after-update";
+
+    /// <summary>A versão de teste roda pelo "dotnet": essa não se troca sozinha.</summary>
+    public static bool CanSelfUpdate =>
+        !Path.GetFileName(Environment.ProcessPath!).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Baixa o .exe novo ao lado do atual, troca os dois e abre o novo. Depois disso o app atual
+    /// precisa fechar (o novo espera por ele). O Windows deixa renomear o .exe que está aberto.
+    /// </summary>
+    /// <param name="exePath">o .exe a trocar; o padrão é o próprio app (o teste usa um arquivo falso)</param>
+    public static async Task InstallAsync(IProgress<int> progress, string downloadUrl = DownloadUrl, string? exePath = null, bool start = true)
+    {
+        var exe = exePath ?? Environment.ProcessPath!;
+        var newExe = Path.Combine(Path.GetDirectoryName(exe)!, "SoundTuneKey.new.exe");
+        var oldExe = exe + ".old";
+
+        using (var http = new HttpClient { Timeout = TimeSpan.FromMinutes(5) })
+        using (var response = await http.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+        {
+            response.EnsureSuccessStatusCode();
+            long total = response.Content.Headers.ContentLength ?? 0;
+            await using var source = await response.Content.ReadAsStreamAsync();
+            await using var target = File.Create(newExe);
+            var buffer = new byte[81920];
+            long done = 0;
+            int read;
+            while ((read = await source.ReadAsync(buffer)) > 0)
+            {
+                await target.WriteAsync(buffer.AsMemory(0, read));
+                done += read;
+                if (total > 0)
+                    progress.Report((int)(done * 100 / total));
+            }
+        }
+
+        if (!LooksLikeProgram(newExe))
+        {
+            File.Delete(newExe);
+            throw new InvalidDataException("O arquivo baixado não é o programa.");
+        }
+
+        File.Move(exe, oldExe, overwrite: true);
+        try
+        {
+            File.Move(newExe, exe);
+        }
+        catch
+        {
+            File.Move(oldExe, exe); // não deu para pôr o novo no lugar: volta o antigo
+            throw;
+        }
+
+        if (start)
+            Process.Start(new ProcessStartInfo(exe, $"{AfterUpdateArgument} {Environment.ProcessId}") { UseShellExecute = false });
+    }
+
+    // um .exe começa com "MZ" e o nosso tem dezenas de MB; uma página de erro não passa nisso
+    public static bool LooksLikeProgram(string path)
+    {
+        using var file = File.OpenRead(path);
+        return file.Length > 1_000_000 && file.ReadByte() == 'M' && file.ReadByte() == 'Z';
+    }
+
+    /// <summary>
+    /// No começo do .exe novo: espera o antigo fechar (para soltar os atalhos e o ícone da bandeja)
+    /// e apaga a cópia antiga. Devolve true se este é o primeiro início depois de uma atualização.
+    /// </summary>
+    public static bool FinishUpdate(string[] args)
+    {
+        if (!CanSelfUpdate)
+            return false; // versão de teste (dotnet): não há .exe para limpar
+        int i = Array.IndexOf(args, AfterUpdateArgument);
+        if (i >= 0 && i + 1 < args.Length && int.TryParse(args[i + 1], out int oldPid))
+        {
+            try { Process.GetProcessById(oldPid).WaitForExit(10_000); }
+            catch (ArgumentException) { } // já fechou
+        }
+
+        var oldExe = Environment.ProcessPath + ".old";
+        for (int attempt = 0; attempt < 10 && File.Exists(oldExe); attempt++)
+        {
+            try { File.Delete(oldExe); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Thread.Sleep(300); }
+        }
+
+        return i >= 0;
+    }
 }
 
 /// <summary>
@@ -45,7 +135,8 @@ public class UpdateWindow : Form
         ForeColor = Theme.MutedText,
     };
 
-    private readonly Button _download = new() { Text = "Baixar", Width = 150, Height = 32, Visible = false };
+    // a versão de teste não se troca sozinha: nela o botão só abre o download no navegador
+    private readonly Button _download = new() { Text = Updates.CanSelfUpdate ? "Atualizar agora" : "Baixar", Width = 150, Height = 32, Visible = false };
     private readonly Button _check = new() { Text = "Verificar atualizações", Width = 150, Height = 32 };
     private readonly Button _close = new() { Text = "Fechar", Width = 100, Height = 32 };
     private readonly Func<Task<Version>> _latest;
@@ -126,11 +217,40 @@ public class UpdateWindow : Form
         ResumeLayout(false);
 
         _close.Click += (_, _) => Close();
-        _download.Click += (_, _) => { Updates.Open(Updates.DownloadUrl); Close(); };
+        _download.Click += async (_, _) => await UpdateNowAsync();
         _check.Click += async (_, _) => await CheckAsync();
         KeyDown += (_, e) => { if (e.KeyCode == Keys.Escape) Close(); };
         if (checkNow)
             Shown += async (_, _) => await CheckAsync();
+    }
+
+    private bool _selfUpdateFailed;
+
+    private async Task UpdateNowAsync()
+    {
+        if (!Updates.CanSelfUpdate || _selfUpdateFailed)
+        {
+            Updates.Open(Updates.DownloadUrl);
+            Close();
+            return;
+        }
+
+        _download.Enabled = _close.Enabled = false;
+        _status.ForeColor = Theme.Text;
+        try
+        {
+            await Updates.InstallAsync(new Progress<int>(p => _status.Text = $"Baixando a versão nova… {p}%"));
+            _status.Text = "Pronto! Abrindo a versão nova…";
+            Application.Exit(); // o .exe novo já abriu e espera este fechar
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            // sem permissão na pasta, sem internet...: o download pelo navegador continua funcionando
+            _status.Text = "Não deu para atualizar sozinho.\nClique em Baixar para pegar pelo navegador.";
+            _download.Text = "Baixar";
+            _download.Enabled = _close.Enabled = true;
+            _selfUpdateFailed = true; // o próximo clique só abre o navegador
+        }
     }
 
     private static Label InfoLabel(string text, Color color) => new()

@@ -28,6 +28,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
 | "Verificar atualizações..." e "Sobre" (versão, autor, GitHub) no menu, com janelinha de cantos arredondados | ✅ | Ainda não |
+| Atualiza sozinho (baixa, troca e reabre) e avisa versão nova (balão, menu e faixa na janela, uma vez por dia) | ✅ | Ainda não |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
 | Lembrar o último app | ✅ | ✅ (e o volume de cada app) |
