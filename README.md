@@ -37,6 +37,7 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 | `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
 | `Ctrl + Alt + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
+| `Ctrl + Alt + V` | 🎤 Mute / unmute the microphone (the whole Windows mic, for Discord, games and everything) |
 
 When you use the volume or mute hotkeys, a small notice shows the app and the volume at the bottom of the screen (when muted, the app name and the speaker turn red) for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
 
@@ -83,6 +84,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 
 - **Sound Tune Key**, at the very top with the app icon — opens **Sobre** (About): version, author, the GitHub link and a button to check for updates
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
+- **Microfone ligado / desligado** (Microphone on / off) — turn the microphone on or off; red when it is off
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list

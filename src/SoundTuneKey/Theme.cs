@@ -62,14 +62,16 @@ public static class Theme
     /// Ícone de menu com a fonte de ícones do próprio Windows (Segoe Fluent Icons no 11, MDL2 no 10),
     /// na cor do texto secundário. Ex.: '' abrir, '' lista, '' teclado.
     /// </summary>
-    public static Bitmap MenuIcon(char glyph)
+    public static Bitmap MenuIcon(char glyph) => MenuIcon(glyph, MutedText);
+
+    public static Bitmap MenuIcon(char glyph, Color color)
     {
         var bmp = new Bitmap(16, 16);
         using var g = Graphics.FromImage(bmp);
         // AntiAlias comum: o ClearType do TextRenderer, num fundo transparente, deixa um quadradinho escuro em volta
         g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
         using var font = new Font(IconFont, 11f, GraphicsUnit.Pixel);
-        using var brush = new SolidBrush(MutedText);
+        using var brush = new SolidBrush(color);
         using var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
         g.DrawString(glyph.ToString(), font, brush, new RectangleF(0, 2, 16, 16), center); // a fonte de ícones desenha o símbolo um pouco alto
         return bmp;
@@ -78,7 +80,9 @@ public static class Theme
     // os ícones e as bolinhas do menu são desenhados um pouco para dentro, para não encostar na borda
     private const int MenuIconInset = 6;
 
-    private static readonly string IconFont = FontFamily.Families.Any(f => f.Name == "Segoe Fluent Icons")
+    public const string MicGlyph = "\uE720", MicOffGlyph = "\uEC54"; // microfone ligado / cortado
+
+    public static readonly string IconFont = FontFamily.Families.Any(f => f.Name == "Segoe Fluent Icons")
         ? "Segoe Fluent Icons" : "Segoe MDL2 Assets";
 
     /// <summary>Barra de título escura (Windows 10 20H1+ e Windows 11).</summary>

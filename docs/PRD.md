@@ -29,6 +29,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
 | "Verificar atualizações..." e "Sobre" (versão, autor, GitHub) no menu, com janelinha de cantos arredondados | ✅ | Ainda não |
 | Atualiza sozinho (baixa, troca e reabre) e avisa versão nova (balão, menu e faixa na janela, uma vez por dia) | ✅ | Ainda não |
+| Mudo do microfone do Windows (atalho, ícone no rodapé, linha no menu, aviso na tela) | ✅ `Ctrl+Alt+V` | Ainda não |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
 | Lembrar o último app | ✅ | ✅ (e o volume de cada app) |

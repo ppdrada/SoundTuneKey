@@ -214,3 +214,43 @@ public class MediaButton : Control
         base.Dispose(disposing);
     }
 }
+
+/// <summary>
+/// Botãozinho só com um símbolo da fonte de ícones do Windows (o microfone do rodapé): cinza,
+/// clareia ao passar o mouse; a cor e o símbolo mudam pelo estado.
+/// </summary>
+public class GlyphButton : Control
+{
+    private string _glyph = "";
+    private Color _color = Theme.MutedText;
+    private bool _hovered;
+
+    public GlyphButton()
+    {
+        SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw, true);
+        SetStyle(ControlStyles.Selectable, false);
+        Cursor = Cursors.Hand;
+    }
+
+    public void Set(string glyph, Color color)
+    {
+        _glyph = glyph;
+        _color = color;
+        Invalidate();
+    }
+
+    protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); _hovered = true; Invalidate(); }
+    protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); _hovered = false; Invalidate(); }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        g.Clear(Parent?.BackColor ?? Theme.Background);
+        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+        using var font = new Font(Theme.IconFont, 16f * Theme.Scale(this), GraphicsUnit.Pixel);
+        // ao passar o mouse, o cinza vira branco; o vermelho (microfone desligado) continua vermelho
+        using var brush = new SolidBrush(_hovered && _color == Theme.MutedText ? Theme.Text : _color);
+        using var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+        g.DrawString(_glyph, font, brush, new RectangleF(0, 2, Width, Height), center);
+    }
+}

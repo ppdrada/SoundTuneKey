@@ -53,8 +53,24 @@ public class OsdWindow : Form
         _position = new Point(screen.Bounds.Left + (screen.Bounds.Width - size.Width) / 2,
                               screen.Bounds.Bottom - size.Height - (int)(90 * scale));
 
+        ShowFrame(Draw(size, scale, appName, volumePercent, muted));
+    }
+
+    /// <summary>Aviso do Ctrl+Alt+V: "Microfone" e "Ligado", ou "Desligado" em vermelho.</summary>
+    public void ShowMicrophone(bool muted)
+    {
+        var screen = Screen.FromHandle(GetForegroundWindow());
+        float scale = Theme.ScaleAt(new Point(screen.Bounds.Left + screen.Bounds.Width / 2, screen.Bounds.Top + screen.Bounds.Height / 2));
+        var size = new Size((int)(Width100 * scale), (int)(Height100 * scale));
+        _position = new Point(screen.Bounds.Left + (screen.Bounds.Width - size.Width) / 2,
+                              screen.Bounds.Bottom - size.Height - (int)(90 * scale));
+        ShowFrame(DrawMicrophone(size, scale, muted));
+    }
+
+    private void ShowFrame(Bitmap frame)
+    {
         _frame?.Dispose();
-        _frame = Draw(size, scale, appName, volumePercent, muted);
+        _frame = frame;
 
         if (!Visible)
             Show();
@@ -78,6 +94,39 @@ public class OsdWindow : Form
             return;
         }
         Apply((byte)(StartAlpha * left));
+    }
+
+    private static Bitmap DrawMicrophone(Size size, float scale, bool muted)
+    {
+        var bmp = new Bitmap(size.Width, size.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using var g = Graphics.FromImage(bmp);
+        g.SmoothingMode = SmoothingMode.AntiAlias;
+        g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+        float S(float v) => v * scale;
+
+        using (var card = Rounded(new RectangleF(0.5f, 0.5f, size.Width - 1, size.Height - 1), S(16)))
+        {
+            using var fill = new SolidBrush(Color.FromArgb(200, Theme.Background));
+            using var border = new Pen(Theme.Border);
+            g.FillPath(fill, card);
+            g.DrawPath(border, card);
+        }
+
+        // mesmo desenho do aviso de volume: título em cima; embaixo, o ícone à esquerda e o estado no meio
+        float side = S(20), titleCenter = S(25), rowCenter = S(56);
+        var color = muted ? Theme.Mute : Theme.Text;
+        var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+        using var title = new Font("Segoe UI", 12.7f * scale, GraphicsUnit.Pixel);
+        using var big = new Font("Segoe UI", 12f * scale, FontStyle.Bold, GraphicsUnit.Pixel);
+        using var icon = new Font(Theme.IconFont, 18f * scale, GraphicsUnit.Pixel);
+        using (var titleBrush = new SolidBrush(muted ? Theme.Mute : Theme.MutedText))
+            g.DrawString("Microfone", title, titleBrush, new RectangleF(0, titleCenter - S(12), size.Width, S(24)), center);
+        using (var brush = new SolidBrush(color))
+        {
+            g.DrawString(muted ? Theme.MicOffGlyph : Theme.MicGlyph, icon, brush, new RectangleF(side - S(4), rowCenter - S(13), S(28), S(28)), center);
+            g.DrawString(muted ? "Desligado" : "Ligado", big, brush, new RectangleF(0, rowCenter - S(12), size.Width, S(24)), center);
+        }
+        return bmp;
     }
 
     private static Bitmap Draw(Size size, float scale, string appName, int volumePercent, bool muted)

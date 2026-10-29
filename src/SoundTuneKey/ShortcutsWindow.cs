@@ -15,6 +15,7 @@ public class ShortcutsWindow : Form
         ("Ctrl + Alt + ←", "Volta ao começo (2x rápido: música anterior)"),
         ("Ctrl + Alt + M", "Mudo / volta o som"),
         ("Ctrl + Alt + A", "Troca o app controlado (o próximo da lista)"),
+        ("Ctrl + Alt + V", "Liga / desliga o microfone (o do Windows inteiro)"),
     ];
 
     public ShortcutsWindow()
