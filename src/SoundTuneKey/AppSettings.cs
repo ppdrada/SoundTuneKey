@@ -11,6 +11,9 @@ public class AppSettings
     /// <summary>Aviso na tela ao usar os atalhos de volume e mudo (dá para desligar no menu da bandeja).</summary>
     public bool ShowOsd { get; set; } = true;
 
+    /// <summary>Última versão nova já avisada no balão (o balão aparece uma vez por versão).</summary>
+    public string? NotifiedVersion { get; set; }
+
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SoundTuneKey", "settings.json");
 

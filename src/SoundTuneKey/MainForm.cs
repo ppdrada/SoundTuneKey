@@ -61,7 +61,7 @@ public class MainForm : Form
     private bool _startHidden;        // aberto pelo Windows com --tray: começa só na bandeja
     private bool _hotkeysRegistered;
 
-    public MainForm(bool startHidden = false)
+    public MainForm(bool startHidden = false, bool justUpdated = false)
     {
         _startHidden = startHidden;
 
@@ -109,6 +109,7 @@ public class MainForm : Form
         Controls.Add(selectedRow);
         Controls.Add(_player);
         Controls.Add(_refresh);
+        Controls.Add(_updateBar);
         Controls.Add(BuildFooter());
 
         WindowsStartup.RefreshPath();
@@ -149,6 +150,7 @@ public class MainForm : Form
         };
 
         SetupTray();
+        SetupUpdateNotice(justUpdated);
         ResumeLayout(false);
     }
 
@@ -281,6 +283,7 @@ public class MainForm : Form
 
         var menu = new ContextMenuStrip();
         menu.Items.Add(aboutItem);
+        menu.Items.Add(_updateItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(playerItem);
         menu.Items.Add(new ToolStripSeparator());
@@ -398,6 +401,74 @@ public class MainForm : Form
 
     private UpdateWindow? _aboutWindow; // uma janela só, mesmo clicando várias vezes
 
+    // ===== Aviso de versão nova =====
+    // Procura 15 s depois de abrir e depois uma vez por dia. Com versão nova: balão do Windows (uma vez
+    // por versão), item no topo do menu da bandeja e faixa embaixo da janela; os três abrem a janelinha
+    // de atualização, que baixa, troca o .exe e reabre o app sozinha.
+
+    private readonly System.Windows.Forms.Timer _updateTimer = new() { Interval = 15_000 };
+    private readonly ToolStripMenuItem _updateItem = new() { Visible = false, Image = Theme.MenuIcon('') };
+    private readonly LinkLabel _updateBar = new()
+    {
+        Dock = DockStyle.Bottom,
+        Height = 30,
+        Visible = false,
+        TextAlign = ContentAlignment.MiddleCenter,
+        BackColor = Theme.Raised,
+        LinkColor = Theme.Text,
+        ActiveLinkColor = Theme.MutedText,
+        LinkBehavior = LinkBehavior.HoverUnderline,
+    };
+    private bool _balloonOpensUpdate;
+
+    private void SetupUpdateNotice(bool justUpdated)
+    {
+        _updateItem.Click += (_, _) => ShowAboutWindow(checkNow: true);
+        _updateBar.LinkClicked += (_, _) => ShowAboutWindow(checkNow: true);
+        _tray.BalloonTipClicked += (_, _) => { if (_balloonOpensUpdate) ShowAboutWindow(checkNow: true); };
+        _updateTimer.Tick += (_, _) =>
+        {
+            _updateTimer.Interval = (int)TimeSpan.FromDays(1).TotalMilliseconds;
+            CheckForUpdate();
+        };
+        _updateTimer.Start();
+
+        if (justUpdated)
+        {
+            _balloonOpensUpdate = false;
+            _tray.ShowBalloonTip(4000, "Sound Tune Key", $"Atualizado para a versão {Updates.Current.ToString(3)}.", ToolTipIcon.Info);
+        }
+    }
+
+    private async void CheckForUpdate()
+    {
+        try
+        {
+            var newest = await Updates.LatestAsync();
+            if (newest > Updates.Current)
+                ShowUpdateAvailable(newest.ToString(3));
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or FormatException or ArgumentException)
+        {
+            // sem internet ou o GitHub fora: tenta de novo amanhã, sem incomodar
+        }
+    }
+
+    private void ShowUpdateAvailable(string version)
+    {
+        _updateItem.Text = $"Atualizar para a versão {version}";
+        _updateItem.Visible = true;
+        _updateBar.Text = $"Versão {version} disponível · Atualizar";
+        _updateBar.Visible = true;
+
+        if (_settings.NotifiedVersion == version)
+            return;
+        _settings.NotifiedVersion = version;
+        _settings.Save();
+        _balloonOpensUpdate = true;
+        _tray.ShowBalloonTip(5000, "Sound Tune Key", $"Versão {version} disponível. Clique aqui para atualizar.", ToolTipIcon.Info);
+    }
+
     private void ShowAboutWindow(bool checkNow)
     {
         if (_aboutWindow is null || _aboutWindow.IsDisposed)
@@ -458,6 +529,7 @@ public class MainForm : Form
         if (!_trayTipShown)
         {
             _trayTipShown = true;
+            _balloonOpensUpdate = false;
             _tray.ShowBalloonTip(3000, "Sound Tune Key",
                 "Continua rodando aqui na bandeja. Os atalhos seguem funcionando.", ToolTipIcon.Info);
         }
