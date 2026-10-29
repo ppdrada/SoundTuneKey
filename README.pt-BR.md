@@ -38,7 +38,7 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 | `Ctrl + Alt + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
 
-Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app, o volume ou "Mudo" embaixo da tela por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
+Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, o nome do app e o alto-falante ficam vermelhos) por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
 
 > ℹ️ Pausar e trocar de música dependem de o app expor controles de mídia ao Windows (Spotify e abas do Chrome expõem). Apps sem esse suporte, como o Discord, podem ser controlados apenas no volume.
 
@@ -69,7 +69,7 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 
 O programa lembra o último app escolhido da próxima vez que for aberto.
 
-Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. Clique no alto-falante 🔈 para deixar mudo ou voltar o som; mexer no volume também tira o mudo. Com o botão direito em qualquer app da lista aparece **Mudo**, marcado quando aquele app está mudo; isso não troca o app controlado. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. Clique no alto-falante 🔈 para deixar mudo ou voltar o som (no mudo: alto-falante vermelho, barra apagada e o nome do app em vermelho na lista); mexer no volume também tira o mudo. Os atalhos mudam o volume de 1% em 1% (segurar repete). Com o botão direito em qualquer app da lista aparece **Mudo**, marcado quando aquele app está mudo; isso não troca o app controlado. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
 
 #### ⚠️ Aviso do Windows na primeira vez
 
@@ -84,7 +84,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - **Sound Tune Key**, bem no topo com o ícone do app — abre o **Sobre**: versão, autor, o link do GitHub e um botão para verificar atualizações
 - Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem com "(mudo)"
+- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem em vermelho
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
