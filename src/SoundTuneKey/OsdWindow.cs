@@ -12,7 +12,7 @@ namespace SoundTuneKey;
 /// </summary>
 public class OsdWindow : Form
 {
-    private const int Width100 = 300, Height100 = 56; // tamanho em pixels de 100%
+    private const int Width100 = 340, Height100 = 78; // tamanho em pixels de 100%
     private static readonly TimeSpan Visible100 = TimeSpan.FromSeconds(1.2);
     private const byte StartAlpha = 255;
 
@@ -88,23 +88,31 @@ public class OsdWindow : Form
         g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
         float S(float v) => v * scale;
 
-        using (var pill = Rounded(new RectangleF(0.5f, 0.5f, size.Width - 1, size.Height - 1), size.Height / 2f))
+        // cartão de cantos arredondados, como o mini player do Spotify
+        using (var card = Rounded(new RectangleF(0.5f, 0.5f, size.Width - 1, size.Height - 1), S(16)))
         {
-            using var fill = new SolidBrush(Color.FromArgb(240, Theme.Background));
+            using var fill = new SolidBrush(Color.FromArgb(200, Theme.Background)); // translúcido, como vidro: dá para ver um pouco do jogo atrás
             using var border = new Pen(Theme.Border);
-            g.FillPath(fill, pill);
-            g.DrawPath(border, pill);
+            g.FillPath(fill, card);
+            g.DrawPath(border, card);
         }
 
-        MediaIcons.Draw(g, muted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker,
-            Rectangle.Round(new RectangleF(S(22), 0, S(16), size.Height)), S(13), Theme.Text);
+        // em cima, o nome do app como título; embaixo, alto-falante, barra e "40%" numa linha só
+        float side = S(20), iconBox = S(16), reserve = S(72); // reserve: espaço do ícone e do "40%" nas pontas
+        float titleCenter = S(25), rowCenter = S(56); // nome e barra bem separados
 
-        using var small = new Font("Segoe UI", 9f * scale);
-        using var big = new Font("Segoe UI", 10f * scale, FontStyle.Bold);
+        using var title = new Font("Segoe UI", 9.5f * scale); // a mesma fonte de antes, só um pouco maior
+        using var big = new Font("Segoe UI", 9f * scale, FontStyle.Bold);
+        float titleHeight = title.GetHeight(g);
         using (var gray = new SolidBrush(Theme.MutedText))
-            g.DrawString(appName, small, gray, new RectangleF(S(52), S(7), S(180), S(18)), new StringFormat { Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap });
+            g.DrawString(appName, title, gray, new RectangleF(side, titleCenter - titleHeight / 2, size.Width - side * 2, titleHeight),
+                new StringFormat { Alignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter, FormatFlags = StringFormatFlags.NoWrap });
 
-        var track = new RectangleF(S(54), S(34), S(170), S(6));
+        MediaIcons.Draw(g, muted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker,
+            Rectangle.Round(new RectangleF(side, rowCenter - S(10), iconBox, S(20))), S(13), Theme.Text);
+
+        float barHeight = S(6);
+        var track = new RectangleF(reserve, rowCenter - barHeight / 2, size.Width - reserve * 2, barHeight);
         using (var rest = new SolidBrush(Theme.Inactive))
         using (var restPath = Rounded(track, track.Height / 2))
             g.FillPath(rest, restPath);
@@ -116,10 +124,11 @@ public class OsdWindow : Form
             g.FillPath(fill, fillPath);
         }
 
+        // desenhado num ponto (sem retângulo), encostado na margem direita: o texto nunca é cortado
+        string label = muted ? "Mudo" : $"{volumePercent}%";
+        var labelSize = g.MeasureString(label, big, PointF.Empty, StringFormat.GenericTypographic);
         using (var text = new SolidBrush(Theme.Text))
-            g.DrawString(muted ? "Mudo" : $"{volumePercent}%", big, text,
-                new RectangleF(S(228), 0, S(66), size.Height),
-                new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center, FormatFlags = StringFormatFlags.NoWrap });
+            g.DrawString(label, big, text, size.Width - side - labelSize.Width, rowCenter - labelSize.Height / 2, StringFormat.GenericTypographic);
 
         return bmp;
     }

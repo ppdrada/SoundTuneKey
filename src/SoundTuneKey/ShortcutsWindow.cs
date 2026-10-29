@@ -14,6 +14,7 @@ public class ShortcutsWindow : Form
         ("Ctrl + Alt + →", "Próxima música"),
         ("Ctrl + Alt + ←", "Volta ao começo (2x rápido: música anterior)"),
         ("Ctrl + Alt + M", "Mudo / volta o som"),
+        ("Ctrl + Alt + A", "Troca o app controlado (o próximo da lista)"),
     ];
 
     public ShortcutsWindow()

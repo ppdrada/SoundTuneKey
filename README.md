@@ -36,6 +36,7 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + →` | ⏭️ Next track |
 | `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 | `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
+| `Ctrl + Alt + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
 
 When you use the volume or mute hotkeys, a small notice shows the app, the volume and "Mudo" (Mute) at the bottom of the screen for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
 
