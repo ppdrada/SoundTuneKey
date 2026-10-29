@@ -316,8 +316,10 @@ public class MainForm : Form
                 _trayPlayer.Scale(new SizeF(scale / current, scale / current));
                 _trayPlayer.MenuScale = scale;
                 playerItem.Size = _trayPlayer.Size;
-                _trayPlayer.Font = new Font(DefaultFont.FontFamily, DefaultFont.Size * scale);
             }
+            // tamanho em pixels (12 px = 9 pt a 100%) vezes a escala: em pontos o Windows já amplia a
+            // fonte pela escala do PC, e multiplicar de novo deixava o texto enorme em telas a 125%/150%
+            _trayPlayer.Font = new Font(DefaultFont.FontFamily, 12f * scale, GraphicsUnit.Pixel);
             AppForHotkey(); // pode achar o último app, se ele abriu depois do Sound Tune Key
             _trayMenuOpen = true;
             UpdateTimelineTimer();
