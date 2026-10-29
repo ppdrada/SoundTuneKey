@@ -151,6 +151,7 @@ public class MainForm : Form
 
         SetupTray();
         SetupUpdateNotice(justUpdated);
+        SetupMicrophone();
         ResumeLayout(false);
     }
 
@@ -222,6 +223,7 @@ public class MainForm : Form
     {
         var footer = new Panel { Dock = DockStyle.Bottom, Height = 32, Padding = new Padding(0, 0, 10, 2) }; // margem para não encostar na borda
         footer.Controls.Add(_startWithWindows);
+        footer.Controls.Add(_micButton); // à esquerda de "Atalhos"
         footer.Controls.Add(FooterLink("Atalhos", ShowShortcutsWindow));
         footer.Controls.Add(FooterLink("Sobre", () => ShowAboutWindow(checkNow: false)));
         return footer;
@@ -287,6 +289,7 @@ public class MainForm : Form
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(playerItem);
         menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(_micItem);
         // em grupos, como no Windows 11: abrir/escolher, opções de liga/desliga, atualizar/sair
         appsMenu.Image = Theme.MenuIcon('\uE8FD');
         menu.Items.Add("Abrir", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
@@ -324,6 +327,7 @@ public class MainForm : Form
             // fonte pela escala do PC, e multiplicar de novo deixava o texto enorme em telas a 125%/150%
             _trayPlayer.Font = new Font(DefaultFont.FontFamily, 12f * scale, GraphicsUnit.Pixel);
             AppForHotkey(); // pode achar o último app, se ele abriu depois do Sound Tune Key
+            ShowMicrophoneState(Microphone.IsMuted()); // pode ter sido mudado pelo Windows ou pelo Discord
             _trayMenuOpen = true;
             UpdateTimelineTimer();
         };
@@ -400,6 +404,42 @@ public class MainForm : Form
     private void SelectApp(string processName) => LoadApps(select: processName);
 
     private UpdateWindow? _aboutWindow; // uma janela só, mesmo clicando várias vezes
+
+    // ===== Microfone (Ctrl+Alt+V) =====
+    // Mudo do microfone do Windows inteiro: ícone no rodapé, linha no menu da bandeja e aviso na tela.
+
+    private readonly GlyphButton _micButton = new() { Dock = DockStyle.Right, Width = 30 };
+    private readonly ToolStripMenuItem _micItem = new();
+    private readonly ToolTip _footerTips = new();
+
+    private void SetupMicrophone()
+    {
+        _footerTips.SetToolTip(_micButton, "Liga / desliga o microfone (Ctrl + Alt + V)");
+        _micButton.Click += (_, _) => ToggleMicrophone(fromHotkey: false);
+        _micItem.Click += (_, _) => ToggleMicrophone(fromHotkey: false);
+        Activated += (_, _) => ShowMicrophoneState(Microphone.IsMuted());
+        ShowMicrophoneState(Microphone.IsMuted());
+    }
+
+    private void ToggleMicrophone(bool fromHotkey)
+    {
+        var muted = Microphone.Toggle();
+        ShowMicrophoneState(muted);
+        if (fromHotkey && muted is bool m && _settings.ShowOsd)
+            _osd.ShowMicrophone(m);
+    }
+
+    // null = sem microfone no PC: o ícone e a linha do menu somem
+    private void ShowMicrophoneState(bool? muted)
+    {
+        _micButton.Visible = _micItem.Visible = muted is not null;
+        if (muted is not bool m)
+            return;
+        _micButton.Set(m ? Theme.MicOffGlyph : Theme.MicGlyph, m ? Theme.Mute : Theme.MutedText);
+        _micItem.Text = m ? "Microfone desligado" : "Microfone ligado";
+        _micItem.ForeColor = m ? Theme.Mute : Theme.Text;
+        _micItem.Image = Theme.MenuIcon((m ? Theme.MicOffGlyph : Theme.MicGlyph)[0], m ? Theme.Mute : Theme.MutedText);
+    }
 
     // ===== Aviso de versão nova =====
     // Procura 15 s depois de abrir e depois uma vez por dia. Com versão nova: balão do Windows (uma vez
@@ -578,6 +618,8 @@ public class MainForm : Form
             failed.Add("Ctrl + Alt + M");
         if (!_hotkeys.Register(ctrlAltOnce, Keys.A, NextApp))
             failed.Add("Ctrl + Alt + A");
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.V, () => ToggleMicrophone(fromHotkey: true)))
+            failed.Add("Ctrl + Alt + V");
 
         if (failed.Count > 0)
         {

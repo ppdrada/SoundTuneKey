@@ -37,6 +37,7 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 | `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 | `Ctrl + Alt + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
+| `Ctrl + Alt + V` | 🎤 Desliga / liga o microfone (o do Windows inteiro: vale para Discord, jogo e tudo) |
 
 Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, o nome do app e o alto-falante ficam vermelhos) por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
 
@@ -83,6 +84,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 
 - **Sound Tune Key**, bem no topo com o ícone do app — abre o **Sobre**: versão, autor, o link do GitHub e um botão para verificar atualizações
 - Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
+- **Microfone ligado / desligado** — liga ou desliga o microfone; fica vermelho quando está desligado
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem em vermelho
 - **Atalhos** — abre a janelinha com a lista de atalhos

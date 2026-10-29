@@ -26,6 +26,7 @@ docs/               este arquivo e o PRD
 | `ShortcutsWindow.cs` | Janelinha "Atalhos" (mesmo estilo do "Sobre") e a lista de atalhos mostrada nela. |
 | `OsdWindow.cs` | Aviso na tela dos atalhos de volume e mudo: janela `WS_EX_LAYERED` + `UpdateLayeredWindow` (transparência por pixel, borda lisa), `WS_EX_TRANSPARENT`/`NOACTIVATE` (não pega clique nem foco), no monitor da janela da frente, some em ~1,5 s. Liga/desliga na caixinha "Aviso na tela" (linha do "Controlando") ou em "Mostrar aviso na tela" na bandeja (`ShowOsd` no `settings.json`). |
 | `ToggleSwitch.cs` | Interruptor desenhado (trilha + bolinha que desliza) no lugar da caixinha de marcar; continua sendo um `CheckBox`. Usado no "Aviso na tela". `RoundCheck`, no mesmo arquivo, é a bolinha de marcar à esquerda do "Iniciar com o Windows"; no menu da bandeja, `Theme.UseDot` desenha a mesma bolinha nos itens de liga/desliga. |
+| `Microphone.cs` | Mudo do microfone do Windows inteiro (`Ctrl+Alt+V`): `AudioEndpointVolume.Mute` do microfone padrão e do padrão de comunicação (o do Discord pode ser outro). O estado é relido ao abrir o menu e ao ativar a janela, porque o Windows ou o Discord podem mudar. |
 | `AppList.cs` | A lista de apps: o botão direito só abre o menu (Mudo) e não seleciona a linha, para não trocar o app controlado. |
 | `WindowsStartup.cs` | "Iniciar com o Windows": chave em `HKCU\...\Run` com `--tray`. |
 | `AppSettings.cs` | Último app em `%AppData%\SoundTuneKey\settings.json`. |
