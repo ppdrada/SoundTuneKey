@@ -101,8 +101,10 @@ public class OsdWindow : Form
         float side = S(20), iconBox = S(16), reserve = S(72); // reserve: espaço do ícone e do "40%" nas pontas
         float titleCenter = S(25), rowCenter = S(56); // nome e barra bem separados
 
-        using var title = new Font("Segoe UI", 9.5f * scale); // a mesma fonte de antes, só um pouco maior
-        using var big = new Font("Segoe UI", 9f * scale, FontStyle.Bold);
+        // tamanhos em pixels (9,5 pt e 9 pt a 100%) vezes a escala do monitor: em pontos, o Windows ainda
+        // ampliaria pela escala do PC, e o texto ficava grande demais em telas a 125%/150%
+        using var title = new Font("Segoe UI", 12.7f * scale, GraphicsUnit.Pixel);
+        using var big = new Font("Segoe UI", 12f * scale, FontStyle.Bold, GraphicsUnit.Pixel);
         float titleHeight = title.GetHeight(g);
         using (var gray = new SolidBrush(muted ? Theme.Mute : Theme.MutedText)) // mudo: o nome fica vermelho, como na lista
             g.DrawString(appName, title, gray, new RectangleF(side, titleCenter - titleHeight / 2, size.Width - side * 2, titleHeight),

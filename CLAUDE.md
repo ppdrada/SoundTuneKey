@@ -57,6 +57,6 @@ Tema escuro com a paleta do ícone (tabela no PRD), janela de tamanho fixo, mesm
 - Testes de atalho falham em silêncio se outra instância do app estiver aberta.
 - No Windows, não mexer no Smart App Control; o Debug roda sem apphost por causa dele.
 - No Windows, o Debug (via `dotnet`) não pode atualizar o "Iniciar com o Windows" ao abrir: ele trocava a entrada do `.exe` de verdade pelo `dotnet.exe` e o fornecedor "ppdrada" sumia.
-- No Windows, medidas novas na tela são em pixels de 100% (a janela amplia sozinha); o que for desenhado à mão usa `Theme.Scale`. Este PC tem um monitor a 100% e outro a 125%: teste nos dois.
+- No Windows, medidas novas na tela são em pixels de 100% (a janela amplia sozinha); o que for desenhado à mão usa `Theme.Scale`. Este PC tem um monitor a 100% e outro a 125%: teste nos dois. Fonte desenhada à mão (aviso na tela, mini player do menu) vai em **pixels** (`GraphicsUnit.Pixel`) vezes a escala: em pontos, num PC a 125%/150% o Windows já amplia e o texto saía gigante. O monitor principal daqui é 100%, então esse erro não aparece aqui.
 - No Mac, `kAudioAggregateDeviceTapAutoStartKey` faz o `AudioDeviceStart` esperar o app tocar e trava a thread principal: não usar.
 - No Mac, ícone novo da barra de menus some atrás do notch se a barra estiver cheia (resolvido com a posição inicial, veja ARCHITECTURE).

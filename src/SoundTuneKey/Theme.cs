@@ -176,19 +176,28 @@ public static class Theme
     // Texto, setinha do submenu e ✓ claros; o renderer padrão desenha esses detalhes em preto.
     private sealed class DarkMenuRenderer() : ToolStripProfessionalRenderer(new DarkMenuColors())
     {
-        // O menu desenha a imagem antes do texto, e o texto fica um pouco acima do meio da linha.
-        // Para ícone e bolinha ficarem na altura do texto, a imagem só guarda a posição aqui e é
-        // desenhada depois, em OnRenderItemText, centrada no texto.
-        private readonly Dictionary<ToolStripItem, (Rectangle Rect, Image? Image)> _pendingImages = [];
-
+        // O texto é centrado na linha (OnRenderItemText); o ícone e a bolinha também, então ficam na
+        // altura do texto. Desenhados na hora: a ordem em que o menu pinta imagem e texto varia.
         protected override void OnRenderItemImage(ToolStripItemImageRenderEventArgs e)
         {
-            if (e.Item is ToolStripMenuItem && (e.Image is not null || e.Item.Tag is DotTag))
+            if (e.Item is not ToolStripMenuItem item || (e.Image is null && item.Tag is not DotTag))
             {
-                _pendingImages[e.Item] = (e.ImageRectangle, e.Image);
+                base.OnRenderItemImage(e);
                 return;
             }
-            base.OnRenderItemImage(e);
+
+            float s = Scale(e.ToolStrip!), centerY = item.Height / 2f;
+            var r = e.ImageRectangle;
+            float x = r.X + MenuIconInset * s;
+            if (item.Tag is DotTag)
+            {
+                float d = RoundCheck.Dot * s;
+                RoundCheck.DrawDot(e.Graphics, new RectangleF(x + (r.Width - d) / 2, centerY - d / 2, d, d), item.Checked, s);
+            }
+            else
+            {
+                e.Graphics.DrawImage(e.Image!, new RectangleF(x, centerY - r.Height / 2f, r.Width, r.Height));
+            }
         }
 
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
@@ -199,22 +208,6 @@ public static class Theme
             textRect.Y = (e.Item.Height - textRect.Height) / 2;
             e.TextRectangle = textRect;
             base.OnRenderItemText(e);
-
-            if (!_pendingImages.Remove(e.Item, out var pending))
-                return;
-
-            float s = Scale(e.ToolStrip!), centerY = e.TextRectangle.Top + e.TextRectangle.Height / 2f;
-            float x = pending.Rect.X + MenuIconInset * s;
-            if (e.Item is ToolStripMenuItem { Tag: DotTag } item)
-            {
-                float d = RoundCheck.Dot * s;
-                RoundCheck.DrawDot(e.Graphics, new RectangleF(x + (pending.Rect.Width - d) / 2, centerY - d / 2, d, d), item.Checked, s);
-            }
-            else if (pending.Image is not null)
-            {
-                var r = pending.Rect;
-                e.Graphics.DrawImage(pending.Image, new RectangleF(x, centerY - r.Height / 2f, r.Width, r.Height));
-            }
         }
 
         // destaque do item sob o mouse: uma pílula com cantos arredondados, afastada das bordas
