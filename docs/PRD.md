@@ -61,7 +61,7 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 
 ## Identidade visual
 
-- **Ícone** feito pelo usuário: quatro barras em rampa (topo inclinado, clareando da branca até a cinza), uma linha embaixo com uma bolinha de "play" grande. Fica em `assets/icon/` (`icon.svg` é a fonte; `.png` e `.ico` derivam dele). Não criar outro.
+- **Ícone** feito pelo usuário: barras de volume crescentes, uma linha embaixo com uma bolinha de "play". Fica em `assets/icon/` (`icon.svg` é a fonte; `.png` e `.ico` derivam dele). Não criar outro.
 - **Tema escuro** com as cores do ícone, igual nos dois sistemas:
 
 | Uso | Cor |
