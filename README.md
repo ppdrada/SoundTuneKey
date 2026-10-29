@@ -51,6 +51,7 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 |---|---|
 | `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
 | `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
+| `⌃ + ⌥ + M` | 🔇 Mute / unmute the selected app (the volume is kept) |
 | `⌃ + ⌥ + P` | ⏯️ Play / pause |
 | `⌃ + ⌥ + →` | ⏭️ Next track |
 | `⌃ + ⌥ + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
@@ -104,7 +105,7 @@ The program remembers the last app you picked and the volume of each app. The vo
 
 The **Iniciar com o Mac** (Start with Mac) checkbox at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. Click the speaker (or right-click the app in the list) to mute it: the name and the speaker turn red, and changing the volume unmutes. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
 
 > ℹ️ **Chrome:** turn on, once in each Chrome profile, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** (View → Developer → Allow JavaScript from Apple Events) in the Mac menu bar while Chrome is in front. Until then, Sound Tune Key shows a warning with a **Como ligar** (How to turn it on) button that lists the steps and brings Chrome to the front. Chrome's volume works without it. In Chrome, ⏭ and the double ⏮ switch videos on YouTube.
 
@@ -125,7 +126,7 @@ Closing the window does not quit the program: it stays in the menu bar icon (nex
 
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
+- **Aplicativos** (Apps) — click an app to control it; muted apps show in red
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
 - **Sair** (Quit) — quit the program

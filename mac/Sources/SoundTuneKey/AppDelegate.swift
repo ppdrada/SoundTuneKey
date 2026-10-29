@@ -126,6 +126,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             let entry = item(app.isPlaying ? "\(app.displayName)  🔊" : app.displayName, #selector(selectApp(_:)))
             entry.representedObject = app.bundleID
             entry.state = app.bundleID == model.selectedBundleID ? .on : .off
+            if model.isMuted(app.bundleID) {
+                entry.attributedTitle = NSAttributedString(string: entry.title, attributes: [.foregroundColor: NSColor(Theme.mute)])
+            }
             menu.addItem(entry)
         }
     }

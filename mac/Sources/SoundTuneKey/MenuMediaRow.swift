@@ -11,6 +11,7 @@ struct MenuMediaRow: View {
     var body: some View {
         let app = model.selectedApp
         let volume = app.map { Int((model.volume(of: $0.bundleID) * 100).rounded()) }
+        let muted = app.map { model.isMuted($0.bundleID) } ?? false
 
         VStack(spacing: 10) {
             // a bolinha do tempo é menor: tempos 3 pontos mais largos para as trilhas começarem juntas
@@ -25,10 +26,13 @@ struct MenuMediaRow: View {
             }
 
             HStack(spacing: 6) {
-                MediaIcon(glyph: .speaker, size: 12, color: .secondary)
+                MediaIcon(glyph: .speaker, size: 12, color: muted ? Theme.mute : .secondary)
                     .frame(width: 36, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .onTapGesture { if let app { model.toggleMute(app.bundleID) } }
+                    .help(muted ? "Tirar o mudo" : "Mudo")
                 VolumeBar(value: volume ?? 0, enabled: app != nil,
-                          fill: .primary, rest: .primary.opacity(0.25), disabled: .primary.opacity(0.12)) { newValue in
+                          fill: muted ? .primary.opacity(0.45) : .primary, rest: .primary.opacity(0.25), disabled: .primary.opacity(0.12)) { newValue in
                     if let app { model.setVolume(Float(newValue) / 100, for: app.bundleID) }
                 }
                 Text(volume.map { "\($0)%" } ?? "—")

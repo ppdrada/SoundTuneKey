@@ -15,6 +15,8 @@ final class AppModel: ObservableObject {
     /// Tempo da música do app escolhido; nil quando o app não informa (só Spotify e Música informam).
     @Published private(set) var mediaStatus: MediaPlayer.Status?
     @Published private(set) var volumes: [String: Float] = [:]
+    /// Apps no mudo. O volume fica guardado: tirar o mudo volta ao mesmo volume (como no Windows).
+    @Published private(set) var muted: Set<String> = []
     @Published private(set) var errorMessage: String?
     @Published private(set) var startsAtLogin = LoginItem.isEnabled
 
@@ -23,9 +25,10 @@ final class AppModel: ObservableObject {
     private enum Keys {
         static let lastApp = "lastApp"
         static let volumes = "volumes"
+        static let muted = "muted"
     }
 
-    /// Uma captura por app com volume abaixo de 100%. Em 100% o app toca direto, sem captura.
+    /// Uma captura por app com volume abaixo de 100% ou no mudo. Em 100% o app toca direto, sem captura.
     private var taps: [String: AppVolumeTap] = [:]
     /// Apps cuja captura falhou; só tenta de novo quando o volume deles mudar.
     private var failed: Set<String> = []
@@ -41,6 +44,7 @@ final class AppModel: ObservableObject {
     init() {
         selectedBundleID = defaults.string(forKey: Keys.lastApp)
         volumes = (defaults.dictionary(forKey: Keys.volumes) as? [String: Double] ?? [:]).mapValues { Float($0) }
+        muted = Set(defaults.stringArray(forKey: Keys.muted) ?? [])
         refresh()
         // Reler a lista a cada segundo é mais simples que ouvir cada processo, e barato.
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -55,8 +59,11 @@ final class AppModel: ObservableObject {
     private func registerHotkeys() {
         typealias Hotkey = GlobalHotkeys.Hotkey
         hotkeys = GlobalHotkeys([
-            Hotkey(keyCode: Hotkey.upArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: 0.05) },
-            Hotkey(keyCode: Hotkey.downArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: -0.05) },
+            Hotkey(keyCode: Hotkey.upArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: 0.01) },
+            Hotkey(keyCode: Hotkey.downArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: -0.01) },
+            Hotkey(keyCode: Hotkey.mKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in
+                if let bundleID = self?.selectedBundleID { self?.toggleMute(bundleID) }
+            },
             // mídia com ⌃⌥ (as mesmas teclas do Ctrl+Alt do Windows): ⌘⌥←/→ troca de aba nos navegadores
             Hotkey(keyCode: Hotkey.pKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaPlayPause() },
             Hotkey(keyCode: Hotkey.rightArrow, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaNext() },
@@ -68,24 +75,37 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// Atalhos de volume: ±5% no app escolhido, arredondando para múltiplos de 5%.
+    /// Atalhos de volume: ±1% no app escolhido, arredondando para o 1% mais perto.
     private func nudgeVolume(by step: Float) {
         guard let bundleID = selectedBundleID else { return }
-        let steps = ((volume(of: bundleID) + step) * 20).rounded()
-        setVolume(steps / 20, for: bundleID)
+        let steps = ((volume(of: bundleID) + step) * 100).rounded()
+        setVolume(steps / 100, for: bundleID)
     }
 
     var selectedApp: AudioApp? { apps.first { $0.bundleID == selectedBundleID } }
 
     func volume(of bundleID: String) -> Float { volumes[bundleID] ?? 1 }
 
+    func isMuted(_ bundleID: String) -> Bool { muted.contains(bundleID) }
+
+    /// O que de fato toca: 0 no mudo, senão o volume.
+    private func gain(of bundleID: String) -> Float { isMuted(bundleID) ? 0 : volume(of: bundleID) }
+
+    /// Mexer no volume tira o mudo, como no Windows.
     func setVolume(_ volume: Float, for bundleID: String) {
-        let volume = min(max(volume, 0), 1)
-        volumes[bundleID] = volume
+        volumes[bundleID] = min(max(volume, 0), 1)
         defaults.set(volumes.mapValues { Double($0) }, forKey: Keys.volumes)
+        setMuted(false, for: bundleID)
+    }
+
+    func toggleMute(_ bundleID: String) { setMuted(!isMuted(bundleID), for: bundleID) }
+
+    private func setMuted(_ mute: Bool, for bundleID: String) {
+        if mute { muted.insert(bundleID) } else { muted.remove(bundleID) }
+        defaults.set(Array(muted), forKey: Keys.muted)
         failed.remove(bundleID)
-        if let tap = taps[bundleID], volume < 1 {
-            tap.setVolume(volume)
+        if let tap = taps[bundleID], gain(of: bundleID) < 1 {
+            tap.setVolume(gain(of: bundleID))
         } else {
             syncTaps()
         }
@@ -207,15 +227,15 @@ final class AppModel: ObservableObject {
 
         for (bundleID, tap) in taps {
             let app = apps.first { $0.bundleID == bundleID }
-            if volume(of: bundleID) >= 1 || app == nil || app?.processes != tap.processes || tap.outputUID != outputUID {
+            if gain(of: bundleID) >= 1 || app == nil || app?.processes != tap.processes || tap.outputUID != outputUID {
                 taps[bundleID] = nil
             }
         }
 
         guard let outputUID else { return }
-        for app in apps where taps[app.bundleID] == nil && volume(of: app.bundleID) < 1 && !failed.contains(app.bundleID) {
+        for app in apps where taps[app.bundleID] == nil && gain(of: app.bundleID) < 1 && !failed.contains(app.bundleID) {
             do {
-                taps[app.bundleID] = try AppVolumeTap(processes: app.processes, outputUID: outputUID, volume: volume(of: app.bundleID))
+                taps[app.bundleID] = try AppVolumeTap(processes: app.processes, outputUID: outputUID, volume: gain(of: app.bundleID))
                 errorMessage = nil
             } catch {
                 failed.insert(app.bundleID)

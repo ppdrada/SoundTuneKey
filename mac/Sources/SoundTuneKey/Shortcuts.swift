@@ -7,6 +7,7 @@ enum Shortcuts {
     static let list: [(keys: String, action: String)] = [
         ("⌘ ⌥ ↑", "Aumenta o volume"),
         ("⌘ ⌥ ↓", "Diminui o volume"),
+        ("⌃ ⌥ M", "Mudo / volta o som"),
         ("⌃ ⌥ P", "Pausar / continuar"),
         ("⌃ ⌥ →", "Próxima música"),
         ("⌃ ⌥ ←", "Volta ao começo (2x rápido: anterior)"),
@@ -22,6 +23,7 @@ enum Shortcuts {
         case kVK_LeftArrow: key = "←"
         case kVK_RightArrow: key = "→"
         case kVK_ANSI_P: key = "P"
+        case kVK_ANSI_M: key = "M"
         default: key = "?"
         }
         return modifiers + key

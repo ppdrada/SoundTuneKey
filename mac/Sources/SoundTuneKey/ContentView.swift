@@ -12,14 +12,30 @@ struct ContentView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
 
+            // títulos das colunas, como na lista do Windows
+            HStack {
+                Text("Aplicativo")
+                Spacer()
+                Text("Volume")
+            }
+            .font(.system(size: 11))
+            .foregroundStyle(Theme.mutedText)
+            .padding(.horizontal, 16) // o mesmo recuo das linhas (8 da lista + 8 da linha)
+            .padding(.top, 6)
+            .background(Theme.surface)
+
             ScrollView {
                 LazyVStack(spacing: 2) {
                     ForEach(model.apps) { app in
                         AppRow(app: app,
                                volume: model.volume(of: app.bundleID),
+                               muted: model.isMuted(app.bundleID),
                                selected: app.bundleID == model.selectedBundleID)
                             .contentShape(Rectangle())
                             .onTapGesture { model.selectedBundleID = app.bundleID }
+                            .contextMenu {
+                                Button(model.isMuted(app.bundleID) ? "Tirar o mudo" : "Mudo") { model.toggleMute(app.bundleID) }
+                            }
                             .pointerCursor()
                     }
                 }
@@ -62,6 +78,7 @@ struct ContentView: View {
     private var volumePanel: some View {
         let app = model.selectedApp
         let volume = app.map { Int((model.volume(of: $0.bundleID) * 100).rounded()) }
+        let muted = app.map { model.isMuted($0.bundleID) } ?? false
 
         // de cima para baixo: tempo da música, ⏮ ⏯ ⏭ e o volume (a mesma ordem do menu da barra)
         return VStack(alignment: .leading, spacing: 14) {
@@ -84,9 +101,14 @@ struct ContentView: View {
 
             HStack(spacing: 6) {
                 // alto-falante ao lado do volume, para não confundir com a barra de tempo
-                MediaIcon(glyph: .speaker, size: 14, color: Theme.mutedText)
+                // clicar no alto-falante liga e desliga o mudo
+                MediaIcon(glyph: .speaker, size: 14, color: muted ? Theme.mute : Theme.mutedText)
                     .frame(width: 40, alignment: .leading) // mesma largura do tempo, para as barras se alinharem
-                VolumeBar(value: volume ?? 0, enabled: app != nil) { newValue in
+                    .contentShape(Rectangle())
+                    .onTapGesture { if let app { model.toggleMute(app.bundleID) } }
+                    .help(muted ? "Tirar o mudo" : "Mudo")
+                    .pointerCursor(app != nil)
+                VolumeBar(value: volume ?? 0, enabled: app != nil, fill: muted ? Theme.mutedBar : Theme.text) { newValue in
                     if let app { model.setVolume(Float(newValue) / 100, for: app.bundleID) }
                 }
                 Text(volume.map { "\($0)%" } ?? "—")
@@ -142,6 +164,7 @@ private struct ShortcutsBox: View {
 private struct AppRow: View {
     let app: AudioApp
     let volume: Float
+    let muted: Bool
     let selected: Bool
 
     var body: some View {
@@ -152,6 +175,7 @@ private struct AppRow: View {
                 RoundedRectangle(cornerRadius: 5).fill(Theme.dim).frame(width: 22, height: 22)
             }
             Text(app.displayName).lineLimit(1)
+                .foregroundStyle(muted ? Theme.mute : Theme.text)
             Spacer()
             if app.isPlaying {
                 HStack(spacing: 5) {
@@ -159,15 +183,15 @@ private struct AppRow: View {
                     Text("tocando")
                 }
                 .font(.system(size: 11))
-                .foregroundStyle(Theme.text)
+                .foregroundStyle(muted ? Theme.mute : Theme.text)
             } else {
                 Text("parado")
                     .font(.system(size: 11))
-                    .foregroundStyle(Theme.dim)
+                    .foregroundStyle(muted ? Theme.mute : Theme.dim)
             }
             Text("\(Int((volume * 100).rounded()))%")
                 .font(.system(size: 12).monospacedDigit())
-                .foregroundStyle(Theme.mutedText)
+                .foregroundStyle(muted ? Theme.mute : Theme.mutedText)
                 .frame(width: 40, alignment: .trailing)
         }
         .font(.system(size: 13))

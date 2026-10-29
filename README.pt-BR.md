@@ -51,6 +51,7 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 |---|---|
 | `⌘ + ⌥ + ↑` | 🔊 Aumenta o volume do app selecionado (segurar repete) |
 | `⌘ + ⌥ + ↓` | 🔉 Diminui o volume do app selecionado (segurar repete) |
+| `⌃ + ⌥ + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 | `⌃ + ⌥ + P` | ⏯️ Pausar / continuar |
 | `⌃ + ⌥ + →` | ⏭️ Próxima música |
 | `⌃ + ⌥ + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
@@ -104,7 +105,7 @@ O programa lembra o último app escolhido e o volume de cada app. O volume vale 
 
 A caixinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
-Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. Clique no alto-falante (ou no app com o botão direito, na lista) para deixar o app mudo: o nome e o alto-falante ficam vermelhos, e mexer no volume tira o mudo. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
 
 > ℹ️ **Chrome:** ligue uma vez, em cada perfil do Chrome, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** na barra de menus do Mac, com o Chrome na frente. Enquanto não estiver ligado, o Sound Tune Key mostra um aviso com o botão **Como ligar**, que mostra os passos e traz o Chrome para a frente. O volume do Chrome funciona mesmo sem isso. No Chrome, o ⏭ e o ⏮ duplo trocam de vídeo no YouTube.
 
@@ -125,7 +126,7 @@ Fechar a janela não encerra o programa: ele continua no ícone da barra de menu
 
 - No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem com "(mudo)"
+- **Aplicativos** — clique num app para controlá-lo; apps mudos aparecem em vermelho
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
 - **Sair** — encerra o programa

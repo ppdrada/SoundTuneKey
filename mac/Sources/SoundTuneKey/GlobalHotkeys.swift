@@ -88,4 +88,5 @@ extension GlobalHotkeys.Hotkey {
     static let leftArrow = UInt32(kVK_LeftArrow)
     static let rightArrow = UInt32(kVK_RightArrow)
     static let pKey = UInt32(kVK_ANSI_P)
+    static let mKey = UInt32(kVK_ANSI_M)
 }

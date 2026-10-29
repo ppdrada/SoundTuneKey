@@ -21,7 +21,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Segurar o atalho de volume repete | ✅ | ✅ |
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | ✅ `⌃⌥P/→/←` (app escolhido: Spotify, Música e vídeos do Chrome); F7/F8/F9 do Mac continuam valendo |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
-| Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | Ainda não |
+| Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | ✅ `⌃⌥M` |
 | Aviso na tela (volume / mudo) ao usar os atalhos, sem tirar o foco | ✅ | Ainda não |
 | Trocar o app controlado pelo teclado (próximo da lista), com o aviso na tela | ✅ `Ctrl+Alt+A` | Ainda não |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
