@@ -296,8 +296,7 @@ public class MainForm : Form
         menu.Items.Add("Verificar atualizações...", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
         menu.Items.Add("Sair", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
         Theme.Apply(menu);
-        // o menu ignora a própria margem interna: o espaço em cima e embaixo vai no primeiro e no último item
-        aboutItem.Padding = aboutItem.Padding with { Top = aboutItem.Padding.Top + 4 };
+        // o menu ignora a própria margem interna: o espaço embaixo vai no último item
         var lastItem = menu.Items[^1];
         lastItem.Padding = lastItem.Padding with { Bottom = lastItem.Padding.Bottom + 4 };
         Theme.Apply(appsMenu.DropDown);
@@ -503,6 +502,8 @@ public class MainForm : Form
             failed.Add("Ctrl + Alt + ←");
         if (!_hotkeys.Register(ctrlAltOnce, Keys.M, () => { ToggleMute(); ShowOsd(); }))
             failed.Add("Ctrl + Alt + M");
+        if (!_hotkeys.Register(ctrlAltOnce, Keys.A, NextApp))
+            failed.Add("Ctrl + Alt + A");
 
         if (failed.Count > 0)
         {
@@ -520,6 +521,18 @@ public class MainForm : Form
             return;
 
         SetVolume(Math.Clamp(Percent(app.Volume) + delta, 0, 100));
+        ShowOsd();
+    }
+
+    // Ctrl+Alt+A: passa para o próximo app da lista (os que estão tocando vêm primeiro) e mostra no aviso
+    private void NextApp()
+    {
+        var apps = AudioApps.List();
+        if (apps.Count == 0)
+            return;
+
+        int index = apps.FindIndex(a => a.ProcessName == SelectedApp?.ProcessName);
+        SelectApp(apps[(index + 1) % apps.Count].ProcessName);
         ShowOsd();
     }
 

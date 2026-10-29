@@ -19,8 +19,8 @@ public sealed class PlayerPanel : Panel
     {
         Dock = DockStyle.Fill,
         Enabled = false,
-        TrackHeight = 4,
-        ThumbSize = 12,
+        TrackHeight = 3,  // mais fina e discreta que a de volume
+        ThumbSize = 10,
         Maximum = 1,
     };
 
@@ -28,6 +28,7 @@ public sealed class PlayerPanel : Panel
     private readonly Label _elapsed, _duration, _volumeText;
     private readonly List<MediaButton> _buttons = [];
     private readonly MediaButton _speaker;
+    private readonly MediaButton _playPause;
     private readonly ToolTip _toolTip = new();
     private readonly float _glyphSize;
 
@@ -51,12 +52,19 @@ public sealed class PlayerPanel : Panel
         timeRow.Controls.Add(_elapsed);
         timeRow.Controls.Add(_duration);
 
-        var buttonRow = new TableLayoutPanel { Dock = DockStyle.Top, Height = buttonHeight, ColumnCount = 3, RowCount = 1 };
-        for (int i = 0; i < 3; i++)
-            buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100f / 3));
-        buttonRow.Controls.Add(Button(MediaGlyph.Previous, "Volta ao começo (2x rápido: música anterior)", () => PreviousClicked?.Invoke()));
-        buttonRow.Controls.Add(Button(MediaGlyph.PlayPause, "Pausar / continuar", () => PlayPauseClicked?.Invoke()));
-        buttonRow.Controls.Add(Button(MediaGlyph.Next, "Próxima música", () => NextClicked?.Invoke()));
+        // ⏮ ▶ ⏭ juntos no meio (colunas vazias dos lados), com o play em destaque num círculo branco
+        var buttonRow = new TableLayoutPanel { Dock = DockStyle.Top, Height = buttonHeight, ColumnCount = 5, RowCount = 1 };
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, buttonHeight * 2.4f));
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, buttonHeight * 1.5f));
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, buttonHeight * 2.4f));
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        _playPause = Button(MediaGlyph.Play, "Pausar / continuar", () => PlayPauseClicked?.Invoke());
+        _playPause.Filled = true;
+        buttonRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        buttonRow.Controls.Add(Button(MediaGlyph.Previous, "Volta ao começo (2x rápido: música anterior)", () => PreviousClicked?.Invoke()), 1, 0);
+        buttonRow.Controls.Add(_playPause, 2, 0);
+        buttonRow.Controls.Add(Button(MediaGlyph.Next, "Próxima música", () => NextClicked?.Invoke()), 3, 0);
 
         // alto-falante: deixa claro que a barra de baixo é o volume, e não o tempo da música;
         // clicar nele liga e desliga o mudo. Fica à esquerda, alinhado com o tempo de cima.
@@ -108,6 +116,8 @@ public sealed class PlayerPanel : Panel
             return;
 
         _timeline.Enabled = timeline is not null;
+        // ‖ enquanto toca, ▶ quando está pausado (ou quando o app não informa)
+        _playPause.Glyph = timeline?.IsPlaying == true ? MediaGlyph.Pause : MediaGlyph.Play;
         if (timeline is null)
         {
             _timeline.Value = 0;

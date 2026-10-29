@@ -1,8 +1,8 @@
-﻿using System.Drawing.Drawing2D;
+using System.Drawing.Drawing2D;
 
 namespace SoundTuneKey;
 
-public enum MediaGlyph { Previous, PlayPause, Next, Speaker, SpeakerMuted }
+public enum MediaGlyph { Previous, PlayPause, Next, Speaker, SpeakerMuted, Play, Pause }
 
 /// <summary>
 /// Ícones desenhados em vez de caracteres como ⏮: as fontes deixam esses símbolos pequenos,
@@ -42,6 +42,17 @@ public static class MediaIcons
                 g.FillPolygon(brush, Triangle(x, y, s * 0.5f, s, right: true));
                 g.FillRectangle(brush, x + s * 0.62f, y, s * 0.14f, s);
                 g.FillRectangle(brush, x + s * 0.86f, y, s * 0.14f, s);
+                break;
+
+            case MediaGlyph.Play:
+                // ▶ (um pouco à direita do centro, para parecer centrado)
+                g.FillPolygon(brush, Triangle(x + s * 0.12f, y, s * 0.86f, s, right: true));
+                break;
+
+            case MediaGlyph.Pause:
+                // ‖
+                g.FillRectangle(brush, x + s * 0.12f, y, s * 0.28f, s);
+                g.FillRectangle(brush, x + s * 0.60f, y, s * 0.28f, s);
                 break;
 
             case MediaGlyph.Speaker:
@@ -107,7 +118,11 @@ public class MediaButton : Control
         _animation.Tick += (_, _) => Animate();
     }
 
-    /// <summary>O ícone pode mudar (alto-falante normal ou mudo).</summary>
+    /// <summary>Botão principal (play/pause): círculo branco cheio com o ícone escuro, como no Spotify.</summary>
+    [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
+    public bool Filled { get; set; }
+
+    /// <summary>O ícone pode mudar (alto-falante normal ou mudo; ▶ ou ‖).</summary>
     [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
     public MediaGlyph Glyph
     {
@@ -119,6 +134,18 @@ public class MediaButton : Control
     {
         var g = e.Graphics;
         g.Clear(BackColor);
+
+        if (Filled)
+        {
+            // o círculo inteiro encolhe ao clicar; ao passar o mouse ele fica um pouco maior
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            float size = _glyphSize * Theme.Scale(this);
+            float d = Math.Min(Math.Min(Width, Height) - 2, size * 2.5f) * _scale * (1 + 0.06f * _hover);
+            using var circle = new SolidBrush(Enabled ? Theme.Text : Theme.Inactive);
+            g.FillEllipse(circle, (Width - d) / 2f, (Height - d) / 2f, d, d);
+            MediaIcons.Draw(g, _glyph, ClientRectangle, size * 0.9f * _scale, Theme.Background);
+            return;
+        }
 
         if (_hover > 0.01f)
         {

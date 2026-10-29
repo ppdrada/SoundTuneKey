@@ -4,7 +4,8 @@ namespace SoundTuneKey;
 
 public enum MediaCommand { PlayPause, Next, Previous, Restart }
 
-public record MediaTimeline(TimeSpan Position, TimeSpan Duration);
+/// IsPlaying: tocando agora (o botão mostra ‖) ou pausado (mostra ▶).
+public record MediaTimeline(TimeSpan Position, TimeSpan Duration, bool IsPlaying);
 
 /// <summary>
 /// Controles de mídia do Windows (os mesmos das teclas de mídia), direcionados a um app específico.
@@ -60,7 +61,7 @@ public static class MediaControls
         if (position > duration)
             position = duration;
 
-        return new MediaTimeline(position, duration);
+        return new MediaTimeline(position, duration, playing);
     }
 
     /// <summary>Pula para <paramref name="position"/> na música do app.</summary>

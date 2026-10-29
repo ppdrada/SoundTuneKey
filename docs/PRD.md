@@ -23,6 +23,7 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
 | Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | Ainda não |
 | Aviso na tela (volume / mudo) ao usar os atalhos, sem tirar o foco | ✅ | Ainda não |
+| Trocar o app controlado pelo teclado (próximo da lista), com o aviso na tela | ✅ `Ctrl+Alt+A` | Ainda não |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |

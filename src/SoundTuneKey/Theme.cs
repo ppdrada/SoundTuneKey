@@ -64,12 +64,17 @@ public static class Theme
     {
         var bmp = new Bitmap(16, 16);
         using var g = Graphics.FromImage(bmp);
-        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+        // AntiAlias comum: o ClearType do TextRenderer, num fundo transparente, deixa um quadradinho escuro em volta
+        g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
         using var font = new Font(IconFont, 11f, GraphicsUnit.Pixel);
-        TextRenderer.DrawText(g, glyph.ToString(), font, new Rectangle(0, 0, 16, 16), MutedText,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        using var brush = new SolidBrush(MutedText);
+        using var center = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+        g.DrawString(glyph.ToString(), font, brush, new RectangleF(0, 0, 16, 16), center);
         return bmp;
     }
+
+    // os ícones e as bolinhas do menu são desenhados um pouco para dentro, para não encostar na borda
+    private const int MenuIconInset = 6;
 
     private static readonly string IconFont = FontFamily.Families.Any(f => f.Name == "Segoe Fluent Icons")
         ? "Segoe Fluent Icons" : "Segoe MDL2 Assets";
@@ -181,7 +186,16 @@ public static class Theme
             {
                 float s = Scale(e.ToolStrip!), d = RoundCheck.Dot * s;
                 var r = e.ImageRectangle;
-                RoundCheck.DrawDot(e.Graphics, new RectangleF(r.X + (r.Width - d) / 2, r.Y + (r.Height - d) / 2, d, d), item.Checked, s);
+                RoundCheck.DrawDot(e.Graphics, new RectangleF(r.X + MenuIconInset * s + (r.Width - d) / 2, r.Y + (r.Height - d) / 2, d, d), item.Checked, s);
+                return;
+            }
+
+            if (e.Image is not null && e.Item is ToolStripMenuItem)
+            {
+                var r = e.ImageRectangle;
+                r.Y = (e.Item.Height - r.Height) / 2; // centrado na linha, como o texto
+                r.Offset((int)(MenuIconInset * Scale(e.ToolStrip!)), 0);
+                e.Graphics.DrawImage(e.Image, r);
                 return;
             }
             base.OnRenderItemImage(e);
