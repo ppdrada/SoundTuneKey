@@ -55,8 +55,12 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 | `⌃ + ⌥ + P` | ⏯️ Pausar / continuar |
 | `⌃ + ⌥ + →` | ⏭️ Próxima música |
 | `⌃ + ⌥ + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
+| `⌃ + ⌥ + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
+| `⌃ + ⌥ + V` | 🎤 Desliga / liga o microfone (o do Mac inteiro: vale para Discord, jogo e tudo) |
 
-> ℹ️ `⌃` é a tecla Control e `⌥` é a Option. Os atalhos de mídia controlam o app escolhido quando ele é o **Spotify**, o **Música** ou um vídeo no **Google Chrome**; as teclas de mídia do próprio Mac (F7/F8/F9) continuam valendo para o app que estiver tocando. Os atalhos também aparecem dentro do programa, embaixo da janela.
+Ao usar os atalhos de volume, mudo, troca de app ou microfone, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, em vermelho) por um instante, sem tirar o foco, até sobre jogos em tela cheia. Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da barra.
+
+> ℹ️ `⌃` é a tecla Control e `⌥` é a Option. Os atalhos de mídia controlam o app escolhido quando ele é o **Spotify**, o **Música** ou um vídeo no **Google Chrome**; as teclas de mídia do próprio Mac (F7/F8/F9) continuam valendo para o app que estiver tocando. Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo da janela. Ao lado, **Sobre** mostra a versão, o autor e o link do GitHub, e o ícone 🎤 liga e desliga o microfone.
 
 ---
 
@@ -103,7 +107,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 
 O programa lembra o último app escolhido e o volume de cada app. O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, os apps voltam ao volume normal até você abrir de novo.
 
-A caixinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
+A bolinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
 Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. Clique no alto-falante (ou no app com o botão direito, na lista) para deixar o app mudo: o nome e o alto-falante ficam vermelhos, e mexer no volume tira o mudo. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
 
@@ -125,11 +129,17 @@ O botão **Abrir Mesmo Assim** só aparece logo depois de você tentar abrir o a
 Fechar a janela não encerra o programa: ele continua no ícone da barra de menus (perto do Wi-Fi) e os atalhos seguem funcionando. Para mudar o ícone de lugar, segure **⌘** e arraste. Clique no ícone para:
 
 - No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
+- **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**
+- **Microfone ligado / desligado** — liga e desliga o microfone (vermelho quando desligado)
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — clique num app para controlá-lo; apps mudos aparecem em vermelho
+- **Aplicativos** — passe o mouse num app para ver **Mudo** (o app controlado, marcado, é escolhido na janela); apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
+- **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
+- **Verificar atualizações...** — procura uma versão nova; **Atualizar agora** baixa, troca o app e abre de novo
 - **Sair** — encerra o programa
+
+O programa também procura versão nova sozinho (ao abrir e uma vez por dia) e avisa com uma notificação, o item no menu e uma faixa na janela.
 
 Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramentas de linha de comando do Xcode: `xcode-select --install`).
 

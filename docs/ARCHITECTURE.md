@@ -48,7 +48,7 @@ docs/               este arquivo e o PRD
 
 | Arquivo | Papel |
 |---|---|
-| `main.swift` / `AppDelegate.swift` | Entrada AppKit. `NSWindow` com a view SwiftUI dentro, e `NSStatusItem` com o menu (Abrir, Aplicativos, Atalhos, Sair). Fechar só esconde; com a janela escondida o app sai do Dock (`.accessory`). |
+| `main.swift` / `AppDelegate.swift` | Entrada AppKit. `NSWindow` com a view SwiftUI dentro, e `NSStatusItem` com o menu (Sobre, versão nova, mini player, microfone, Abrir, Aplicativos, Atalhos, Iniciar com o Mac, aviso na tela, Verificar atualizações, Sair). No Mac, item com submenu não reage ao clique: o app controlado é escolhido na janela e o submenu de cada app tem só Mudo. Fechar só esconde; com a janela escondida o app sai do Dock (`.accessory`). |
 | `AppModel.swift` | Estado: lista de apps, app escolhido, volumes, capturas. Relê a lista a cada 1 s. Registra os atalhos. |
 | `AudioApps.swift` | Lista os processos de áudio do Core Audio (`kAudioHardwarePropertyProcessObjectList`, macOS 14.2+), acha o app "de verdade" de cada processo (o próprio processo, o pai, ou um app cujo bundle ID é o começo do bundle ID do processo) e junta os auxiliares (Chrome Helper etc.). Esconde os terminais. |
 | `AppVolumeTap.swift` | Volume por app (abaixo). |
@@ -60,6 +60,10 @@ docs/               este arquivo e o PRD
 | `ChromeMedia.swift` | Mídia do **Chrome**: executa JavaScript nas abas (`execute ... javascript`) para achar o `<video>`/`<audio>` (prefere o que está tocando) e ler/mudar `currentTime`, `paused`, `duration`. Guarda a aba encontrada e só procura de novo a cada 2 s (passa por todas as abas). ⏭ e o ⏮ duplo clicam nos botões do player do YouTube; em outros sites o ⏮ volta ao começo. `showSetup()` é o botão "Como ligar". |
 | `MediaIcons.swift` | Ícones ⏮ ⏯ ⏭ e alto-falante desenhados com `Canvas`, nas mesmas formas do `MediaIcons.cs`; `MediaButton` com mãozinha, círculo ao passar o mouse e encolhimento ao clicar; `pointerCursor()` para qualquer item clicável. |
 | `MenuMediaRow.swift` | Primeira linha do menu da barra (um `NSHostingView` dentro do `NSMenuItem`): tempo, ⏮ ⏯ ⏭ e volume, em cores do sistema (o menu segue claro/escuro). Clicar não fecha o menu. |
+| `Osd.swift` | Aviso na tela: `NSPanel` sem borda e `.nonactivatingPanel` (não rouba o foco), `ignoresMouseEvents`, nível `.screenSaver` com `.fullScreenAuxiliary` (aparece sobre tela cheia), embaixo no meio do `NSScreen.main`. Some aos poucos depois de 1,2 s. |
+| `Microphone.swift` | Mudo do microfone padrão (`⌃⌥V`): `kAudioDevicePropertyMute` no escopo de entrada (canal principal ou canal 1). Sem esse controle, o ícone e o item do menu somem. |
+| `Updates.swift` / `Dialogs.swift` | Versão nova em `download/version-mac.txt` (15 s depois de abrir e uma vez por dia; notificação uma vez por versão). "Atualizar agora" baixa o `.zip`, descompacta com `ditto`, confere o bundle ID, troca o `.app` (`replaceItemAt`) e reabre com `--after-update`. Sobre e Atalhos em janelinhas sem borda (`DialogWindow`, fecha com Esc). |
+| `Controls.swift` | Interruptor, bolinha (também como imagem dos itens de liga/desliga do menu), links e botões das janelinhas. |
 | `LoginItem.swift` | "Iniciar com o Mac" pelo `SMAppService.mainApp` (macOS 13+; aparece em Ajustes → Geral → Itens de Início). Aberto pelo login (evento de abertura com `keyAELaunchedAsLogInItem`) ou com `--tray`, o app começa escondido na barra de menus. |
 | `Resources/Info.plist` | Bundle `com.ppdrada.SoundTuneKey`, mínimo 14.2, texto da permissão de áudio (`NSAudioCaptureUsageDescription`). |
 | `build-app.sh` | Compila e monta o `.app` (veja abaixo). |

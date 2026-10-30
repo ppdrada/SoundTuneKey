@@ -2,8 +2,12 @@ import AppKit
 
 /// Ícone da barra de menus: as quatro barras crescentes e a linha do ícone do app
 /// (assets/icon/icon.svg), em versão "template" para o macOS pintar de claro ou escuro.
+/// Com o app escolhido no mudo, o ícone fica vermelho.
 enum MenuBarIcon {
-    static let image: NSImage = {
+    static let image = make(.black)
+    static let muted = make(NSColor(Theme.mute))
+
+    private static func make(_ color: NSColor) -> NSImage {
         let size = NSSize(width: 18, height: 18)
         let image = NSImage(size: size, flipped: true) { _ in
             // coordenadas do icon.svg (grupo de 512 x 570), encaixadas em 18 x 18
@@ -14,7 +18,7 @@ enum MenuBarIcon {
             }
 
             // as partes claras do ícone ficam cheias; as apagadas, meio transparentes
-            let full = NSColor.black, dim = NSColor.black.withAlphaComponent(0.35)
+            let full = color, dim = color.withAlphaComponent(0.35)
             for (x, y, color) in [(32, 170, full), (152, 115, full), (272, 60, dim), (392, 0, dim)] as [(CGFloat, CGFloat, NSColor)] {
                 color.setFill()
                 NSBezierPath(roundedRect: rect(x, y, 88, 360 - y), xRadius: 16 * scale, yRadius: 16 * scale).fill()
@@ -36,7 +40,8 @@ enum MenuBarIcon {
             NSGraphicsContext.current?.compositingOperation = .sourceOver
             return true
         }
-        image.isTemplate = true
+        // só o preto é template; o vermelho fica com a própria cor
+        image.isTemplate = color == .black
         return image
-    }()
+    }
 }

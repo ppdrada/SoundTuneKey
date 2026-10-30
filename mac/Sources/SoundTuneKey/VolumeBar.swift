@@ -12,6 +12,8 @@ struct VolumeBar: View {
     var fill: Color = Theme.text
     var rest: Color = Theme.dim
     var disabled: Color = Theme.border
+    /// Setas do teclado mudam 1 de cada vez (a barra de volume, como no Windows).
+    var arrowKeys = false
     let onChange: (Int) -> Void
     /// Ao soltar o mouse (a barra de tempo só pula para o trecho nessa hora).
     var onRelease: () -> Void = {}
@@ -49,6 +51,15 @@ struct VolumeBar: View {
         }
         .frame(height: thumbSize + 4)
         .pointerCursor(enabled)
+        .focusable(arrowKeys && enabled)
+        .focusEffectDisabled()
+        .onKeyPress(keys: [.leftArrow, .downArrow, .rightArrow, .upArrow]) { press in
+            guard arrowKeys && enabled else { return .ignored }
+            let step = press.key == .leftArrow || press.key == .downArrow ? -1 : 1
+            let newValue = min(max(value + step, 0), maximum)
+            if newValue != value { onChange(newValue) }
+            return .handled
+        }
     }
 }
 
@@ -61,7 +72,7 @@ struct TimeBar: View {
     var fill: Color = Theme.text
     var rest: Color = Theme.dim
     var disabled: Color = Theme.border
-    var labelWidth: CGFloat = 40
+    var labelWidth: CGFloat = 49
     let onSeek: (Double) -> Void
 
     @State private var dragging: Int?
@@ -72,7 +83,7 @@ struct TimeBar: View {
             Text(status.map { _ in Self.format(Double(position)) } ?? "--:--")
                 .frame(width: labelWidth, alignment: .leading)
             VolumeBar(value: position, maximum: Int((status?.duration ?? 0).rounded(.up)), enabled: status != nil,
-                      trackHeight: 4, thumbSize: 12, fill: fill, rest: rest, disabled: disabled,
+                      trackHeight: 3, thumbSize: 10, fill: fill, rest: rest, disabled: disabled,
                       onChange: { dragging = $0 },
                       onRelease: {
                           if let dragging { onSeek(Double(dragging)) }

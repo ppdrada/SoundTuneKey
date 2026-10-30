@@ -19,6 +19,12 @@ final class AppModel: ObservableObject {
     @Published private(set) var muted: Set<String> = []
     @Published private(set) var errorMessage: String?
     @Published private(set) var startsAtLogin = LoginItem.isEnabled
+    /// Aviso na tela ao usar os atalhos (interruptor da janela e item do menu, sempre iguais).
+    @Published var showOsd: Bool { didSet { defaults.set(showOsd, forKey: Keys.showOsd) } }
+    /// Mudo do microfone do Mac; nil quando não há microfone (o ícone e a linha do menu somem).
+    @Published private(set) var micMuted: Bool?
+    let updates = Updates()
+    private let osd = Osd()
 
     /// O último app e os volumes ficam salvos, para os atalhos já valerem quando o Mac liga.
     private let defaults = UserDefaults.standard
@@ -26,6 +32,7 @@ final class AppModel: ObservableObject {
         static let lastApp = "lastApp"
         static let volumes = "volumes"
         static let muted = "muted"
+        static let showOsd = "showOsd"
     }
 
     /// Uma captura por app com volume abaixo de 100% ou no mudo. Em 100% o app toca direto, sem captura.
@@ -42,6 +49,7 @@ final class AppModel: ObservableObject {
     private var mediaErrorShown: String?
 
     init() {
+        showOsd = defaults.object(forKey: Keys.showOsd) as? Bool ?? true
         selectedBundleID = defaults.string(forKey: Keys.lastApp)
         volumes = (defaults.dictionary(forKey: Keys.volumes) as? [String: Double] ?? [:]).mapValues { Float($0) }
         muted = Set(defaults.stringArray(forKey: Keys.muted) ?? [])
@@ -54,6 +62,8 @@ final class AppModel: ObservableObject {
             MainActor.assumeIsolated { self?.taps.removeAll() }
         }
         registerHotkeys()
+        refreshMic()
+        updates.startAutomaticCheck()
     }
 
     private func registerHotkeys() {
@@ -62,7 +72,15 @@ final class AppModel: ObservableObject {
             Hotkey(keyCode: Hotkey.upArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: 0.01) },
             Hotkey(keyCode: Hotkey.downArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: -0.01) },
             Hotkey(keyCode: Hotkey.mKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in
-                if let bundleID = self?.selectedBundleID { self?.toggleMute(bundleID) }
+                guard let self, let bundleID = selectedBundleID else { return }
+                toggleMute(bundleID)
+                showVolumeOsd()
+            },
+            Hotkey(keyCode: Hotkey.aKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.switchApp() },
+            Hotkey(keyCode: Hotkey.vKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in
+                guard let self else { return }
+                toggleMic()
+                if showOsd, let micMuted { osd.show(.mic(muted: micMuted)) }
             },
             // mídia com ⌃⌥ (as mesmas teclas do Ctrl+Alt do Windows): ⌘⌥←/→ troca de aba nos navegadores
             Hotkey(keyCode: Hotkey.pKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in self?.mediaPlayPause() },
@@ -80,6 +98,37 @@ final class AppModel: ObservableObject {
         guard let bundleID = selectedBundleID else { return }
         let steps = ((volume(of: bundleID) + step) * 100).rounded()
         setVolume(steps / 100, for: bundleID)
+        showVolumeOsd()
+    }
+
+    /// ⌃⌥A: o próximo app da lista (os tocando vêm primeiro); depois do último, volta ao primeiro.
+    func switchApp() {
+        refresh()
+        guard !apps.isEmpty else { return }
+        let index = apps.firstIndex { $0.bundleID == selectedBundleID }.map { ($0 + 1) % apps.count } ?? 0
+        selectedBundleID = apps[index].bundleID
+        showVolumeOsd()
+    }
+
+    private func showVolumeOsd() {
+        guard showOsd, let app = selectedApp else { return }
+        osd.show(.volume(app: app.displayName, volume: Int((volume(of: app.bundleID) * 100).rounded()),
+                         muted: isMuted(app.bundleID)))
+    }
+
+    // MARK: - Microfone
+
+    /// Relido ao abrir o menu e ao ativar a janela: o sistema ou o Discord podem mudá-lo.
+    func refreshMic() {
+        let value = Microphone.isMuted()
+        if value != micMuted { micMuted = value }
+    }
+
+    func toggleMic() {
+        refreshMic()
+        guard let micMuted else { return }
+        if !Microphone.setMuted(!micMuted) { errorMessage = "Não foi possível mudar o microfone." }
+        refreshMic()
     }
 
     var selectedApp: AudioApp? { apps.first { $0.bundleID == selectedBundleID } }
