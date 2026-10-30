@@ -10,6 +10,9 @@ enum Shortcuts {
         ("⌃ ⌥ P", "Pausar / continuar"),
         ("⌃ ⌥ →", "Próxima música"),
         ("⌃ ⌥ ←", "Volta ao começo (2x rápido: anterior)"),
+        ("⌃ ⌥ M", "Mudo / volta o som do app"),
+        ("⌃ ⌥ A", "Troca para o próximo app"),
+        ("⌃ ⌥ V", "Desliga / liga o microfone"),
     ]
 
     /// Nome legível de um atalho, para o aviso de "outro programa já usa".
@@ -22,6 +25,9 @@ enum Shortcuts {
         case kVK_LeftArrow: key = "←"
         case kVK_RightArrow: key = "→"
         case kVK_ANSI_P: key = "P"
+        case kVK_ANSI_M: key = "M"
+        case kVK_ANSI_A: key = "A"
+        case kVK_ANSI_V: key = "V"
         default: key = "?"
         }
         return modifiers + key

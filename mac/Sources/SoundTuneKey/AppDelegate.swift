@@ -1,22 +1,31 @@
 import AppKit
 import Combine
 import SwiftUI
+import UserNotifications
 
 /// Janela + ícone na barra de menus, como a janela + bandeja da versão Windows.
 /// Fechar a janela só esconde: o app continua na barra de menus e os atalhos seguem funcionando.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate, UNUserNotificationCenterDelegate {
     private let model = AppModel()
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private let appsMenu = NSMenu()
     private var selectionWatch: AnyCancellable?
+    private var muteWatch: AnyCancellable?
     private lazy var startAtLoginItem = item("Iniciar com o Mac", #selector(toggleStartAtLogin))
+    private lazy var osdItem = item("Mostrar aviso na tela", #selector(toggleOsd))
+    private lazy var updateItem = item("Atualizar", #selector(showUpdate), symbol: "arrow.down.circle")
+    private lazy var micItem = item("Microfone", #selector(toggleMic))
+    private var aboutWindow: NSWindow?
+    private var shortcutsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = makeMainMenu()
         setupWindow()
         setupStatusItem()
+        UNUserNotificationCenter.current().delegate = self
+        if Updates.justUpdatedTo != nil { showAbout(checking: false) }
         // aberto pelo "Iniciar com o Mac": fica só na barra de menus, como o --tray do Windows
         if LoginItem.launchedHidden {
             NSApp.setActivationPolicy(.accessory)
@@ -34,12 +43,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     // MARK: - Janela
 
     private func setupWindow() {
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 411, height: 500),
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 411, height: 440),
                           styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = "Sound Tune Key"
         window.appearance = NSAppearance(named: .darkAqua)
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(rootView: ContentView(model: model))
+        window.contentView = NSHostingView(rootView: ContentView(
+            model: model, updates: model.updates,
+            openShortcuts: { [weak self] in self?.showShortcuts() },
+            openAbout: { [weak self] in self?.showAbout(checking: $0) }))
         window.delegate = self
         window.center()
     }
@@ -52,14 +64,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         model.setShowingMedia(true, by: "janela")
     }
 
+    func windowDidBecomeKey(_ notification: Notification) {
+        if notification.object as? NSWindow === window { model.refreshMic() }
+    }
+
     func windowWillClose(_ notification: Notification) {
+        guard notification.object as? NSWindow === window else { return }
         NSApp.setActivationPolicy(.accessory)
         model.setShowingMedia(false, by: "janela")
     }
 
     // o tempo da música só é lido com o menu aberto (ou a janela visível)
     func menuWillOpen(_ menu: NSMenu) {
-        if menu === statusItem.menu { model.setShowingMedia(true, by: "menu") }
+        if menu === statusItem.menu {
+            model.setShowingMedia(true, by: "menu")
+            model.refreshMic()
+        }
     }
 
     func menuDidClose(_ menu: NSMenu) {
@@ -83,20 +103,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         statusItem.button?.toolTip = "Sound Tune Key"
 
         let menu = NSMenu()
+        let about = item("Sound Tune Key", #selector(showAboutFromMenu))
+        about.image = NSApp.applicationIconImage.resized(16)
+        menu.addItem(about)
+        menu.addItem(updateItem)
+        menu.addItem(.separator())
         let media = NSMenuItem()
         let mediaView = NSHostingView(rootView: MenuMediaRow(model: model))
         mediaView.frame = NSRect(origin: .zero, size: MenuMediaRow.size)
         media.view = mediaView
         menu.addItem(media)
         menu.addItem(.separator())
-        menu.addItem(item("Abrir", #selector(showWindow)))
+        menu.addItem(micItem)
+        menu.addItem(item("Abrir", #selector(showWindow), symbol: "macwindow"))
         let apps = NSMenuItem(title: "Aplicativos", action: nil, keyEquivalent: "")
+        apps.image = symbol("list.bullet")
         apps.submenu = appsMenu
         menu.addItem(apps)
-        menu.addItem(item("Atalhos", #selector(showShortcuts)))
-        menu.addItem(startAtLoginItem)
+        menu.addItem(item("Atalhos", #selector(showShortcuts), symbol: "keyboard"))
         menu.addItem(.separator())
-        menu.addItem(item("Sair", #selector(quit)))
+        menu.addItem(startAtLoginItem)
+        menu.addItem(osdItem)
+        menu.addItem(.separator())
+        menu.addItem(item("Verificar atualizações...", #selector(showUpdate), symbol: "arrow.clockwise"))
+        menu.addItem(item("Sair", #selector(quit), symbol: "power"))
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
         appsMenu.delegate = self
         menu.delegate = self
@@ -104,13 +134,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
         // o app pode ser escolhido na janela ou no menu; a dica do ícone acompanha os dois
         selectionWatch = model.$selectedBundleID.receive(on: RunLoop.main).sink { [weak self] _ in self?.updateToolTip() }
+        // ícone vermelho enquanto o app escolhido estiver no mudo
+        muteWatch = model.$selectedBundleID.combineLatest(model.$muted).receive(on: RunLoop.main).sink { [weak self] app, muted in
+            self?.statusItem.button?.image = app.map(muted.contains) == true ? MenuBarIcon.muted : MenuBarIcon.image
+        }
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         guard menu === appsMenu else {
-            // menu principal: a caixinha acompanha a da janela e os Ajustes do Sistema
+            // menu principal: a bolinha acompanha a da janela e os Ajustes do Sistema
             model.refreshStartsAtLogin()
-            startAtLoginItem.state = model.startsAtLogin ? .on : .off
+            // a mesma bolinha da janela no lugar do ✓, na coluna dos ícones para alinhar com os outros itens
+            startAtLoginItem.image = RadioDot.menuImage(on: model.startsAtLogin)
+            osdItem.image = RadioDot.menuImage(on: model.showOsd)
+            updateItem.isHidden = model.updates.available == nil
+            updateItem.title = "Atualizar para a versão \(model.updates.available ?? "")"
+            model.refreshMic()
+            micItem.isHidden = model.micMuted == nil
+            let micOff = model.micMuted == true
+            micItem.attributedTitle = NSAttributedString(string: micOff ? "Microfone desligado" : "Microfone ligado",
+                                                         attributes: micOff ? [.foregroundColor: NSColor(Theme.mute)] : [:])
+            micItem.image = symbol(micOff ? "mic.slash" : "mic", color: micOff ? NSColor(Theme.mute) : nil)
             return
         }
         menu.removeAllItems()
@@ -123,15 +167,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             return
         }
         for app in model.apps {
-            let entry = item(app.isPlaying ? "\(app.displayName)  🔊" : app.displayName, #selector(selectApp(_:)))
-            entry.representedObject = app.bundleID
+            let entry = NSMenuItem(title: app.isPlaying ? "\(app.displayName)  🔊" : app.displayName, action: nil, keyEquivalent: "")
             entry.state = app.bundleID == model.selectedBundleID ? .on : .off
+            if model.isMuted(app.bundleID) {
+                entry.attributedTitle = NSAttributedString(string: entry.title, attributes: [.foregroundColor: NSColor(Theme.mute)])
+            }
+            // como no Windows, o mudo fica no submenu de cada app. No Mac, clicar num item com
+            // submenu não faz nada: o app é escolhido na janela
+            let submenu = NSMenu()
+            let mute = item("Mudo", #selector(toggleMute(_:)))
+            mute.representedObject = app.bundleID
+            mute.state = model.isMuted(app.bundleID) ? .on : .off
+            submenu.addItem(mute)
+            entry.submenu = submenu
             menu.addItem(entry)
         }
     }
 
-    @objc private func selectApp(_ sender: NSMenuItem) {
-        model.selectedBundleID = sender.representedObject as? String
+    @objc private func toggleMute(_ sender: NSMenuItem) {
+        if let bundleID = sender.representedObject as? String { model.toggleMute(bundleID) }
     }
 
     /// Como o texto do ícone da bandeja no Windows: mostra qual app está sendo controlado.
@@ -141,13 +195,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     }
 
     @objc private func showShortcuts() {
-        let alert = NSAlert()
-        alert.messageText = "Sound Tune Key — Atalhos"
-        alert.informativeText = Shortcuts.list.map { "\($0.keys)    \($0.action)" }.joined(separator: "\n")
-            + "\n\nO volume muda no app escolhido em Aplicativos."
-        alert.icon = NSApp.applicationIconImage
+        if shortcutsWindow?.isVisible != true {
+            shortcutsWindow = DialogWindow(size: ShortcutsView.size) { ShortcutsView(close: $0) }
+        }
         NSApp.activate()
-        alert.runModal()
+        shortcutsWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    @objc private func showAboutFromMenu() { showAbout(checking: false) }
+    @objc private func showUpdate() { showAbout(checking: true) }
+
+    /// Sobre e atualizações na mesma janelinha; checking já procura a versão nova.
+    private func showAbout(checking: Bool) {
+        aboutWindow?.close()
+        aboutWindow = DialogWindow(size: AboutView.size) { [model] close in
+            AboutView(updates: model.updates, checkOnOpen: checking, close: close)
+        }
+        NSApp.activate()
+        aboutWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    @objc private func toggleOsd() { model.showOsd.toggle() }
+    @objc private func toggleMic() { model.toggleMic() }
+
+    // clicar na notificação de versão nova abre a janela de atualizar
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        await MainActor.run { showAbout(checking: true) }
     }
 
     @objc private func toggleStartAtLogin() {
@@ -158,10 +231,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         NSApp.terminate(nil)
     }
 
-    private func item(_ title: String, _ action: Selector) -> NSMenuItem {
+    private func item(_ title: String, _ action: Selector, symbol name: String? = nil) -> NSMenuItem {
         let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
         item.target = self
+        if let name { item.image = symbol(name) }
         return item
+    }
+
+    /// Ícones do menu com os símbolos do próprio macOS.
+    private func symbol(_ name: String, color: NSColor? = nil) -> NSImage? {
+        let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)
+        guard let color else { return image }
+        return image?.withSymbolConfiguration(.init(paletteColors: [color]))
     }
 
     // MARK: - Menu do app (⌘W fecha a janela, ⌘Q sai)
@@ -179,5 +260,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             main.addItem(entry)
         }
         return main
+    }
+}
+
+private extension NSImage {
+    func resized(_ side: CGFloat) -> NSImage {
+        NSImage(size: NSSize(width: side, height: side), flipped: false) { rect in
+            self.draw(in: rect)
+            return true
+        }
     }
 }

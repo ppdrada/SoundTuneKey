@@ -9,6 +9,9 @@ enum Theme {
     static let text = Color(hex: 0xF2F2F2)
     static let mutedText = Color(hex: 0x9A9AA0)
     static let dim = Color(hex: 0x4A4A50)
+    /// App no mudo: alto-falante e nome em vermelho, barra de volume apagada (como no Windows).
+    static let mute = Color(hex: 0xE5534B)
+    static let mutedBar = Color(hex: 0x6A6A70)
 }
 
 extension Color {

@@ -21,15 +21,15 @@ Primeiro para o próprio autor (gamer, Windows e Mac). O código não tem licen�
 | Segurar o atalho de volume repete | ✅ | ✅ |
 | Pausar / próxima / anterior | ✅ `Ctrl+Alt+P/→/←` (só do app escolhido) | ✅ `⌃⌥P/→/←` (app escolhido: Spotify, Música e vídeos do Chrome); F7/F8/F9 do Mac continuam valendo |
 | `←` volta ao começo; dois toques em menos de 1 s = música anterior | ✅ | ✅ |
-| Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | Ainda não |
-| Aviso na tela (volume / mudo) ao usar os atalhos, sem tirar o foco | ✅ | Ainda não |
-| Trocar o app controlado pelo teclado (próximo da lista), com o aviso na tela | ✅ `Ctrl+Alt+A` | Ainda não |
+| Mudo do app escolhido (atalho e clique no alto-falante); mexer no volume tira o mudo | ✅ `Ctrl+Alt+M` | ✅ `⌃⌥M` |
+| Aviso na tela (volume / mudo) ao usar os atalhos, sem tirar o foco | ✅ | ✅ (aparece até sobre tela cheia) |
+| Trocar o app controlado pelo teclado (próximo da lista), com o aviso na tela | ✅ `Ctrl+Alt+A` | ✅ `⌃⌥A` |
 | Botões ⏮ ⏯ ⏭ na janela e no topo do menu da bandeja / barra de menus, junto com o tempo e o volume | ✅ | ✅ Spotify, Música e vídeos do Chrome (apagados nos outros apps) |
 | Barra de tempo da música (arrastar para pular), diferente da de volume | ✅ | ✅ Spotify, Música e vídeos do Chrome |
 | Fica escondido (bandeja / barra de menus), fechar só esconde | ✅ | ✅ |
-| "Verificar atualizações..." e "Sobre" (versão, autor, GitHub) no menu, com janelinha de cantos arredondados | ✅ | Ainda não |
-| Atualiza sozinho (baixa, troca e reabre) e avisa versão nova (balão, menu e faixa na janela, uma vez por dia) | ✅ | Ainda não |
-| Mudo do microfone do Windows (atalho, ícone no rodapé, linha no menu, aviso na tela) | ✅ `Ctrl+Alt+V` | Ainda não |
+| "Verificar atualizações..." e "Sobre" (versão, autor, GitHub) no menu, com janelinha de cantos arredondados | ✅ | ✅ |
+| Atualiza sozinho (baixa, troca e reabre) e avisa versão nova (balão, menu e faixa na janela, uma vez por dia) | ✅ | ✅ (`download/version-mac.txt`; troca o `.app`) |
+| Mudo do microfone do Windows (atalho, ícone no rodapé, linha no menu, aviso na tela) | ✅ `Ctrl+Alt+V` | ✅ `⌃⌥V` (microfone padrão do Mac) |
 | Lista de atalhos dentro do app | ✅ | ✅ |
 | Iniciar com o sistema (abre escondido) | ✅ | ✅ |
 | Lembrar o último app | ✅ | ✅ (e o volume de cada app) |

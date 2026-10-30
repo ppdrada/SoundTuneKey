@@ -51,11 +51,16 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 |---|---|
 | `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
 | `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
+| `⌃ + ⌥ + M` | 🔇 Mute / unmute the selected app (the volume is kept) |
 | `⌃ + ⌥ + P` | ⏯️ Play / pause |
 | `⌃ + ⌥ + →` | ⏭️ Next track |
 | `⌃ + ⌥ + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
+| `⌃ + ⌥ + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
+| `⌃ + ⌥ + V` | 🎤 Mute / unmute the microphone (the whole Mac's: works for Discord, games and everything) |
 
-> ℹ️ `⌃` is Control and `⌥` is Option. The media hotkeys control the selected app when it is **Spotify**, **Music** or a video in **Google Chrome**; the Mac's own media keys (F7/F8/F9) keep working for whatever app is playing. The hotkeys are also listed inside the app, at the bottom of the window.
+When you use the volume, mute, switch-app or microphone hotkeys, a small notice shows the app and the volume at the bottom of the screen (red when muted) for a moment, without taking the focus, even over full-screen games. To turn it off, switch off **Aviso na tela** (On-screen notice), next to "Controlando" in the window, or **Mostrar aviso na tela** in the menu bar menu.
+
+> ℹ️ `⌃` is Control and `⌥` is Option. The media hotkeys control the selected app when it is **Spotify**, **Music** or a video in **Google Chrome**; the Mac's own media keys (F7/F8/F9) keep working for whatever app is playing. The hotkeys are also listed inside the app: click **Atalhos** (Shortcuts) at the bottom of the window. Next to it, **Sobre** (About) shows the version, the author and the GitHub link, and the 🎤 icon mutes and unmutes the microphone.
 
 ---
 
@@ -102,9 +107,9 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 
 The program remembers the last app you picked and the volume of each app. The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume until you open it again.
 
-The **Iniciar com o Mac** (Start with Mac) checkbox at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
+The **Iniciar com o Mac** (Start with Mac) dot at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. Click the speaker (or right-click the app in the list) to mute it: the name and the speaker turn red, and changing the volume unmutes. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
 
 > ℹ️ **Chrome:** turn on, once in each Chrome profile, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** (View → Developer → Allow JavaScript from Apple Events) in the Mac menu bar while Chrome is in front. Until then, Sound Tune Key shows a warning with a **Como ligar** (How to turn it on) button that lists the steps and brings Chrome to the front. Chrome's volume works without it. In Chrome, ⏭ and the double ⏮ switch videos on YouTube.
 
@@ -124,11 +129,17 @@ The **Open Anyway** button only shows up right after you try to open the app: if
 Closing the window does not quit the program: it stays in the menu bar icon (next to Wi-Fi) and the hotkeys keep working. To move the icon, hold **⌘** and drag it. The program is in Portuguese; click the icon for:
 
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
+- **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up
+- **Microfone ligado / desligado** (Microphone on / off) — mutes and unmutes the microphone (red when off)
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show "(mudo)"
+- **Aplicativos** (Apps) — hover an app to see **Mudo** (Mute) (the checked app is the one being controlled; pick it in the window); muted apps show in red, and the menu bar icon turns red while the chosen app is muted
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
+- **Mostrar aviso na tela** (Show on-screen notice) — turns the volume and mute notice on or off
+- **Verificar atualizações...** (Check for updates) — looks for a new version; **Atualizar agora** (Update now) downloads it, replaces the app and opens it again
 - **Sair** (Quit) — quit the program
+
+The program also checks for a new version by itself (at start and once a day) and tells you with a notification, the menu item and a strip in the window.
 
 To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command Line Tools: `xcode-select --install`).
 
