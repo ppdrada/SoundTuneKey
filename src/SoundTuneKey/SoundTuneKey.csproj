@@ -16,7 +16,7 @@
     <ApplicationIcon>..\..\assets\icon\icon.ico</ApplicationIcon>
 
     <!-- aparece nas Propriedades do .exe e nos avisos de segurança do Windows -->
-    <Version>0.6.3</Version>
+    <Version>0.6.4</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Product>Sound Tune Key</Product>
     <AssemblyTitle>Sound Tune Key</AssemblyTitle>

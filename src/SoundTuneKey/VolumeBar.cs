@@ -102,7 +102,9 @@ public class VolumeBar : Control
         using var thumb = new SolidBrush(Enabled ? Accent : Theme.Inactive);
         g.FillEllipse(thumb, thumbX - thumbSize / 2f, centerY - thumbSize / 2f, thumbSize, thumbSize);
 
-        if (Focused && ShowFocusCues) // só quem chegou pelo teclado (Tab) vê a borda; clicar e arrastar não
+        // só quem chegou pelo teclado (Tab) vê a borda; clicar e arrastar não. No menu da bandeja
+        // (sem janela) o Windows sempre mostra as dicas de teclado, então lá ela nunca aparece
+        if (Focused && ShowFocusCues && FindForm() is not null)
             ControlPaint.DrawFocusRectangle(g, ClientRectangle, Theme.Text, Theme.Background);
     }
 
