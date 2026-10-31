@@ -6,6 +6,10 @@ Control the audio of **one specific app** straight from your keyboard.
 
 Pick the app you want to control — Spotify, Google Chrome, Discord or anything else that is playing sound — and use global hotkeys to change its volume, pause it or skip tracks. The rest of your computer's volume stays untouched.
 
+![Sound Tune Key in action: per-app volume, mute, media buttons and the menu bar icon](docs/demo/demo-en.gif)
+
+[▶ Watch in higher quality (MP4)](docs/demo/demo-en.mp4)
+
 [![Download for Windows](https://img.shields.io/badge/Windows-Download_.exe-1DB954?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe) [![Download for macOS](https://img.shields.io/badge/macOS-Download_.zip-1DB954?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey-mac.zip)
 
 ---

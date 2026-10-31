@@ -6,6 +6,10 @@ Controle o áudio de **um aplicativo específico** direto pelo teclado.
 
 Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qualquer outro que esteja tocando som — e use atalhos globais para ajustar o volume, pausar ou trocar de música. O volume do resto do computador não é alterado.
 
+![Sound Tune Key funcionando: volume por app, mudo, botões de mídia e o ícone da barra de menus](docs/demo/demo-pt.gif)
+
+[▶ Assistir em qualidade melhor (MP4)](docs/demo/demo-pt.mp4)
+
 [![Baixar para Windows](https://img.shields.io/badge/Windows-Baixar_.exe-1DB954?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe) [![Baixar para macOS](https://img.shields.io/badge/macOS-Baixar_.zip-1DB954?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey-mac.zip)
 
 ---

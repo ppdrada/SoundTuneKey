@@ -8,6 +8,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var apps: [AudioApp] = []
     @Published var selectedBundleID: String? {
         didSet {
+            guard !demo else { return }
             defaults.set(selectedBundleID, forKey: Keys.lastApp)
             refreshMedia()
         }
@@ -47,6 +48,8 @@ final class AppModel: ObservableObject {
     private var lastPreviousPress = Date.distantPast
     /// Aviso de mídia na tela (permissão, opção do Chrome), para tirar quando voltar a funcionar.
     private var mediaErrorShown: String?
+    /// Modo demonstração (vídeo do README): estado de mentira, sem ler o sistema nem mexer no som.
+    private var demo = false
 
     init() {
         showOsd = defaults.object(forKey: Keys.showOsd) as? Bool ?? true
@@ -246,6 +249,7 @@ final class AppModel: ObservableObject {
 
     /// Relê do sistema: o usuário também pode desligar em Ajustes do Sistema.
     func refreshStartsAtLogin() {
+        guard !demo else { return }
         startsAtLogin = LoginItem.isEnabled
     }
 
@@ -292,4 +296,25 @@ final class AppModel: ObservableObject {
             }
         }
     }
+
+    // MARK: - Modo demonstração (mac/Demo/make-video.swift)
+
+    /// Só para gravar o vídeo do README: não lê o sistema, não registra atalhos e não mexe no som.
+    init(demoApps: [AudioApp]) {
+        showOsd = true
+        demo = true
+        apps = demoApps
+    }
+
+    /// Muda o estado mostrado na tela, sem tocar em nada de verdade.
+    func setDemo(volumes: [String: Float], muted: Set<String>, media: MediaPlayer.Status?,
+                 startsAtLogin: Bool, micMuted: Bool?) {
+        precondition(demo, "só no modo demonstração")
+        self.volumes = volumes
+        self.muted = muted
+        mediaStatus = media
+        self.startsAtLogin = startsAtLogin
+        self.micMuted = micMuted
+    }
+
 }
