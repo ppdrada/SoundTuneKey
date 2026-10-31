@@ -11,8 +11,6 @@ public class MainForm : Form
         HideSelection = false,
     };
 
-    private readonly Button _refresh = new() { Text = "Atualizar lista", Dock = DockStyle.Bottom, Height = 36 };
-
     // o mesmo mini player na janela e no topo do menu da bandeja
     private readonly PlayerPanel _player = new(Theme.Background, glyphSize: 16f, buttonHeight: 44, new Padding(10, 0, 10, 14))
     {
@@ -86,7 +84,6 @@ public class MainForm : Form
         ForeColor = Theme.Text;
         HandleCreated += (_, _) => Theme.UseDarkTitleBar(this);
         Theme.Apply(_list);
-        Theme.Apply(_refresh);
         _showOsd.Checked = _settings.ShowOsd;
         _showOsd.CheckedChanged += (_, _) =>
         {
@@ -108,7 +105,6 @@ public class MainForm : Form
         selectedRow.Controls.Add(_showOsd);
         Controls.Add(selectedRow);
         Controls.Add(_player);
-        Controls.Add(_refresh);
         Controls.Add(_updateBar);
         Controls.Add(BuildFooter());
 
@@ -116,7 +112,6 @@ public class MainForm : Form
         _startWithWindows.Checked = WindowsStartup.IsEnabled;
         _startWithWindows.CheckedChanged += (_, _) => WindowsStartup.SetEnabled(_startWithWindows.Checked);
 
-        _refresh.Click += (_, _) => LoadApps();
         _list.SelectedIndexChanged += (_, _) => OnListSelectionChanged();
         SetupListMenu();
         foreach (var player in new[] { _player, _trayPlayer })
@@ -130,9 +125,10 @@ public class MainForm : Form
         }
 
         // mãozinha em tudo que é clicável, como no Mac
-        _list.Cursor = _refresh.Cursor = Cursors.Hand;
+        _list.Cursor = Cursors.Hand;
 
         _timelineTimer.Tick += (_, _) => RefreshTimeline();
+        _appsTimer.Tick += (_, _) => RefreshAppsIfChanged();
         VisibleChanged += (_, _) => UpdateTimelineTimer();
         Load += (_, _) => LoadApps();
         Shown += (_, _) => RegisterHotkeys();
@@ -163,9 +159,29 @@ public class MainForm : Form
 
     private void UpdateTimelineTimer()
     {
-        _timelineTimer.Enabled = Visible || _trayMenuOpen;
+        _timelineTimer.Enabled = _appsTimer.Enabled = Visible || _trayMenuOpen;
         if (_timelineTimer.Enabled)
             RefreshTimeline();
+    }
+
+    // A lista de apps se atualiza sozinha: a cada 5 s, também só à mostra, e só é montada de novo
+    // quando um app entrou, saiu, começou/parou de tocar ou mutou (assim não pisca).
+    private readonly System.Windows.Forms.Timer _appsTimer = new() { Interval = 5000 };
+    private readonly ToolStripMenuItem _appsMenu = new("Aplicativos");
+    private string _appsSignature = "";
+
+    private static string Signature(IEnumerable<AudioApp> apps) =>
+        string.Join("|", apps.Select(a => $"{a.ProcessName}:{a.IsMuted}:{a.IsPlaying}"));
+
+    private void RefreshAppsIfChanged()
+    {
+        if (Signature(AudioApps.List()) == _appsSignature)
+            return;
+        if (Visible)
+            LoadApps();
+        // com o submenu do Mudo aberto, espera: montar de novo o fecharia na mão da pessoa
+        if (_trayMenuOpen && !_appsMenu.DropDownItems.OfType<ToolStripMenuItem>().Any(i => i.DropDown.Visible))
+            FillAppsMenu(_appsMenu);
     }
 
     private async void RefreshTimeline()
@@ -259,7 +275,7 @@ public class MainForm : Form
 
     private void SetupTray()
     {
-        var appsMenu = new ToolStripMenuItem("Aplicativos");
+        var appsMenu = _appsMenu;
         var startupItem = new ToolStripMenuItem("Iniciar com o Windows") { CheckOnClick = true };
         var osdItem = new ToolStripMenuItem("Mostrar aviso na tela") { CheckOnClick = true };
         Theme.UseDot(startupItem);
@@ -368,6 +384,7 @@ public class MainForm : Form
         var selectedName = SelectedApp?.ProcessName;
 
         var apps = AudioApps.List();
+        _appsSignature = Signature(apps);
         if (apps.Count == 0)
             appsMenu.DropDownItems.Add(new ToolStripMenuItem("Nenhum app com som") { Enabled = false });
 
@@ -390,11 +407,6 @@ public class MainForm : Form
             appsMenu.DropDownItems.Add(item);
         }
 
-        appsMenu.DropDownItems.Add(new ToolStripSeparator());
-        var refresh = new ToolStripMenuItem("Atualizar lista", Theme.MenuIcon(''));
-        // monta de novo depois do clique: tirar o item clicado no meio do clique atrapalha o menu
-        refresh.Click += (_, _) => BeginInvoke(() => { LoadApps(); FillAppsMenu(appsMenu); });
-        appsMenu.DropDownItems.Add(refresh);
     }
 
     // "Mudo", marcado quando o app está mudo: no submenu da bandeja e no botão direito da lista
@@ -760,7 +772,9 @@ public class MainForm : Form
         _list.Items.Clear();
         _current = null;
 
-        foreach (var app in AudioApps.List())
+        var apps = AudioApps.List();
+        _appsSignature = Signature(apps);
+        foreach (var app in apps)
         {
             var item = new ListViewItem(app.DisplayName) { Tag = app };
             item.SubItems.Add(FormatVolume(app));

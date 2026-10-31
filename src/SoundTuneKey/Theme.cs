@@ -215,6 +215,15 @@ public static class Theme
         }
 
         // destaque do item sob o mouse: uma pílula com cantos arredondados, afastada das bordas
+        // a linha com a mesma folga dos dois lados, como o destaque (a padrão começa depois da coluna dos ícones)
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
+        {
+            float s = Scale(e.ToolStrip!);
+            int y = e.Item.Height / 2;
+            using var line = new Pen(Border);
+            e.Graphics.DrawLine(line, 6 * s, y, e.Item.Width - 6 * s, y);
+        }
+
         protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
         {
             if (!e.Item.Selected || !e.Item.Enabled || e.Item is ToolStripControlHost)

@@ -95,7 +95,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 - Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
 - **Microfone ligado / desligado** — liga ou desliga o microfone; fica vermelho quando está desligado
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem em vermelho. **Atualizar lista**, no fim, acha apps que acabaram de abrir. Escolher e ligar/desligar não fecham o menu, para corrigir na hora
+- **Aplicativos** — clique num app para controlá-lo; o submenu dele tem **Mudo**, e apps mudos aparecem em vermelho. A lista se atualiza sozinha (a cada 5 segundos, enquanto está aberta). Escolher e ligar/desligar não fecham o menu, para corrigir na hora
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Windows** — abre o programa sozinho, já na bandeja, quando o PC liga
 - **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
