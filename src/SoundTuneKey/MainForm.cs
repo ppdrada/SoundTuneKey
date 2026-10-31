@@ -113,6 +113,9 @@ public class MainForm : Form
         _startWithWindows.CheckedChanged += (_, _) => WindowsStartup.SetEnabled(_startWithWindows.Checked);
 
         _list.SelectedIndexChanged += (_, _) => OnListSelectionChanged();
+        // no menu da bandeja, o app controlado aparece no próprio "Aplicativos" e muda junto
+        _selectedLabel.TextChanged += (_, _) =>
+            _appsMenu.Text = SelectedApp is { } app ? $"Aplicativos - Controlando: {app.DisplayName}" : "Aplicativos";
         SetupListMenu();
         foreach (var player in new[] { _player, _trayPlayer })
         {

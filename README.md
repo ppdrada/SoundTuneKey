@@ -95,7 +95,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Microfone ligado / desligado** (Microphone on / off) — turn the microphone on or off; red when it is off
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red. The list updates by itself (every 5 seconds while open). Picking and toggling don't close the menu, so you can fix a wrong pick right away
+- **Aplicativos** (Apps) — shows the controlled app ("Aplicativos - Controlando: Spotify"). Click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red. The list updates by itself (every 5 seconds while open). Picking and toggling don't close the menu, so you can fix a wrong pick right away
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Mostrar aviso na tela** (Show on-screen notice) — turn the volume/mute notice on or off
