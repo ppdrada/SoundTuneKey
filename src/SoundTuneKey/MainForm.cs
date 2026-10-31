@@ -23,7 +23,6 @@ public class MainForm : Form
     {
         Dock = DockStyle.Fill,
         Padding = new Padding(8, 0, 0, 0),
-        Text = "Selecione um app na lista",
         TextAlign = ContentAlignment.MiddleLeft,
     };
 
@@ -41,7 +40,6 @@ public class MainForm : Form
 
     private readonly RoundCheck _startWithWindows = new()
     {
-        Text = "Iniciar com o Windows",
         Dock = DockStyle.Left,
         AutoSize = true,
         Padding = new Padding(10, 0, 0, 0),
@@ -49,19 +47,27 @@ public class MainForm : Form
 
     private readonly ToggleSwitch _showOsd = new()
     {
-        Text = "Aviso na tela",
         Dock = DockStyle.Right,
         AutoSize = true,
         Padding = new Padding(0, 0, 10, 0),
     };
 
     private readonly AppSettings _settings = AppSettings.Load();
+
+    // os textos que trocam de idioma (os do menu ficam aqui para o ApplyTexts alcançar)
+    private readonly LinkLabel _shortcutsLink, _aboutLink;
+    private ToolStripMenuItem _startupItem = null!, _osdItem = null!;
+    private ToolStripItem _openItem = null!, _shortcutsItem = null!, _checkItem = null!, _exitItem = null!;
+    private string? _availableVersion; // versão nova encontrada, para reescrever o aviso no outro idioma
     private bool _startHidden;        // aberto pelo Windows com --tray: começa só na bandeja
     private bool _hotkeysRegistered;
 
     public MainForm(bool startHidden = false, bool justUpdated = false)
     {
         _startHidden = startHidden;
+        Lang.Load(_settings.Language);
+        _shortcutsLink = FooterLink(ShowShortcutsWindow);
+        _aboutLink = FooterLink(() => ShowAboutWindow(checkNow: false));
 
         // tudo abaixo é medido em pixels de 100%; o Windows aumenta junto em telas a 125%, 150%...
         // e de novo quando a janela muda para um monitor com outra escala
@@ -91,7 +97,7 @@ public class MainForm : Form
             _settings.Save();
         };
 
-        _list.Columns.Add("Aplicativo", 0);
+        _list.Columns.Add("", 0); // "Aplicativo": o texto vem do ApplyTexts
         _list.Columns.Add("Volume", VolumeColumnWidth);
         _list.Resize += (_, _) => FitColumns();
         // a lista amplia as colunas sozinha ao mudar de escala; sem isso sobra uma rolagem horizontal
@@ -113,9 +119,6 @@ public class MainForm : Form
         _startWithWindows.CheckedChanged += (_, _) => WindowsStartup.SetEnabled(_startWithWindows.Checked);
 
         _list.SelectedIndexChanged += (_, _) => OnListSelectionChanged();
-        // no menu da bandeja, o app controlado aparece no próprio "Aplicativos" e muda junto
-        _selectedLabel.TextChanged += (_, _) =>
-            _appsMenu.Text = SelectedApp is { } app ? $"Aplicativos - Controlando: {app.DisplayName}" : "Aplicativos";
         SetupListMenu();
         foreach (var player in new[] { _player, _trayPlayer })
         {
@@ -151,6 +154,13 @@ public class MainForm : Form
         SetupTray();
         SetupUpdateNotice(justUpdated);
         SetupMicrophone();
+        ApplyTexts();
+        Lang.Changed += () =>
+        {
+            _settings.Language = Lang.Code;
+            _settings.Save();
+            ApplyTexts();
+        };
         ResumeLayout(false);
     }
 
@@ -243,25 +253,52 @@ public class MainForm : Form
         var footer = new Panel { Dock = DockStyle.Bottom, Height = 32, Padding = new Padding(0, 0, 10, 2) }; // margem para não encostar na borda
         footer.Controls.Add(_startWithWindows);
         footer.Controls.Add(_micButton); // à esquerda de "Atalhos"
-        footer.Controls.Add(FooterLink("Atalhos", ShowShortcutsWindow));
-        footer.Controls.Add(FooterLink("Sobre", () => ShowAboutWindow(checkNow: false)));
+        footer.Controls.Add(_shortcutsLink);
+        footer.Controls.Add(_aboutLink);
         return footer;
     }
 
-    private static LinkLabel FooterLink(string text, Action action)
+    private static LinkLabel FooterLink(Action action)
     {
         var link = new LinkLabel
         {
-            Text = text,
             Dock = DockStyle.Right,
             AutoSize = true,
             Padding = new Padding(8, 6, 0, 0),
-            LinkBehavior = LinkBehavior.HoverUnderline,
+            LinkBehavior = LinkBehavior.NeverUnderline,
             LinkColor = Theme.MutedText,
             ActiveLinkColor = Theme.Text,
         };
+        // sem sublinhado: ao passar o mouse o cinza clareia, como o ícone do microfone ao lado
+        link.MouseEnter += (_, _) => link.LinkColor = Theme.Text;
+        link.MouseLeave += (_, _) => link.LinkColor = Theme.MutedText;
         link.LinkClicked += (_, _) => action();
         return link;
+    }
+
+    // Textos fixos nas duas línguas: ao abrir e quando o idioma muda no "Sobre" (vale na hora).
+    private void ApplyTexts()
+    {
+        _startWithWindows.Text = _startupItem.Text = Lang.T("Iniciar com o Windows", "Start with Windows");
+        _showOsd.Text = Lang.T("Aviso na tela", "On-screen notice");
+        _osdItem.Text = Lang.T("Mostrar aviso na tela", "Show on-screen notice");
+        _list.Columns[0].Text = Lang.T("Aplicativo", "App");
+        _shortcutsLink.Text = _shortcutsItem.Text = Lang.T("Atalhos", "Shortcuts");
+        _aboutLink.Text = Lang.T("Sobre", "About");
+        _openItem.Text = Lang.T("Abrir", "Open");
+        _checkItem.Text = Lang.T("Verificar atualizações...", "Check for updates...");
+        _exitItem.Text = Lang.T("Sair", "Exit");
+        _footerTips.SetToolTip(_micButton, Lang.T("Liga / desliga o microfone (Ctrl + Alt + V)", "Microphone on / off (Ctrl + Alt + V)"));
+        _player.ApplyTexts();
+        _trayPlayer.ApplyTexts();
+        ShowSelected();
+        ShowMicrophoneState(Microphone.IsMuted());
+        if (_availableVersion is { } version)
+        {
+            _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}");
+            _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update");
+        }
+        _shortcutsWindow?.Close(); // abre de novo já no idioma novo
     }
 
     private ShortcutsWindow? _shortcutsWindow; // uma janela só, mesmo clicando várias vezes
@@ -279,8 +316,8 @@ public class MainForm : Form
     private void SetupTray()
     {
         var appsMenu = _appsMenu;
-        var startupItem = new ToolStripMenuItem("Iniciar com o Windows") { CheckOnClick = true };
-        var osdItem = new ToolStripMenuItem("Mostrar aviso na tela") { CheckOnClick = true };
+        var startupItem = _startupItem = new ToolStripMenuItem { CheckOnClick = true };
+        var osdItem = _osdItem = new ToolStripMenuItem { CheckOnClick = true };
         Theme.UseDot(startupItem);
         Theme.UseDot(osdItem);
         // a caixinha da janela salva a escolha; as duas ficam sempre iguais
@@ -311,15 +348,15 @@ public class MainForm : Form
         menu.Items.Add(_micItem);
         // em grupos, como no Windows 11: abrir/escolher, opções de liga/desliga, atualizar/sair
         appsMenu.Image = Theme.MenuIcon('\uE8FD');
-        var openItem = menu.Items.Add("Abrir", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
+        var openItem = _openItem = menu.Items.Add("", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
-        var shortcutsItem = menu.Items.Add("Atalhos", Theme.MenuIcon('\uE765'), (_, _) => ShowShortcutsWindow());
+        var shortcutsItem = _shortcutsItem = menu.Items.Add("", Theme.MenuIcon('\uE765'), (_, _) => ShowShortcutsWindow());
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(startupItem);
         menu.Items.Add(osdItem);
         menu.Items.Add(new ToolStripSeparator());
-        var checkItem = menu.Items.Add("Verificar atualizações...", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
-        var exitItem = menu.Items.Add("Sair", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
+        var checkItem = _checkItem = menu.Items.Add("", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
+        var exitItem = _exitItem = menu.Items.Add("", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
         Theme.Apply(menu);
         // o menu ignora a própria margem interna: o espaço embaixo vai no último item
         var lastItem = menu.Items[^1];
@@ -389,7 +426,7 @@ public class MainForm : Form
         var apps = AudioApps.List(withSilent: true);
         _appsSignature = Signature(apps);
         if (apps.Count == 0)
-            appsMenu.DropDownItems.Add(new ToolStripMenuItem("Nenhum app com som") { Enabled = false });
+            appsMenu.DropDownItems.Add(new ToolStripMenuItem(Lang.T("Nenhum app com som", "No apps with sound")) { Enabled = false });
 
         foreach (var app in apps)
         {
@@ -419,7 +456,7 @@ public class MainForm : Form
     // "Mudo", marcado quando o app está mudo: no submenu da bandeja e no botão direito da lista
     private ToolStripMenuItem MuteItem(AudioApp app)
     {
-        var mute = new ToolStripMenuItem("Mudo") { Checked = app.IsMuted };
+        var mute = new ToolStripMenuItem(Lang.T("Mudo", "Mute")) { Checked = app.IsMuted };
         mute.Click += (_, _) =>
         {
             // o menu fica aberto: o estado vem do ✓, não do app guardado quando o menu abriu
@@ -466,7 +503,6 @@ public class MainForm : Form
 
     private void SetupMicrophone()
     {
-        _footerTips.SetToolTip(_micButton, "Liga / desliga o microfone (Ctrl + Alt + V)");
         _micButton.Click += (_, _) => ToggleMicrophone(fromHotkey: false);
         _micItem.Click += (_, _) => ToggleMicrophone(fromHotkey: false);
         Activated += (_, _) => ShowMicrophoneState(Microphone.IsMuted());
@@ -488,7 +524,7 @@ public class MainForm : Form
         if (muted is not bool m)
             return;
         _micButton.Set(m ? Theme.MicOffGlyph : Theme.MicGlyph, m ? Theme.Mute : Theme.MutedText);
-        _micItem.Text = m ? "Microfone desligado" : "Microfone ligado";
+        _micItem.Text = m ? Lang.T("Microfone desligado", "Microphone off") : Lang.T("Microfone ligado", "Microphone on");
         _micItem.ForeColor = m ? Theme.Mute : Theme.Text;
         _micItem.Image = Theme.MenuIcon((m ? Theme.MicOffGlyph : Theme.MicGlyph)[0], m ? Theme.Mute : Theme.MutedText);
     }
@@ -528,7 +564,7 @@ public class MainForm : Form
         if (justUpdated)
         {
             _balloonOpensUpdate = false;
-            _tray.ShowBalloonTip(4000, "Sound Tune Key", $"Atualizado para a versão {Updates.Current.ToString(3)}.", ToolTipIcon.Info);
+            _tray.ShowBalloonTip(4000, "Sound Tune Key", Lang.T($"Atualizado para a versão {Updates.Current.ToString(3)}.", $"Updated to version {Updates.Current.ToString(3)}."), ToolTipIcon.Info);
         }
     }
 
@@ -548,9 +584,10 @@ public class MainForm : Form
 
     private void ShowUpdateAvailable(string version)
     {
-        _updateItem.Text = $"Atualizar para a versão {version}";
+        _availableVersion = version;
+        _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}");
         _updateItem.Visible = true;
-        _updateBar.Text = $"Versão {version} disponível · Atualizar";
+        _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update");
         _updateBar.Visible = true;
 
         if (_settings.NotifiedVersion == version)
@@ -558,7 +595,7 @@ public class MainForm : Form
         _settings.NotifiedVersion = version;
         _settings.Save();
         _balloonOpensUpdate = true;
-        _tray.ShowBalloonTip(5000, "Sound Tune Key", $"Versão {version} disponível. Clique aqui para atualizar.", ToolTipIcon.Info);
+        _tray.ShowBalloonTip(5000, "Sound Tune Key", Lang.T($"Versão {version} disponível. Clique aqui para atualizar.", $"Version {version} available. Click here to update."), ToolTipIcon.Info);
     }
 
     private void ShowAboutWindow(bool checkNow)
@@ -623,7 +660,7 @@ public class MainForm : Form
             _trayTipShown = true;
             _balloonOpensUpdate = false;
             _tray.ShowBalloonTip(3000, "Sound Tune Key",
-                "Continua rodando aqui na bandeja. Os atalhos seguem funcionando.", ToolTipIcon.Info);
+                Lang.T("Continua rodando aqui na bandeja. Os atalhos seguem funcionando.", "Still running here in the tray. The hotkeys keep working."), ToolTipIcon.Info);
         }
     }
 
@@ -676,8 +713,10 @@ public class MainForm : Form
         if (failed.Count > 0)
         {
             MessageBox.Show(
-                $"Não foi possível usar: {string.Join(", ", failed)}.\n\n" +
-                "Outro programa já usa esse atalho (por exemplo, um script do AutoHotkey). Feche-o e abra o Sound Tune Key de novo.",
+                Lang.T($"Não foi possível usar: {string.Join(", ", failed)}.\n\n" +
+                    "Outro programa já usa esse atalho (por exemplo, um script do AutoHotkey). Feche-o e abra o Sound Tune Key de novo.",
+                    $"Couldn't use: {string.Join(", ", failed)}.\n\n" +
+                    "Another program already uses this hotkey (for example, an AutoHotkey script). Close it and open Sound Tune Key again."),
                 "Sound Tune Key", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
@@ -812,7 +851,8 @@ public class MainForm : Form
 
         if (app is null)
         {
-            _selectedLabel.Text = "Selecione um app na lista";
+            _selectedLabel.Text = Lang.T("Selecione um app na lista", "Pick an app from the list");
+            _appsMenu.Text = Lang.T("Aplicativos", "Apps");
             _tray.Text = "Sound Tune Key";
             return;
         }
@@ -823,7 +863,10 @@ public class MainForm : Form
             _settings.Save();
         }
 
-        _selectedLabel.Text = app.HasAudio ? $"Controlando: {app.DisplayName}" : $"Controlando: {app.DisplayName} (sem som ainda)";
+        _selectedLabel.Text = Lang.T("Controlando: ", "Controlling: ") + app.DisplayName +
+            (app.HasAudio ? "" : Lang.T(" (sem som ainda)", " (no sound yet)"));
+        // no menu da bandeja, o app controlado aparece no próprio "Aplicativos" e muda junto
+        _appsMenu.Text = Lang.T($"Aplicativos - Controlando: {app.DisplayName}", $"Apps - Controlling: {app.DisplayName}");
         _tray.Text = TrayText($"Sound Tune Key — {app.DisplayName}");
     }
 

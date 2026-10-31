@@ -89,7 +89,7 @@ If Windows blocks it **with no "Run anyway" button**, the PC has **Smart App Con
 
 #### 🖥️ System tray
 
-Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program is in Portuguese; right-click the icon for:
+Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program comes in Portuguese and English: pick it in **Sobre** (About); the first time, it follows the Windows language. Right-click the icon for:
 
 - **Sound Tune Key**, at the very top with the app icon — opens **Sobre** (About): version, author, the GitHub link and a button to check for updates
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once

@@ -1,4 +1,4 @@
-namespace SoundTuneKey;
+﻿namespace SoundTuneKey;
 
 /// <summary>
 /// Mini player do app escolhido, de cima para baixo: tempo da música, ⏮ ⏯ ⏭ e volume (a mesma
@@ -28,7 +28,7 @@ public sealed class PlayerPanel : Panel
     private readonly Label _elapsed, _duration, _volumeText;
     private readonly List<MediaButton> _buttons = [];
     private readonly MediaButton _speaker;
-    private readonly MediaButton _playPause;
+    private readonly MediaButton _playPause, _previous, _next;
     private readonly ToolTip _toolTip = new();
     private readonly float _glyphSize;
 
@@ -61,16 +61,18 @@ public sealed class PlayerPanel : Panel
         buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, buttonHeight * 1.5f));
         buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, buttonHeight * 2.4f));
         buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-        _playPause = Button(MediaGlyph.Play, "Pausar / continuar", () => PlayPauseClicked?.Invoke());
+        _playPause = Button(MediaGlyph.Play, () => PlayPauseClicked?.Invoke());
+        _previous = Button(MediaGlyph.Previous, () => PreviousClicked?.Invoke());
+        _next = Button(MediaGlyph.Next, () => NextClicked?.Invoke());
         _playPause.Filled = true;
         buttonRow.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        buttonRow.Controls.Add(Button(MediaGlyph.Previous, "Volta ao começo (2x rápido: música anterior)", () => PreviousClicked?.Invoke()), 1, 0);
+        buttonRow.Controls.Add(_previous, 1, 0);
         buttonRow.Controls.Add(_playPause, 2, 0);
-        buttonRow.Controls.Add(Button(MediaGlyph.Next, "Próxima música", () => NextClicked?.Invoke()), 3, 0);
+        buttonRow.Controls.Add(_next, 3, 0);
 
         // alto-falante: deixa claro que a barra de baixo é o volume, e não o tempo da música;
         // clicar nele liga e desliga o mudo. Fica à esquerda, alinhado com o tempo de cima.
-        _speaker = Button(MediaGlyph.Speaker, "Mudo / volta o som (Ctrl + Alt + M)", () => MuteClicked?.Invoke());
+        _speaker = Button(MediaGlyph.Speaker, () => MuteClicked?.Invoke());
         _speaker.Dock = DockStyle.Left;
         _speaker.Width = 30;
         var volumeRow = new Panel { Dock = DockStyle.Top, Height = 28 };
@@ -141,10 +143,18 @@ public sealed class PlayerPanel : Panel
         _duration.Text = FormatTime(timeline.Duration);
     }
 
-    private MediaButton Button(MediaGlyph glyph, string tip, Action action)
+    /// <summary>Dicas dos botões no idioma escolhido (chamado de novo quando ele muda).</summary>
+    public void ApplyTexts()
+    {
+        _toolTip.SetToolTip(_playPause, Lang.T("Pausar / continuar", "Play / pause"));
+        _toolTip.SetToolTip(_previous, Lang.T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)"));
+        _toolTip.SetToolTip(_next, Lang.T("Próxima música", "Next track"));
+        _toolTip.SetToolTip(_speaker, Lang.T("Mudo / volta o som (Ctrl + Alt + M)", "Mute / unmute (Ctrl + Alt + M)"));
+    }
+
+    private MediaButton Button(MediaGlyph glyph, Action action)
     {
         var button = new MediaButton(glyph, _glyphSize) { Dock = DockStyle.Fill, Enabled = false, BackColor = BackColor };
-        _toolTip.SetToolTip(button, tip);
         button.Click += (_, _) => action();
         _buttons.Add(button);
         return button;
