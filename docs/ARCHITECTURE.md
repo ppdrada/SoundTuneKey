@@ -67,6 +67,7 @@ docs/               este arquivo e o PRD
 | `Controls.swift` | Interruptor, bolinha (também como imagem dos itens de liga/desliga do menu), links e botões das janelinhas. |
 | `LoginItem.swift` | "Iniciar com o Mac" pelo `SMAppService.mainApp` (macOS 13+; aparece em Ajustes → Geral → Itens de Início). Aberto pelo login (evento de abertura com `keyAELaunchedAsLogInItem`) ou com `--tray`, o app começa escondido na barra de menus. |
 | `Resources/Info.plist` | Bundle `com.ppdrada.SoundTuneKey`, mínimo 14.2, texto da permissão de áudio (`NSAudioCaptureUsageDescription`). |
+| `Demo/make-video.swift` + `Demo/make-video.sh` | Vídeo de demonstração do README (`docs/demo/demo-pt` e `demo-en`, `.gif` e `.mp4`): desenha as telas de verdade (janela, mini player, menu da barra, aviso na tela) com o `AppModel(demoApps:)`, que não lê o sistema nem mexe no som, e põe cursor, cliques e legendas por cima. A moldura da janela, a barra de menus e os itens comuns do menu são imitações. Gera com o AVFoundation e o ImageIO, sem instalar nada. |
 | `build-app.sh` | Compila e monta o `.app` (veja abaixo). |
 
 **Volume por app no Mac:** o macOS não tem volume por app. Para cada app com volume abaixo de 100%:

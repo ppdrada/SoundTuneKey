@@ -50,7 +50,7 @@ final class Osd {
     }
 }
 
-private struct OsdCard: View {
+struct OsdCard: View { // fora do private: o vídeo de demonstração desenha o aviso
     let content: Osd.Content
 
     var body: some View {
