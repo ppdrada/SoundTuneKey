@@ -77,7 +77,7 @@ Ao usar os atalhos de volume, mudo, troca de app ou microfone, um aviso pequeno 
 3. Selecione na lista o aplicativo que você quer controlar.
 4. Pronto! Use os atalhos acima, inclusive dentro do jogo.
 
-O programa lembra o último app escolhido da próxima vez que for aberto.
+O programa lembra o último app escolhido da próxima vez que for aberto. Apps tocando têm um alto-falante ao lado do volume. Apps abertos que ainda não tocaram som aparecem em cinza no fim da lista: dá para escolher antes, e o volume passa a valer quando ele tocar (o Windows só dá volume a um app depois disso).
 
 Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho da música ou do vídeo), os botões **⏮ ⏯ ⏭**, que fazem o mesmo que os atalhos, e a barra de volume 🔈. Clique no alto-falante 🔈 para deixar mudo ou voltar o som (no mudo: alto-falante vermelho, barra apagada e o nome do app em vermelho na lista); mexer no volume também tira o mudo. Os atalhos mudam o volume de 1% em 1% (segurar repete). Com o botão direito em qualquer app da lista aparece **Mudo**, marcado quando aquele app está mudo; isso não troca o app controlado. A barra de tempo só funciona com apps que informam o tempo da música ao Windows (Spotify e abas do Chrome informam).
 

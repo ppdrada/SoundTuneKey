@@ -5,7 +5,8 @@ namespace SoundTuneKey;
 
 /// <summary>Um app que tem pelo menos uma sessão de áudio no Windows.</summary>
 /// IsMuted: o mudo do próprio Windows para o app (o volume fica guardado e volta ao tirar o mudo).
-public record AudioApp(string ProcessName, string DisplayName, float Volume, bool IsPlaying, bool IsMuted);
+/// HasAudio false: o app está aberto mas ainda não abriu o som; o Windows só dá volume a ele depois disso.
+public record AudioApp(string ProcessName, string DisplayName, float Volume, bool IsPlaying, bool IsMuted, bool HasAudio = true);
 
 public static class AudioApps
 {
@@ -13,7 +14,43 @@ public static class AudioApps
     /// Lista os apps com sessão de áudio no dispositivo de saída padrão.
     /// Um mesmo app (ex.: Chrome) pode ter várias sessões; aqui elas viram uma linha só.
     /// </summary>
-    public static List<AudioApp> List()
+    /// <param name="withSilent">
+    /// Inclui no fim, em ordem alfabética, os apps com janela aberta que ainda não abriram o som:
+    /// dá para escolher antes, e o controle começa a valer quando ele tocar.
+    /// </param>
+    public static List<AudioApp> List(bool withSilent = false)
+    {
+        var apps = AudioSessions();
+        if (!withSilent)
+            return apps;
+
+        var names = new HashSet<string>(apps.Select(a => a.ProcessName), StringComparer.OrdinalIgnoreCase);
+        var silent = new List<AudioApp>();
+        foreach (var process in Process.GetProcesses())
+        {
+            try
+            {
+                if (process.MainWindowHandle == IntPtr.Zero || process.MainWindowTitle.Length == 0 ||
+                    process.Id == Environment.ProcessId || NotApps.Contains(process.ProcessName) || !names.Add(process.ProcessName))
+                    continue;
+                silent.Add(new AudioApp(process.ProcessName, FriendlyName(process), 0f, false, false, HasAudio: false));
+            }
+            catch (InvalidOperationException) { } // fechou no meio da leitura
+        }
+
+        return [.. apps, .. silent.OrderBy(a => a.DisplayName)];
+    }
+
+    // janelas do próprio Windows e terminais, que não tocam som
+    private static readonly HashSet<string> NotApps = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "explorer", "ApplicationFrameHost", "TextInputHost", "SystemSettings", "ShellExperienceHost",
+        "SearchHost", "StartMenuExperienceHost", "LockApp", "Taskmgr",
+        // terminais: janelas de texto, não tocam som
+        "WindowsTerminal", "OpenConsole", "conhost", "cmd", "powershell", "pwsh", "powershell_ise",
+    };
+
+    private static List<AudioApp> AudioSessions()
     {
         using var enumerator = new MMDeviceEnumerator();
         using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
@@ -104,10 +141,17 @@ public static class AudioApps
         {
             var description = process.MainModule?.FileVersionInfo.FileDescription;
             if (!string.IsNullOrWhiteSpace(description))
-                return description;
+                return ShortName(description);
         }
         catch (System.ComponentModel.Win32Exception) { }
 
         return process.ProcessName;
+    }
+
+    // nome comprido fica só com as duas primeiras palavras: "Visual Studio Code" → "Visual Studio"
+    private static string ShortName(string name)
+    {
+        var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return words.Length <= 2 ? name.Trim() : $"{words[0]} {words[1]}";
     }
 }

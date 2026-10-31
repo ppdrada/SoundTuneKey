@@ -171,11 +171,11 @@ public class MainForm : Form
     private string _appsSignature = "";
 
     private static string Signature(IEnumerable<AudioApp> apps) =>
-        string.Join("|", apps.Select(a => $"{a.ProcessName}:{a.IsMuted}:{a.IsPlaying}"));
+        string.Join("|", apps.Select(a => $"{a.ProcessName}:{a.IsMuted}:{a.IsPlaying}:{a.HasAudio}"));
 
     private void RefreshAppsIfChanged()
     {
-        if (Signature(AudioApps.List()) == _appsSignature)
+        if (Signature(AudioApps.List(withSilent: true)) == _appsSignature)
             return;
         if (Visible)
             LoadApps();
@@ -383,17 +383,20 @@ public class MainForm : Form
         appsMenu.DropDownItems.Clear();
         var selectedName = SelectedApp?.ProcessName;
 
-        var apps = AudioApps.List();
+        var apps = AudioApps.List(withSilent: true);
         _appsSignature = Signature(apps);
         if (apps.Count == 0)
             appsMenu.DropDownItems.Add(new ToolStripMenuItem("Nenhum app com som") { Enabled = false });
 
         foreach (var app in apps)
         {
-            var label = app.IsPlaying ? $"{app.DisplayName}  🔊" : app.DisplayName;
-            var item = new ToolStripMenuItem(label) { Checked = app.ProcessName == selectedName };
+            // tocando: espaços no fim guardam o lugar do alto-falante, desenhado pelo Theme (PlayingTag)
+            var label = app.IsPlaying ? $"{app.DisplayName}      " : app.DisplayName;
+            var item = new ToolStripMenuItem(label) { Checked = app.ProcessName == selectedName, Tag = app.IsPlaying ? Theme.PlayingTag : null };
             if (app.IsMuted)
                 item.ForeColor = Theme.Mute; // app mudo aparece em vermelho
+            else if (!app.HasAudio)
+                item.ForeColor = Theme.MutedText; // aberto mas ainda sem som: cinza e sem o Mudo
             // clicar no nome escolhe o app; o ✓ muda na hora, com o menu aberto
             item.Click += (_, _) =>
             {
@@ -401,7 +404,8 @@ public class MainForm : Form
                 foreach (var other in appsMenu.DropDownItems.OfType<ToolStripMenuItem>())
                     other.Checked = other == item;
             };
-            item.DropDownItems.Add(MuteItem(app));
+            if (app.HasAudio)
+                item.DropDownItems.Add(MuteItem(app));
             Theme.Apply(item.DropDown);
             KeepOpenOnClick(item.DropDown);
             appsMenu.DropDownItems.Add(item);
@@ -435,7 +439,7 @@ public class MainForm : Form
         {
             menu.Items.Clear();
             var item = _list.GetItemAt(_list.PointToClient(Cursor.Position).X, _list.PointToClient(Cursor.Position).Y);
-            if (item is null)
+            if (item is null || !((AudioApp)item.Tag!).HasAudio) // sem som ainda não tem mudo
             {
                 e.Cancel = true;
                 return;
@@ -720,7 +724,8 @@ public class MainForm : Form
 
     private async void SendMedia(MediaCommand command)
     {
-        var app = AppForHotkey();
+        // a mídia vale mesmo sem som ainda: o play do Spotify recém-aberto começa a tocar
+        var app = AppForHotkey() ?? SelectedApp;
         if (app is null)
             return;
 
@@ -753,13 +758,14 @@ public class MainForm : Form
     }
 
     // Se o app salvo ainda não tocava quando o programa abriu (ex.: Spotify aberto depois do
-    // Windows), o atalho atualiza a lista e tenta selecioná-lo de novo.
+    // Windows), o atalho atualiza a lista e tenta selecioná-lo de novo. Sem som ainda (cinza),
+    // não há volume nem mudo para mexer: devolve null.
     private AudioApp? AppForHotkey()
     {
-        if (SelectedApp is null && _settings.LastApp is not null)
+        if (SelectedApp is null or { HasAudio: false } && _settings.LastApp is not null)
             LoadApps();
 
-        return SelectedApp;
+        return SelectedApp is { HasAudio: true } app ? app : null;
     }
 
     private void LoadApps(string? select = null)
@@ -772,7 +778,7 @@ public class MainForm : Form
         _list.Items.Clear();
         _current = null;
 
-        var apps = AudioApps.List();
+        var apps = AudioApps.List(withSilent: true);
         _appsSignature = Signature(apps);
         foreach (var app in apps)
         {
@@ -796,8 +802,9 @@ public class MainForm : Form
     private void ShowSelected()
     {
         var app = SelectedApp;
-        _player.SetApp(app is null ? null : Percent(app.Volume), app?.IsMuted ?? false);
-        _trayPlayer.SetApp(app is null ? null : Percent(app.Volume), app?.IsMuted ?? false);
+        int? volume = app is { HasAudio: true } ? Percent(app.Volume) : null; // sem som ainda: barra desligada
+        _player.SetApp(volume, app?.IsMuted ?? false);
+        _trayPlayer.SetApp(volume, app?.IsMuted ?? false);
         RefreshTimeline();
 
         if (app is null)
@@ -813,7 +820,7 @@ public class MainForm : Form
             _settings.Save();
         }
 
-        _selectedLabel.Text = $"Controlando: {app.DisplayName}";
+        _selectedLabel.Text = app.HasAudio ? $"Controlando: {app.DisplayName}" : $"Controlando: {app.DisplayName} (sem som ainda)";
         _tray.Text = TrayText($"Sound Tune Key — {app.DisplayName}");
     }
 
@@ -883,7 +890,7 @@ public class MainForm : Form
 
     private static int Percent(float volume) => (int)Math.Round(volume * 100);
 
-    private static string FormatVolume(AudioApp app) => $"{Percent(app.Volume)}%"; // mudo: o vermelho já mostra
+    private static string FormatVolume(AudioApp app) => app.HasAudio ? $"{Percent(app.Volume)}%" : "—"; // mudo: o vermelho já mostra
 
     // o Windows limita o texto do ícone da bandeja a 127 caracteres
     private static string TrayText(string text) => text.Length <= 127 ? text : text[..126] + "…";
