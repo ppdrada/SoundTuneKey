@@ -292,20 +292,24 @@ public class MainForm : Form
         menu.Items.Add(_micItem);
         // em grupos, como no Windows 11: abrir/escolher, opções de liga/desliga, atualizar/sair
         appsMenu.Image = Theme.MenuIcon('\uE8FD');
-        menu.Items.Add("Abrir", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
+        var openItem = menu.Items.Add("Abrir", Theme.MenuIcon('\uE8A7'), (_, _) => ShowFromTray());
         menu.Items.Add(appsMenu);
-        menu.Items.Add("Atalhos", Theme.MenuIcon('\uE765'), (_, _) => ShowShortcutsWindow());
+        var shortcutsItem = menu.Items.Add("Atalhos", Theme.MenuIcon('\uE765'), (_, _) => ShowShortcutsWindow());
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(startupItem);
         menu.Items.Add(osdItem);
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Verificar atualizações...", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
-        menu.Items.Add("Sair", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
+        var checkItem = menu.Items.Add("Verificar atualizações...", Theme.MenuIcon('\uE72C'), (_, _) => ShowAboutWindow(checkNow: true));
+        var exitItem = menu.Items.Add("Sair", Theme.MenuIcon('\uE7E8'), (_, _) => ExitApp());
         Theme.Apply(menu);
         // o menu ignora a própria margem interna: o espaço embaixo vai no último item
         var lastItem = menu.Items[^1];
         lastItem.Padding = lastItem.Padding with { Bottom = lastItem.Padding.Bottom + 4 };
         Theme.Apply(appsMenu.DropDown);
+        // só o que abre uma janela ou sai fecha o menu
+        _menuClosers = [aboutItem, _updateItem, openItem, shortcutsItem, checkItem, exitItem];
+        KeepOpenOnClick(menu);
+        KeepOpenOnClick(appsMenu.DropDown);
 
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
         menu.Opening += (_, _) =>
@@ -343,6 +347,21 @@ public class MainForm : Form
         _tray.Visible = true;
     }
 
+    // Escolher e ligar/desligar no menu não o fecham, como no Mac: dá para ver o resultado e corrigir na hora.
+    private HashSet<ToolStripItem> _menuClosers = [];
+    private bool _keepMenuOpen;
+
+    private void KeepOpenOnClick(ToolStripDropDown dropDown)
+    {
+        // o clique chega antes do fechamento, inclusive nos menus de cima quando é num submenu
+        dropDown.ItemClicked += (_, e) => _keepMenuOpen = e.ClickedItem is not null && !_menuClosers.Contains(e.ClickedItem);
+        dropDown.Closing += (_, e) =>
+        {
+            if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked && _keepMenuOpen)
+                e.Cancel = true;
+        };
+    }
+
     private void FillAppsMenu(ToolStripMenuItem appsMenu)
     {
         appsMenu.DropDownItems.Clear();
@@ -350,10 +369,7 @@ public class MainForm : Form
 
         var apps = AudioApps.List();
         if (apps.Count == 0)
-        {
             appsMenu.DropDownItems.Add(new ToolStripMenuItem("Nenhum app com som") { Enabled = false });
-            return;
-        }
 
         foreach (var app in apps)
         {
@@ -361,23 +377,39 @@ public class MainForm : Form
             var item = new ToolStripMenuItem(label) { Checked = app.ProcessName == selectedName };
             if (app.IsMuted)
                 item.ForeColor = Theme.Mute; // app mudo aparece em vermelho
-            // clicar no nome escolhe o app, como antes; o submenu só tem o mudo
+            // clicar no nome escolhe o app; o ✓ muda na hora, com o menu aberto
             item.Click += (_, _) =>
             {
                 SelectApp(app.ProcessName);
-                _tray.ContextMenuStrip?.Close(); // item com submenu não fecha o menu sozinho
+                foreach (var other in appsMenu.DropDownItems.OfType<ToolStripMenuItem>())
+                    other.Checked = other == item;
             };
             item.DropDownItems.Add(MuteItem(app));
             Theme.Apply(item.DropDown);
+            KeepOpenOnClick(item.DropDown);
             appsMenu.DropDownItems.Add(item);
         }
+
+        appsMenu.DropDownItems.Add(new ToolStripSeparator());
+        var refresh = new ToolStripMenuItem("Atualizar lista", Theme.MenuIcon(''));
+        // monta de novo depois do clique: tirar o item clicado no meio do clique atrapalha o menu
+        refresh.Click += (_, _) => BeginInvoke(() => { LoadApps(); FillAppsMenu(appsMenu); });
+        appsMenu.DropDownItems.Add(refresh);
     }
 
     // "Mudo", marcado quando o app está mudo: no submenu da bandeja e no botão direito da lista
     private ToolStripMenuItem MuteItem(AudioApp app)
     {
         var mute = new ToolStripMenuItem("Mudo") { Checked = app.IsMuted };
-        mute.Click += (_, _) => SetMute(app, !app.IsMuted);
+        mute.Click += (_, _) =>
+        {
+            // o menu fica aberto: o estado vem do ✓, não do app guardado quando o menu abriu
+            bool muted = !mute.Checked;
+            SetMute(app, muted);
+            mute.Checked = muted;
+            if (mute.OwnerItem is ToolStripMenuItem appItem)
+                appItem.ForeColor = muted ? Theme.Mute : Theme.Text;
+        };
         return mute;
     }
 
@@ -385,6 +417,7 @@ public class MainForm : Form
     {
         var menu = new ContextMenuStrip();
         Theme.Apply(menu);
+        KeepOpenOnClick(menu);
         // monta na hora, com o app que está embaixo do mouse; fora de um app, não abre
         menu.Opening += (_, e) =>
         {
