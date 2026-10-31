@@ -102,7 +102,7 @@ public class VolumeBar : Control
         using var thumb = new SolidBrush(Enabled ? Accent : Theme.Inactive);
         g.FillEllipse(thumb, thumbX - thumbSize / 2f, centerY - thumbSize / 2f, thumbSize, thumbSize);
 
-        if (Focused)
+        if (Focused && ShowFocusCues) // só quem chegou pelo teclado (Tab) vê a borda; clicar e arrastar não
             ControlPaint.DrawFocusRectangle(g, ClientRectangle, Theme.Text, Theme.Background);
     }
 

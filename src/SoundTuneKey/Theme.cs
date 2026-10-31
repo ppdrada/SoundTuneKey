@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace SoundTuneKey;
 
@@ -102,12 +102,16 @@ public static class Theme
         list.ForeColor = Text;
         list.BorderStyle = BorderStyle.None;
         list.OwnerDraw = true;
+        var headerFiller = new HeaderFiller(list);
         list.HandleCreated += (_, _) =>
         {
             // ItemsView: barra de rolagem escura e sem linhas de coluna na área vazia;
             // no cabeçalho, pinta escuro o espaço depois da última coluna
             const int LVM_GETHEADER = 0x101F;
-            SetWindowTheme(SendMessage(list.Handle, LVM_GETHEADER, 0, 0), "DarkMode_ItemsView", null);
+            SetWindowTheme(list.Handle, "DarkMode_Explorer", null); // barra de rolagem escura e fina
+            var header = SendMessage(list.Handle, LVM_GETHEADER, 0, 0);
+            SetWindowTheme(header, "DarkMode_ItemsView", null);
+            headerFiller.AssignHandle(header);
         };
 
         list.DrawColumnHeader += (_, e) =>
@@ -131,9 +135,45 @@ public static class Theme
             e.Graphics.FillRectangle(back, e.Bounds);
 
             var textBounds = Rectangle.Inflate(e.Bounds, -6, 0);
-            TextRenderer.DrawText(e.Graphics, e.SubItem!.Text, list.Font, textBounds, (e.Item.Tag as AudioApp)?.IsMuted == true ? Mute : Text,
+            // mudo em vermelho; aberto mas ainda sem som, em cinza
+            var app = e.Item.Tag as AudioApp;
+            var color = app?.IsMuted == true ? Mute : app?.HasAudio == false ? MutedText : Text;
+            bool speaker = e.ColumnIndex == 0 && app?.IsPlaying == true;
+            int iconSpace = speaker ? (int)(20 * Scale(list)) : 0;
+            textBounds.Width -= iconSpace;
+            TextRenderer.DrawText(e.Graphics, e.SubItem!.Text, list.Font, textBounds, color,
                 TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.EndEllipsis);
+
+            // tocando: o alto-falante no fim da coluna do nome, ao lado do volume
+            if (speaker)
+            {
+                var box = new Rectangle(textBounds.Right, e.Bounds.Y, iconSpace, e.Bounds.Height);
+                MediaIcons.Draw(e.Graphics, app!.IsMuted ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker, box, 11 * Scale(list), app.IsMuted ? Mute : MutedText);
+            }
         };
+    }
+
+    // O tema não pinta o cabeçalho depois da última coluna (em cima da barra de rolagem): ficava um
+    // canto branco. Depois de cada pintura, esse espaço recebe o fundo e a linha das colunas.
+    private sealed class HeaderFiller(ListView list) : NativeWindow
+    {
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            const int WM_PAINT = 0x000F;
+            if (m.Msg != WM_PAINT)
+                return;
+
+            int right = list.Columns.Cast<ColumnHeader>().Sum(c => c.Width);
+            using var g = Graphics.FromHwnd(Handle);
+            var bounds = g.VisibleClipBounds;
+            if (right >= bounds.Right)
+                return;
+            using var back = new SolidBrush(Raised);
+            g.FillRectangle(back, right, 0, bounds.Right - right, bounds.Bottom);
+            using var line = new Pen(Border);
+            g.DrawLine(line, right, bounds.Bottom - 1, bounds.Right, bounds.Bottom - 1);
+        }
     }
 
     public static void Apply(Button button)
@@ -148,6 +188,9 @@ public static class Theme
 
     /// <summary>Tag de um item de menu que é liga/desliga: aparece com a bolinha à esquerda em vez de ✓.</summary>
     public const string DotTag = "dot";
+
+    /// <summary>App tocando no menu da bandeja: o alto-falante é desenhado depois do nome.</summary>
+    public const string PlayingTag = "playing";
 
     /// <summary>Item marcável do menu com a bolinha do "Iniciar com o Windows" (veja <see cref="DotTag"/>).</summary>
     public static void UseDot(ToolStripMenuItem item)
@@ -206,12 +249,30 @@ public static class Theme
 
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
         {
-            e.TextColor = !e.Item.Enabled ? MutedText : e.Item.ForeColor == Mute ? Mute : Text;
+            e.TextColor = !e.Item.Enabled || e.Item.ForeColor == MutedText ? MutedText : e.Item.ForeColor == Mute ? Mute : Text;
             // o menu põe o texto um pouco acima do meio, e o destaque parecia ter mais espaço embaixo
             var textRect = e.TextRectangle;
             textRect.Y = (e.Item.Height - textRect.Height) / 2;
             e.TextRectangle = textRect;
             base.OnRenderItemText(e);
+
+            // app tocando: o alto-falante logo depois do nome (o texto termina com espaços que guardam o lugar)
+            if (e.Item.Tag is PlayingTag && e.Text is { } text)
+            {
+                float s = Scale(e.ToolStrip!);
+                int nameWidth = TextRenderer.MeasureText(e.Graphics, text.TrimEnd(), e.TextFont, Size.Empty, TextFormatFlags.NoPadding).Width;
+                var box = new Rectangle(textRect.X + nameWidth + (int)(4 * s), 0, (int)(16 * s), e.Item.Height);
+                MediaIcons.Draw(e.Graphics, e.Item.ForeColor == Mute ? MediaGlyph.SpeakerMuted : MediaGlyph.Speaker, box, 11 * s, e.TextColor);
+            }
+        }
+
+        // a linha com a mesma folga dos dois lados, como o destaque (a padrão começa depois da coluna dos ícones)
+        protected override void OnRenderSeparator(ToolStripSeparatorRenderEventArgs e)
+        {
+            float s = Scale(e.ToolStrip!);
+            int y = e.Item.Height / 2;
+            using var line = new Pen(Border);
+            e.Graphics.DrawLine(line, 6 * s, y, e.Item.Width - 6 * s, y);
         }
 
         // destaque do item sob o mouse: uma pílula com cantos arredondados, afastada das bordas

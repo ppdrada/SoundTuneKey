@@ -77,7 +77,7 @@ When you use the volume, mute, switch-app or microphone hotkeys, a small notice 
 3. Select the app you want to control from the list.
 4. Done! Use the hotkeys above, even while in-game.
 
-The program remembers the last app you picked the next time it opens.
+The program remembers the last app you picked the next time it opens. Apps that are playing show a speaker next to the volume. Open apps that haven't played sound yet show in gray at the end of the list: you can pick one ahead of time, and volume control starts once it plays (Windows only gives an app its own volume after that).
 
 Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part of the song or video), the **⏮ ⏯ ⏭** buttons, which do the same as the hotkeys, and the 🔈 volume bar. Click the 🔈 speaker to mute or unmute (muted: red speaker, dimmed bar, app name in red in the list); changing the volume also unmutes. The hotkeys change the volume 1% at a time (hold to repeat). Right-click any app in the list for **Mudo** (Mute), checked while that app is muted; it does not change the controlled app. The time bar only works with apps that report the track time to Windows (Spotify and Chrome tabs do).
 
@@ -95,7 +95,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
 - **Microfone ligado / desligado** (Microphone on / off) — turn the microphone on or off; red when it is off
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red. **Atualizar lista** (Refresh list), at the end, finds apps that just started. Picking and toggling don't close the menu, so you can fix a wrong pick right away
+- **Aplicativos** (Apps) — click an app to control it; its submenu has **Mudo** (Mute), and muted apps show in red. The list updates by itself (every 5 seconds while open). Picking and toggling don't close the menu, so you can fix a wrong pick right away
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Windows** (Start with Windows) — start the program automatically, already in the tray, when the PC boots
 - **Mostrar aviso na tela** (Show on-screen notice) — turn the volume/mute notice on or off

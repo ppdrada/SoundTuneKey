@@ -78,7 +78,7 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 | Apagado | `#4A4A50` |
 
 - **Janela de tamanho fixo** (411 × 500 de área útil nos dois), só com o botão de fechar. De cima para baixo:
-  - Windows: lista de apps (nome, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume, "Atualizar lista", rodapé com "Iniciar com o Windows", "Atalhos" e "Sobre". "Atalhos" e "Sobre" abrem janelinhas sem barra de título e com cantos arredondados (no rodapé e no menu da bandeja). Mesma ordem do Mac e do mini player da bandeja.
+  - Windows: lista de apps (nome, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume (a lista se atualiza sozinha a cada 5 s), rodapé com "Iniciar com o Windows", "Atalhos" e "Sobre". "Atalhos" e "Sobre" abrem janelinhas sem barra de título e com cantos arredondados (no rodapé e no menu da bandeja). Mesma ordem do Mac e do mini player da bandeja.
   - Mac: lista de apps (nome, tocando/parado, volume), "Controlando: <app>", barra de tempo, botões ⏮ ⏯ ⏭, barra de volume, caixa de atalhos, "Iniciar com o Mac". O volume fica **embaixo** dos botões (pedido do usuário), na mesma ordem da linha do menu da barra. A lista se atualiza sozinha, sem botão.
 - **Itens clicáveis** (nos dois): mãozinha do mouse em cima; os botões ⏮ ⏯ ⏭ são só o ícone, mostram um círculo claro ao passar o mouse e encolhem um pouco ao clicar (animados).
 - **Barra de volume** desenhada: trilha clara até o volume, apagada depois, bolinha para arrastar. Alto-falante à esquerda e a porcentagem à direita.
