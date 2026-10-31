@@ -1,8 +1,8 @@
 import AppKit
 
 /// Controles de mídia de um app específico. O macOS não tem API pública para isso (o
-/// MediaRemote é privado), então fala direto, por AppleScript, com quem aceita: Spotify e
-/// Música pelos comandos de player, e o Chrome executando JavaScript no vídeo da aba (veja
+/// MediaRemote é privado), então fala direto, por AppleScript, com quem aceita: Spotify,
+/// Música e VLC pelos comandos de player, e o Chrome executando JavaScript no vídeo da aba (veja
 /// `ChromeMedia`). Na primeira vez o macOS pergunta se o Sound Tune Key pode controlá-los.
 @MainActor
 enum MediaPlayer {
@@ -17,13 +17,36 @@ enum MediaPlayer {
 
     private struct Player {
         let bundleID: String
-        /// O Spotify informa a duração em milissegundos; o Música, em segundos.
-        let durationScale: Double
+        /// O Spotify informa a duração em milissegundos; o Música e o VLC, em segundos.
+        var durationScale: Double = 1
+        /// Devolve {estado, posição, duração}, com o estado "stopped" quando não há nada tocando.
+        var statusScript = """
+            if player state is stopped then return {"stopped", 0, 0}
+            return {player state as string, player position, duration of current track}
+            """
+        var playPause = "playpause"
+        var next = "next track"
+        var previous = "previous track"
+        var position = "player position"
     }
 
     private static let players = [
         Player(bundleID: "com.spotify.client", durationScale: 1000),
-        Player(bundleID: "com.apple.Music", durationScale: 1),
+        Player(bundleID: "com.apple.Music"),
+        // o VLC tem outros nomes: "play" alterna, "current time" é a posição, e a duração dá
+        // erro (ou -1) sem vídeo aberto
+        Player(bundleID: "org.videolan.vlc",
+               statusScript: """
+                   try
+                       set d to duration of current item
+                   on error
+                       return {"stopped", 0, 0}
+                   end try
+                   if d ≤ 0 then return {"stopped", 0, 0}
+                   if playing then return {"playing", current time, d}
+                   return {"paused", current time, d}
+                   """,
+               playPause: "play", next: "next", previous: "previous", position: "current time"),
     ]
 
     static func supports(_ bundleID: String) -> Bool {
@@ -34,12 +57,7 @@ enum MediaPlayer {
     static func status(of bundleID: String) throws -> Status? {
         if bundleID == ChromeMedia.bundleID { return isRunning(bundleID) ? try ChromeMedia.status() : nil }
         guard let player = player(bundleID) else { return nil }
-        let result = try run("""
-            tell application id "\(bundleID)"
-                if player state is stopped then return {"stopped", 0, 0}
-                return {player state as string, player position, duration of current track}
-            end tell
-            """)
+        let result = try run("tell application id \"\(bundleID)\"\n\(player.statusScript)\nend tell")
         guard result.numberOfItems == 3, let state = result.atIndex(1)?.stringValue, state != "stopped",
               let position = result.atIndex(2)?.doubleValue, let duration = result.atIndex(3)?.doubleValue
         else { return nil }
@@ -51,12 +69,12 @@ enum MediaPlayer {
             if isRunning(bundleID) { try ChromeMedia.send(command) }
             return
         }
-        guard player(bundleID) != nil else { return }
+        guard let player = player(bundleID) else { return }
         let action = switch command {
-        case .playPause: "playpause"
-        case .next: "next track"
-        case .previous: "previous track"
-        case .restart: "set player position to 0"
+        case .playPause: player.playPause
+        case .next: player.next
+        case .previous: player.previous
+        case .restart: "set \(player.position) to 0"
         }
         try run("tell application id \"\(bundleID)\" to \(action)")
     }
@@ -66,8 +84,8 @@ enum MediaPlayer {
             if isRunning(bundleID) { try ChromeMedia.seek(to: seconds) }
             return
         }
-        guard player(bundleID) != nil else { return }
-        try run("tell application id \"\(bundleID)\" to set player position to \(Int(seconds.rounded()))")
+        guard let player = player(bundleID) else { return }
+        try run("tell application id \"\(bundleID)\" to set \(player.position) to \(Int(seconds.rounded()))")
     }
 
     /// Só fala com o app se ele já estiver aberto: o AppleScript abriria o app.

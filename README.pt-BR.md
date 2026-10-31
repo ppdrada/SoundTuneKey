@@ -60,7 +60,7 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 
 Ao usar os atalhos de volume, mudo, troca de app ou microfone, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, em vermelho) por um instante, sem tirar o foco, até sobre jogos em tela cheia. Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da barra.
 
-> ℹ️ `⌃` é a tecla Control e `⌥` é a Option. Os atalhos de mídia controlam o app escolhido quando ele é o **Spotify**, o **Música** ou um vídeo no **Google Chrome**; as teclas de mídia do próprio Mac (F7/F8/F9) continuam valendo para o app que estiver tocando. Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo da janela. Ao lado, **Sobre** mostra a versão, o autor e o link do GitHub, e o ícone 🎤 liga e desliga o microfone.
+> ℹ️ `⌃` é a tecla Control e `⌥` é a Option. Os atalhos de mídia controlam o app escolhido quando ele é o **Spotify**, o **Música**, o **VLC** ou um vídeo no **Google Chrome**; as teclas de mídia do próprio Mac (F7/F8/F9) continuam valendo para o app que estiver tocando. Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo da janela. Ao lado, **Sobre** mostra a versão, o autor e o link do GitHub, e o ícone 🎤 liga e desliga o microfone.
 
 ---
 
@@ -109,7 +109,7 @@ O programa lembra o último app escolhido e o volume de cada app. O volume vale 
 
 A bolinha **Iniciar com o Mac**, embaixo da janela, abre o programa sozinho, já na barra de menus, quando você entra no Mac. Mova o app para **Aplicativos** antes de ligar.
 
-Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. Clique no alto-falante (ou no app com o botão direito, na lista) para deixar o app mudo: o nome e o alto-falante ficam vermelhos, e mexer no volume tira o mudo. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
+Embaixo de "Controlando", a janela tem a **barra de tempo** da música (tempo atual à esquerda, duração à direita; arraste para ir para outro trecho), os botões **⏮ ⏯ ⏭** e a barra de volume 🔈. Clique no alto-falante (ou no app com o botão direito, na lista) para deixar o app mudo: o nome e o alto-falante ficam vermelhos, e mexer no volume tira o mudo. O ⏮ volta ao começo da música; dois toques em menos de 1 s vão para a música anterior. Os botões e a barra de tempo funcionam com o **Spotify**, o **Música**, o **VLC** e vídeos no **Google Chrome**: na primeira vez, o macOS pergunta se o Sound Tune Key pode controlá-los, e é só aceitar. Com outros apps, eles ficam apagados.
 
 > ℹ️ **Chrome:** ligue uma vez, em cada perfil do Chrome, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** na barra de menus do Mac, com o Chrome na frente. Enquanto não estiver ligado, o Sound Tune Key mostra um aviso com o botão **Como ligar**, que mostra os passos e traz o Chrome para a frente. O volume do Chrome funciona mesmo sem isso. No Chrome, o ⏭ e o ⏮ duplo trocam de vídeo no YouTube.
 
@@ -132,7 +132,7 @@ Fechar a janela não encerra o programa: ele continua no ícone da barra de menu
 - **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**
 - **Microfone ligado / desligado** — liga e desliga o microfone (vermelho quando desligado)
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — passe o mouse num app para ver **Mudo** (o app controlado, marcado, é escolhido na janela); apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo
+- **Aplicativos** — clique num app para controlá-lo (o marcado é o controlado); o submenu dele tem **Mudo**. Escolher e ligar/desligar não fecham o menu, para corrigir na hora; apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
 - **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo
@@ -158,5 +158,5 @@ Para compilar a partir do código, rode `mac/build-app.sh` (precisa das ferramen
 
 - **Swift / SwiftUI** — aplicativo nativo para Mac
 - **Core Audio process taps** — controle de volume por aplicativo
-- **AppleScript** — pausar, próxima, anterior e a barra de tempo no Spotify e no Música, e nos vídeos do Chrome por JavaScript
+- **AppleScript** — pausar, próxima, anterior e a barra de tempo no Spotify, no Música e no VLC, e nos vídeos do Chrome por JavaScript
 - **Carbon `RegisterEventHotKey`** — atalhos globais de teclado

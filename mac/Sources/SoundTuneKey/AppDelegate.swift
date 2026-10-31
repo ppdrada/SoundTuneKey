@@ -13,10 +13,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private let appsMenu = NSMenu()
     private var selectionWatch: AnyCancellable?
     private var muteWatch: AnyCancellable?
-    private lazy var startAtLoginItem = item("Iniciar com o Mac", #selector(toggleStartAtLogin))
-    private lazy var osdItem = item("Mostrar aviso na tela", #selector(toggleOsd))
+    // escolher e ligar/desligar não fecham o menu (MenuRow); a bolinha acompanha a da janela
+    private lazy var startAtLoginItem = MenuRow.item(model: model, content: {
+        ("Iniciar com o Mac", RadioDot.menuImage(on: $0.startsAtLogin), nil)
+    }, action: { [unowned self] in toggleStartAtLogin() })
+    private lazy var osdItem = MenuRow.item(model: model, content: {
+        ("Mostrar aviso na tela", RadioDot.menuImage(on: $0.showOsd), nil)
+    }, action: { [unowned self] in toggleOsd() })
     private lazy var updateItem = item("Atualizar", #selector(showUpdate), symbol: "arrow.down.circle")
-    private lazy var micItem = item("Microfone", #selector(toggleMic))
+    private lazy var micItem = MenuRow.item(model: model, content: { [unowned self] model in
+        let off = model.micMuted == true
+        return (off ? "Microfone desligado" : "Microfone ligado",
+                symbol(off ? "mic.slash" : "mic", color: off ? NSColor(Theme.mute) : nil), off ? Theme.mute : nil)
+    }, action: { [unowned self] in toggleMic() })
     private var aboutWindow: NSWindow?
     private var shortcutsWindow: NSWindow?
 
@@ -144,17 +153,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         guard menu === appsMenu else {
             // menu principal: a bolinha acompanha a da janela e os Ajustes do Sistema
             model.refreshStartsAtLogin()
-            // a mesma bolinha da janela no lugar do ✓, na coluna dos ícones para alinhar com os outros itens
-            startAtLoginItem.image = RadioDot.menuImage(on: model.startsAtLogin)
-            osdItem.image = RadioDot.menuImage(on: model.showOsd)
             updateItem.isHidden = model.updates.available == nil
             updateItem.title = "Atualizar para a versão \(model.updates.available ?? "")"
             model.refreshMic()
             micItem.isHidden = model.micMuted == nil
-            let micOff = model.micMuted == true
-            micItem.attributedTitle = NSAttributedString(string: micOff ? "Microfone desligado" : "Microfone ligado",
-                                                         attributes: micOff ? [.foregroundColor: NSColor(Theme.mute)] : [:])
-            micItem.image = symbol(micOff ? "mic.slash" : "mic", color: micOff ? NSColor(Theme.mute) : nil)
             return
         }
         menu.removeAllItems()
@@ -167,25 +169,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             return
         }
         for app in model.apps {
-            let entry = NSMenuItem(title: app.isPlaying ? "\(app.displayName)  🔊" : app.displayName, action: nil, keyEquivalent: "")
-            entry.state = app.bundleID == model.selectedBundleID ? .on : .off
-            if model.isMuted(app.bundleID) {
-                entry.attributedTitle = NSAttributedString(string: entry.title, attributes: [.foregroundColor: NSColor(Theme.mute)])
-            }
-            // como no Windows, o mudo fica no submenu de cada app. No Mac, clicar num item com
-            // submenu não faz nada: o app é escolhido na janela
-            let submenu = NSMenu()
-            let mute = item("Mudo", #selector(toggleMute(_:)))
-            mute.representedObject = app.bundleID
-            mute.state = model.isMuted(app.bundleID) ? .on : .off
-            submenu.addItem(mute)
-            entry.submenu = submenu
-            menu.addItem(entry)
+            menu.addItem(AppMenuRow.item(model: model, app: app))
         }
-    }
-
-    @objc private func toggleMute(_ sender: NSMenuItem) {
-        if let bundleID = sender.representedObject as? String { model.toggleMute(bundleID) }
     }
 
     /// Como o texto do ícone da bandeja no Windows: mostra qual app está sendo controlado.
@@ -215,15 +200,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         aboutWindow?.makeKeyAndOrderFront(nil)
     }
 
-    @objc private func toggleOsd() { model.showOsd.toggle() }
-    @objc private func toggleMic() { model.toggleMic() }
+    private func toggleOsd() { model.showOsd.toggle() }
+    private func toggleMic() { model.toggleMic() }
 
     // clicar na notificação de versão nova abre a janela de atualizar
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         await MainActor.run { showAbout(checking: true) }
     }
 
-    @objc private func toggleStartAtLogin() {
+    private func toggleStartAtLogin() {
         model.setStartsAtLogin(!model.startsAtLogin)
     }
 

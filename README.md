@@ -60,7 +60,7 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 
 When you use the volume, mute, switch-app or microphone hotkeys, a small notice shows the app and the volume at the bottom of the screen (red when muted) for a moment, without taking the focus, even over full-screen games. To turn it off, switch off **Aviso na tela** (On-screen notice), next to "Controlando" in the window, or **Mostrar aviso na tela** in the menu bar menu.
 
-> ℹ️ `⌃` is Control and `⌥` is Option. The media hotkeys control the selected app when it is **Spotify**, **Music** or a video in **Google Chrome**; the Mac's own media keys (F7/F8/F9) keep working for whatever app is playing. The hotkeys are also listed inside the app: click **Atalhos** (Shortcuts) at the bottom of the window. Next to it, **Sobre** (About) shows the version, the author and the GitHub link, and the 🎤 icon mutes and unmutes the microphone.
+> ℹ️ `⌃` is Control and `⌥` is Option. The media hotkeys control the selected app when it is **Spotify**, **Music**, **VLC** or a video in **Google Chrome**; the Mac's own media keys (F7/F8/F9) keep working for whatever app is playing. The hotkeys are also listed inside the app: click **Atalhos** (Shortcuts) at the bottom of the window. Next to it, **Sobre** (About) shows the version, the author and the GitHub link, and the 🎤 icon mutes and unmutes the microphone.
 
 ---
 
@@ -109,7 +109,7 @@ The program remembers the last app you picked and the volume of each app. The vo
 
 The **Iniciar com o Mac** (Start with Mac) dot at the bottom of the window opens the program automatically, already in the menu bar, when you log in. Move the app to **Applications** before turning it on.
 
-Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. Click the speaker (or right-click the app in the list) to mute it: the name and the speaker turn red, and changing the volume unmutes. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
+Under "Controlando" (Controlling), the window has the track **time bar** (current time on the left, length on the right; drag to jump to another part), the **⏮ ⏯ ⏭** buttons and the 🔈 volume bar. Click the speaker (or right-click the app in the list) to mute it: the name and the speaker turn red, and changing the volume unmutes. ⏮ restarts the current track; press it twice within 1 s for the previous track. The buttons and the time bar work with **Spotify**, **Music**, **VLC** and videos in **Google Chrome**: the first time, macOS asks whether Sound Tune Key may control them, just allow it. With other apps they are greyed out.
 
 > ℹ️ **Chrome:** turn on, once in each Chrome profile, **Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple** (View → Developer → Allow JavaScript from Apple Events) in the Mac menu bar while Chrome is in front. Until then, Sound Tune Key shows a warning with a **Como ligar** (How to turn it on) button that lists the steps and brings Chrome to the front. Chrome's volume works without it. In Chrome, ⏭ and the double ⏮ switch videos on YouTube.
 
@@ -132,7 +132,7 @@ Closing the window does not quit the program: it stays in the menu bar icon (nex
 - **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up
 - **Microfone ligado / desligado** (Microphone on / off) — mutes and unmutes the microphone (red when off)
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — hover an app to see **Mudo** (Mute) (the checked app is the one being controlled; pick it in the window); muted apps show in red, and the menu bar icon turns red while the chosen app is muted
+- **Aplicativos** (Apps) — click an app to control it (the checked app is the one being controlled); its submenu has **Mudo** (Mute). Picking and toggling don't close the menu, so you can fix a wrong pick right away; muted apps show in red, and the menu bar icon turns red while the chosen app is muted
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
 - **Mostrar aviso na tela** (Show on-screen notice) — turns the volume and mute notice on or off
@@ -158,5 +158,5 @@ To build it from source instead, run `mac/build-app.sh` (needs the Xcode Command
 
 - **Swift / SwiftUI** — native Mac app
 - **Core Audio process taps** — per-app volume control
-- **AppleScript** — play/pause, next, previous and the time bar for Spotify and Music, and for Chrome videos through JavaScript
+- **AppleScript** — play/pause, next, previous and the time bar for Spotify, Music and VLC, and for Chrome videos through JavaScript
 - **Carbon `RegisterEventHotKey`** — global keyboard hotkeys
