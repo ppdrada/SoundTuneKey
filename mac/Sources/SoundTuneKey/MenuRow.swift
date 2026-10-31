@@ -29,7 +29,9 @@ struct MenuRow: View {
         }
         .font(.system(size: NSFont.menuFont(ofSize: 0).pointSize))
         .foregroundStyle(hovering ? Color.white : Color.primary)
-        .padding(.horizontal, 9)
+        // 11 à esquerda: ícone e texto na mesma coluna dos itens comuns do menu
+        .padding(.leading, 11)
+        .padding(.trailing, 9)
         .frame(height: Self.height)
         // o mesmo destaque azul dos itens comuns ao passar o mouse
         .background(RoundedRectangle(cornerRadius: 4).fill(hovering ? Color.accentColor : .clear))
@@ -46,7 +48,8 @@ struct MenuRow: View {
                      action: @escaping () -> Void) -> NSMenuItem {
         let item = NSMenuItem()
         let view = NSHostingView(rootView: MenuRow(model: model, content: content, action: action))
-        view.frame = NSRect(x: 0, y: 0, width: 200, height: height)
+        // a mesma largura da linha de mídia: mais estreito, o menu encolhia e cortava os números dela
+        view.frame = NSRect(x: 0, y: 0, width: MenuMediaRow.size.width, height: height)
         view.autoresizingMask = [.width]
         item.view = view
         return item
@@ -81,7 +84,9 @@ struct AppMenuRow: View {
         }
         .foregroundStyle(text)
         .font(.system(size: NSFont.menuFont(ofSize: 0).pointSize))
-        .padding(.horizontal, 9)
+        // 11 à esquerda: ícone e texto na mesma coluna dos itens comuns do menu
+        .padding(.leading, 11)
+        .padding(.trailing, 9)
         .frame(height: MenuRow.height)
         .background(RoundedRectangle(cornerRadius: 4).fill(hovering ? Color.accentColor : .clear))
         .padding(.horizontal, 5)
