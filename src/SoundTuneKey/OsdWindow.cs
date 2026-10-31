@@ -1,4 +1,4 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
 
@@ -120,11 +120,11 @@ public class OsdWindow : Form
         using var big = new Font("Segoe UI", 12f * scale, FontStyle.Bold, GraphicsUnit.Pixel);
         using var icon = new Font(Theme.IconFont, 18f * scale, GraphicsUnit.Pixel);
         using (var titleBrush = new SolidBrush(muted ? Theme.Mute : Theme.MutedText))
-            g.DrawString("Microfone", title, titleBrush, new RectangleF(0, titleCenter - S(12), size.Width, S(24)), center);
+            g.DrawString(Lang.T("Microfone", "Microphone"), title, titleBrush, new RectangleF(0, titleCenter - S(12), size.Width, S(24)), center);
         using (var brush = new SolidBrush(color))
         {
             g.DrawString(muted ? Theme.MicOffGlyph : Theme.MicGlyph, icon, brush, new RectangleF(side - S(4), rowCenter - S(13), S(28), S(28)), center);
-            g.DrawString(muted ? "Desligado" : "Ligado", big, brush, new RectangleF(0, rowCenter - S(12), size.Width, S(24)), center);
+            g.DrawString(muted ? Lang.T("Desligado", "Off") : Lang.T("Ligado", "On"), big, brush, new RectangleF(0, rowCenter - S(12), size.Width, S(24)), center);
         }
         return bmp;
     }

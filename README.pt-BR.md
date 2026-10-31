@@ -89,7 +89,7 @@ Se o Windows bloquear **sem o botão "Executar assim mesmo"**, o PC está com o 
 
 #### 🖥️ Bandeja do Windows
 
-Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. Clique com o botão direito no ícone para:
+Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. O programa vem em português e inglês: escolha no **Sobre**; na primeira vez, ele segue o idioma do Windows. Clique com o botão direito no ícone para:
 
 - **Sound Tune Key**, bem no topo com o ícone do app — abre o **Sobre**: versão, autor, o link do GitHub e um botão para verificar atualizações
 - Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
