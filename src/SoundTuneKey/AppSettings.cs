@@ -14,7 +14,7 @@ public class AppSettings
     /// <summary>Última versão nova já avisada no balão (o balão aparece uma vez por versão).</summary>
     public string? NotifiedVersion { get; set; }
 
-    /// <summary>"pt" ou "en", escolhido no "Sobre"; sem nada, o app segue o idioma do Windows.</summary>
+    /// <summary>"pt", "en" ou "es", escolhido no "Sobre"; sem nada, o app segue o idioma do Windows.</summary>
     public string? Language { get; set; }
 
     private static readonly string FilePath = Path.Combine(

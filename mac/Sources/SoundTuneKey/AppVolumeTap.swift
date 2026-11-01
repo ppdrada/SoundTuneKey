@@ -39,7 +39,7 @@ final class AppVolumeTap {
         description.name = "Sound Tune Key"
         description.isPrivate = true
         description.muteBehavior = .mutedWhenTapped
-        try check(AudioHardwareCreateProcessTap(description, &tapID), T("criar a captura", "create the capture"))
+        try check(AudioHardwareCreateProcessTap(description, &tapID), T("criar a captura", "create the capture", "crear la captura"))
 
         let aggregate: [String: Any] = [
             kAudioAggregateDeviceNameKey: "Sound Tune Key",
@@ -53,12 +53,12 @@ final class AppVolumeTap {
                 kAudioSubTapDriftCompensationKey: true,
             ]],
         ]
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), T("criar o dispositivo", "create the device"))
+        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), T("criar o dispositivo", "create the device", "crear el dispositivo"))
 
         try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, nil) { [unowned self] _, input, _, output, _ in
             Self.copy(input, to: output, gain: self.gain)
-        }, T("criar o processamento", "create the processing"))
-        try check(AudioDeviceStart(aggregateID, ioProcID), T("começar a tocar", "start playing"))
+        }, T("criar o processamento", "create the processing", "crear el procesamiento"))
+        try check(AudioDeviceStart(aggregateID, ioProcID), T("começar a tocar", "start playing", "empezar a reproducir"))
     }
 
     func stop() {
@@ -119,7 +119,7 @@ final class AppVolumeTap {
 struct AudioError: LocalizedError {
     let step: String
     let status: OSStatus
-    var errorDescription: String? { T("Não foi possível \(step) (erro \(status)).", "Couldn't \(step) (error \(status)).") }
+    var errorDescription: String? { T("Não foi possível \(step) (erro \(status)).", "Couldn't \(step) (error \(status)).", "No se pudo \(step) (error \(status)).") }
 }
 
 private func check(_ status: OSStatus, _ step: String) throws {

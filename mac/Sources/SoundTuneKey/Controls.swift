@@ -22,7 +22,7 @@ struct ToggleSwitch: View {
         .onTapGesture { withAnimation(.easeOut(duration: 0.15)) { isOn.toggle() } }
         .pointerCursor()
         .accessibilityAddTraits(.isButton)
-        .accessibilityValue(isOn ? T("ligado", "on") : T("desligado", "off"))
+        .accessibilityValue(isOn ? T("ligado", "on", "activado") : T("desligado", "off", "desactivado"))
     }
 }
 
@@ -45,7 +45,7 @@ struct RadioDot: View {
         .onTapGesture { isOn.toggle() }
         .pointerCursor()
         .accessibilityAddTraits(.isButton)
-        .accessibilityValue(isOn ? T("ligado", "on") : T("desligado", "off"))
+        .accessibilityValue(isOn ? T("ligado", "on", "activado") : T("desligado", "off", "desactivado"))
     }
 
     /// A mesma bolinha para os itens de liga/desliga do menu da barra.

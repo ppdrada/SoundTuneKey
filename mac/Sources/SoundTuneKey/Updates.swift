@@ -21,15 +21,15 @@ final class Updates: ObservableObject {
         var message: String {
             switch self {
             case let .newer(version): T("Versão \(version) disponível! Você está na \(Updates.current).",
-                                        "Version \(version) available! You have \(Updates.current).")
+                                        "Version \(version) available! You have \(Updates.current).", "¡Versión \(version) disponible! Tienes la \(Updates.current).")
             case .upToDate: T("Você já tem a versão mais nova (\(Updates.current)).",
-                              "You already have the latest version (\(Updates.current)).")
+                              "You already have the latest version (\(Updates.current)).", "Ya tienes la versión más reciente (\(Updates.current)).")
             case .missing: T("O GitHub ainda não informa a versão nova. Tente de novo mais tarde.",
-                             "GitHub doesn't list the new version yet. Try again later.")
+                             "GitHub doesn't list the new version yet. Try again later.", "GitHub todavía no muestra la nueva versión. Inténtalo más tarde.")
             case .offline: T("Não deu para falar com o GitHub. Confira a internet e tente de novo.",
-                             "Couldn't reach GitHub. Check the internet and try again.")
+                             "Couldn't reach GitHub. Check the internet and try again.", "No se pudo conectar con GitHub. Revisa internet e inténtalo de nuevo.")
             case .unexpected: T("O GitHub respondeu algo inesperado. Tente de novo mais tarde.",
-                                "GitHub sent an unexpected answer. Try again later.")
+                                "GitHub sent an unexpected answer. Try again later.", "GitHub respondió algo inesperado. Inténtalo más tarde.")
             }
         }
     }
@@ -52,7 +52,7 @@ final class Updates: ObservableObject {
         let content = UNMutableNotificationContent()
         content.title = "Sound Tune Key"
         content.body = T("Versão \(version) disponível. Clique aqui para atualizar.",
-                         "Version \(version) available. Click here to update.")
+                         "Version \(version) available. Click here to update.", "Versión \(version) disponible. Haz clic aquí para actualizar.")
         try? await center.add(UNNotificationRequest(identifier: "update", content: content, trigger: nil))
     }
 
@@ -150,7 +150,7 @@ final class Updates: ObservableObject {
     struct UpdateError: LocalizedError {
         var errorDescription: String? {
             T("Não deu para atualizar sozinho. Clique em Baixar para pegar pelo navegador.",
-              "Couldn't update by itself. Click Download to get it in the browser.")
+              "Couldn't update by itself. Click Download to get it in the browser.", "No se pudo actualizar solo. Haz clic en Descargar para bajarla en el navegador.")
         }
     }
 }

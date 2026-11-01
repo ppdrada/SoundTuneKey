@@ -140,7 +140,7 @@ public class UpdateWindow : Form
     private readonly Button _check = new() { Width = 150, Height = 32 };
     private readonly Button _close = new() { Width = 100, Height = 32 };
     private readonly Label _version, _author;
-    private readonly LinkLabel _portuguese, _english; // escolha do idioma do app inteiro
+    private readonly LinkLabel _portuguese, _english, _spanish; // escolha do idioma do app inteiro
     private readonly Func<Task<Version>> _latest;
 
     /// <param name="latest">De onde vem a versão nova; o padrão é o GitHub (trocado nos testes).</param>
@@ -193,19 +193,23 @@ public class UpdateWindow : Form
         };
         link.LinkClicked += (_, _) => Updates.Open(Updates.RepoUrl);
 
-        // Português · English, centrados: o escolhido em branco, o outro em cinza (clareia ao passar o mouse)
-        _portuguese = LanguageLink("Português", english: false);
-        _english = LanguageLink("English", english: true);
-        var dot = new Label { Text = "·", AutoSize = true, ForeColor = Theme.MutedText };
+        // Português · English · Español, centrados: o escolhido em branco, os outros em cinza (clareiam ao passar o mouse)
+        _portuguese = LanguageLink("Português", "pt");
+        _english = LanguageLink("English", "en");
+        _spanish = LanguageLink("Español", "es");
+        var dot1 = new Label { Text = "·", AutoSize = true, ForeColor = Theme.MutedText };
+        var dot2 = new Label { Text = "·", AutoSize = true, ForeColor = Theme.MutedText };
         var languages = new Panel { Dock = DockStyle.Top, Height = 30 };
-        languages.Controls.AddRange([_portuguese, dot, _english]);
+        Control[] row = [_portuguese, dot1, _english, dot2, _spanish];
+        languages.Controls.AddRange(row);
         languages.Layout += (_, _) =>
         {
-            int width = _portuguese.Width + dot.Width + _english.Width;
-            int x = (languages.Width - width) / 2;
-            _portuguese.Location = new Point(x, 0);
-            dot.Location = new Point(x + _portuguese.Width, 0);
-            _english.Location = new Point(dot.Right, 0);
+            int x = (languages.Width - row.Sum(c => c.Width)) / 2;
+            foreach (var c in row)
+            {
+                c.Location = new Point(x, 0);
+                x += c.Width;
+            }
         };
 
         Theme.Apply(_download);
@@ -251,18 +255,19 @@ public class UpdateWindow : Form
     // trocar o idioma aqui vale na hora, nesta janela e no resto do app
     private void ApplyTexts()
     {
-        Text = Lang.T("Sobre o Sound Tune Key", "About Sound Tune Key");
-        _version.Text = Lang.T("Versão ", "Version ") + Updates.Current.ToString(3);
-        _author.Text = Lang.T("Desenvolvido por ppdrada", "Made by ppdrada");
+        Text = Lang.T("Sobre o Sound Tune Key", "About Sound Tune Key", "Acerca de Sound Tune Key");
+        _version.Text = Lang.T("Versão ", "Version ", "Versión ") + Updates.Current.ToString(3);
+        _author.Text = Lang.T("Desenvolvido por ppdrada", "Made by ppdrada", "Hecho por ppdrada");
         // a versão de teste não se troca sozinha: nela o botão só abre o download no navegador
-        _download.Text = Updates.CanSelfUpdate && !_selfUpdateFailed ? Lang.T("Atualizar agora", "Update now") : Lang.T("Baixar", "Download");
-        _check.Text = Lang.T("Verificar atualizações", "Check for updates");
-        _close.Text = Lang.T("Fechar", "Close");
-        _portuguese.LinkColor = Lang.English ? Theme.MutedText : Theme.Text;
-        _english.LinkColor = Lang.English ? Theme.Text : Theme.MutedText;
+        _download.Text = Updates.CanSelfUpdate && !_selfUpdateFailed ? Lang.T("Atualizar agora", "Update now", "Actualizar ahora") : Lang.T("Baixar", "Download", "Descargar");
+        _check.Text = Lang.T("Verificar atualizações", "Check for updates", "Buscar actualizaciones");
+        _close.Text = Lang.T("Fechar", "Close", "Cerrar");
+        _portuguese.LinkColor = Lang.Code == "pt" ? Theme.Text : Theme.MutedText;
+        _english.LinkColor = Lang.Code == "en" ? Theme.Text : Theme.MutedText;
+        _spanish.LinkColor = Lang.Code == "es" ? Theme.Text : Theme.MutedText;
     }
 
-    private LinkLabel LanguageLink(string text, bool english)
+    private LinkLabel LanguageLink(string text, string code)
     {
         var link = new LinkLabel
         {
@@ -274,7 +279,7 @@ public class UpdateWindow : Form
         };
         link.MouseEnter += (_, _) => link.LinkColor = Theme.Text;
         link.MouseLeave += (_, _) => ApplyTexts(); // volta à cor de escolhido ou não
-        link.LinkClicked += (_, _) => Lang.Set(english);
+        link.LinkClicked += (_, _) => Lang.Set(code);
         return link;
     }
 
@@ -291,16 +296,17 @@ public class UpdateWindow : Form
         _status.ForeColor = Theme.Text;
         try
         {
-            await Updates.InstallAsync(new Progress<int>(p => _status.Text = Lang.T($"Baixando a versão nova… {p}%", $"Downloading the new version… {p}%")));
-            _status.Text = Lang.T("Pronto! Abrindo a versão nova…", "Done! Opening the new version…");
+            await Updates.InstallAsync(new Progress<int>(p => _status.Text = Lang.T($"Baixando a versão nova… {p}%", $"Downloading the new version… {p}%", $"Descargando la nueva versión… {p}%")));
+            _status.Text = Lang.T("Pronto! Abrindo a versão nova…", "Done! Opening the new version…", "¡Listo! Abriendo la nueva versión…");
             Application.Exit(); // o .exe novo já abriu e espera este fechar
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or UnauthorizedAccessException or InvalidDataException)
         {
             // sem permissão na pasta, sem internet...: o download pelo navegador continua funcionando
             _status.Text = Lang.T("Não deu para atualizar sozinho.\nClique em Baixar para pegar pelo navegador.",
-                "Couldn't update by itself.\nClick Download to get it in the browser.");
-            _download.Text = Lang.T("Baixar", "Download");
+                "Couldn't update by itself.\nClick Download to get it in the browser.",
+                "No se pudo actualizar sola.\nHaz clic en Descargar para obtenerla en el navegador.");
+            _download.Text = Lang.T("Baixar", "Download", "Descargar");
             _download.Enabled = _close.Enabled = true;
             _selfUpdateFailed = true; // o próximo clique só abre o navegador
         }
@@ -320,7 +326,7 @@ public class UpdateWindow : Form
         var current = Updates.Current;
         _check.Enabled = false;
         _status.ForeColor = Theme.MutedText;
-        _status.Text = Lang.T("Procurando atualizações…", "Checking for updates…");
+        _status.Text = Lang.T("Procurando atualizações…", "Checking for updates…", "Buscando actualizaciones…");
         try
         {
             var newest = await _latest();
@@ -328,28 +334,29 @@ public class UpdateWindow : Form
             {
                 _status.ForeColor = Theme.Text;
                 _status.Text = Lang.T($"Versão {newest.ToString(3)} disponível!\nVocê está na {current.ToString(3)}.",
-                    $"Version {newest.ToString(3)} available!\nYou have {current.ToString(3)}.");
+                    $"Version {newest.ToString(3)} available!\nYou have {current.ToString(3)}.",
+                    $"¡Versión {newest.ToString(3)} disponible!\nTienes la {current.ToString(3)}.");
                 _check.Visible = false;
                 _download.Visible = true;
                 AcceptButton = _download;
             }
             else
             {
-                _status.Text = Lang.T($"Você já tem a versão mais nova ({current.ToString(3)}).", $"You already have the latest version ({current.ToString(3)}).");
+                _status.Text = Lang.T($"Você já tem a versão mais nova ({current.ToString(3)}).", $"You already have the latest version ({current.ToString(3)}).", $"Ya tienes la versión más reciente ({current.ToString(3)}).");
             }
         }
         catch (HttpRequestException ex) when (ex.StatusCode is not null)
         {
             // o GitHub respondeu (ex.: 404), então a internet está ok: falta o arquivo de versão lá
-            _status.Text = Lang.T("O GitHub ainda não informa a versão nova.\nTente de novo mais tarde.", "GitHub doesn't list the new version yet.\nTry again later.");
+            _status.Text = Lang.T("O GitHub ainda não informa a versão nova.\nTente de novo mais tarde.", "GitHub doesn't list the new version yet.\nTry again later.", "GitHub aún no muestra la nueva versión.\nInténtalo de nuevo más tarde.");
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            _status.Text = Lang.T("Não deu para falar com o GitHub.\nConfira a internet e tente de novo.", "Couldn't reach GitHub.\nCheck the internet and try again.");
+            _status.Text = Lang.T("Não deu para falar com o GitHub.\nConfira a internet e tente de novo.", "Couldn't reach GitHub.\nCheck the internet and try again.", "No se pudo conectar con GitHub.\nRevisa tu conexión a internet e inténtalo de nuevo.");
         }
         catch (Exception ex) when (ex is FormatException or ArgumentException)
         {
-            _status.Text = Lang.T("O GitHub respondeu algo inesperado.\nTente de novo mais tarde.", "GitHub sent an unexpected answer.\nTry again later.");
+            _status.Text = Lang.T("O GitHub respondeu algo inesperado.\nTente de novo mais tarde.", "GitHub sent an unexpected answer.\nTry again later.", "GitHub dio una respuesta inesperada.\nInténtalo de nuevo más tarde.");
         }
         finally
         {

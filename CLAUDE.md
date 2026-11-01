@@ -33,7 +33,7 @@ Controla o volume (e a mídia) de **um app escolhido** por atalhos globais, sem 
 
 ## README
 
-- `README.md` (inglês, principal) e `README.pt-BR.md`, com a linha de bandeiras no topo e o logo do app no título.
+- `README.md` (inglês, principal), `README.pt-BR.md` e `README.es.md`, com a linha de bandeiras no topo e o logo do app no título.
 - Cada seção (requisitos, atalhos, como usar, tecnologias) dividida em **Windows** e **macOS**. Os botões de download ficam lado a lado.
 - O programa é em português; no README em inglês, os nomes de menu aparecem em português com a tradução ao lado.
 - Sem aviso de "em desenvolvimento".

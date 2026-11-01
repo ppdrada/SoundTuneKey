@@ -22,15 +22,16 @@ struct AboutView: View {
                 .frame(width: 128, height: 128)
                 .frame(height: 140)
             Text("Sound Tune Key").font(.system(size: 13, weight: .bold)).frame(height: 34)
-            Text(T("Versão ", "Version ") + Updates.current).font(.system(size: 12)).frame(height: 24)
-            Text(T("Desenvolvido por ppdrada", "Made by ppdrada")).font(.system(size: 12)).foregroundStyle(Theme.mutedText).frame(height: 24)
+            Text(T("Versão ", "Version ", "Versión ") + Updates.current).font(.system(size: 12)).frame(height: 24)
+            Text(T("Desenvolvido por ppdrada", "Made by ppdrada", "Hecho por ppdrada")).font(.system(size: 12)).foregroundStyle(Theme.mutedText).frame(height: 24)
             LinkText(title: "github.com/ppdrada/SoundTuneKey") { NSWorkspace.shared.open(Updates.repoURL) }
                 .frame(height: 30)
             // idioma do app inteiro: o escolhido em branco, o outro em cinza
             HStack(spacing: 6) {
-                LinkText(title: "Português", color: lang.english ? Theme.mutedText : Theme.text) { lang.english = false }
-                Text("·").font(.system(size: 12)).foregroundStyle(Theme.mutedText)
-                LinkText(title: "English", color: lang.english ? Theme.text : Theme.mutedText) { lang.english = true }
+                ForEach(Array(zip(Lang.Code.allCases, ["Português", "English", "Español"])), id: \.0) { code, name in
+                    if code != .pt { Text("·").font(.system(size: 12)).foregroundStyle(Theme.mutedText) }
+                    LinkText(title: name, color: lang.code == code ? Theme.text : Theme.mutedText) { lang.code = code }
+                }
             }
             .frame(height: 30)
             Text(message ?? "")
@@ -41,11 +42,11 @@ struct AboutView: View {
                 .frame(height: 54)
             HStack(spacing: 10) {
                 Spacer()
-                DarkButton(title: failed ? T("Baixar", "Download") : newer ? T("Atualizar agora", "Update now")
-                           : T("Verificar atualizações", "Check for updates"), width: 150,
+                DarkButton(title: failed ? T("Baixar", "Download", "Descargar") : newer ? T("Atualizar agora", "Update now", "Actualizar ahora")
+                           : T("Verificar atualizações", "Check for updates", "Buscar actualizaciones"), width: 150,
                            primary: newer || failed) { mainAction() }
                     .disabled(busy)
-                DarkButton(title: T("Fechar", "Close"), width: 100, action: close)
+                DarkButton(title: T("Fechar", "Close", "Cerrar"), width: 100, action: close)
                     .keyboardShortcut(.cancelAction)
             }
             .padding(.trailing, 30)
@@ -54,7 +55,7 @@ struct AboutView: View {
         }
         .onAppear {
             if let version = Updates.justUpdatedTo {
-                message = T("Atualizado para a versão \(version).", "Updated to version \(version).")
+                message = T("Atualizado para a versão \(version).", "Updated to version \(version).", "Actualizado a la versión \(version).")
             } else if checkOnOpen {
                 mainAction()
             }
@@ -70,17 +71,17 @@ struct AboutView: View {
         Task {
             defer { busy = false }
             if newer {
-                message = T("Baixando a versão nova… 0%", "Downloading the new version… 0%")
+                message = T("Baixando a versão nova… 0%", "Downloading the new version… 0%", "Descargando la nueva versión… 0%")
                 do {
                     try await updates.install(progress: {
-                        message = T("Baixando a versão nova… \($0)%", "Downloading the new version… \($0)%")
-                    }, opening: { message = T("Pronto! Abrindo a versão nova…", "Done! Opening the new version…") })
+                        message = T("Baixando a versão nova… \($0)%", "Downloading the new version… \($0)%", "Descargando la nueva versión… \($0)%")
+                    }, opening: { message = T("Pronto! Abrindo a versão nova…", "Done! Opening the new version…", "¡Listo! Abriendo la nueva versión…") })
                 } catch {
                     failed = true
                     message = error.localizedDescription
                 }
             } else {
-                message = T("Procurando atualizações…", "Checking for updates…")
+                message = T("Procurando atualizações…", "Checking for updates…", "Buscando actualizaciones…")
                 let result = await updates.check()
                 message = result.message
                 if case .newer = result { newer = true }
@@ -98,8 +99,8 @@ struct ShortcutsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(T("Atalhos", "Shortcuts")).font(.system(size: 13, weight: .bold))
-            Text(T("Funcionam com qualquer janela na frente, inclusive jogos", "They work with any window in front, even games"))
+            Text(T("Atalhos", "Shortcuts", "Atajos")).font(.system(size: 13, weight: .bold))
+            Text(T("Funcionam com qualquer janela na frente, inclusive jogos", "They work with any window in front, even games", "Funcionan con cualquier ventana al frente, incluso juegos"))
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.mutedText)
                 .padding(.top, 4)
@@ -117,12 +118,12 @@ struct ShortcutsView: View {
             Spacer()
             HStack {
                 Spacer()
-                DarkButton(title: T("Fechar", "Close"), width: 100, action: close)
+                DarkButton(title: T("Fechar", "Close", "Cerrar"), width: 100, action: close)
                     .keyboardShortcut(.cancelAction)
             }
         }
         .padding(20)
-        .id(lang.english)
+        .id(lang.code)
     }
 
     static var size: NSSize { NSSize(width: 440, height: 112 + 28 * CGFloat(Shortcuts.list.count)) }

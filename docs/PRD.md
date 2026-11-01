@@ -83,4 +83,4 @@ Cada etapa é pequena, testada pelo usuário e entra por PR (veja `CLAUDE.md`).
 - **Barra de volume** desenhada: trilha clara até o volume, apagada depois, bolinha para arrastar. Alto-falante à esquerda e a porcentagem à direita.
 - **Barra de tempo**: o mesmo desenho, porém **mais fina** (trilha 4 px, bolinha 12 px; a de volume tem 6 e 18), com o tempo atual à esquerda e a duração à direita (`1:23` … `3:45`). Assim o usuário não confunde as duas. Apagada com `--:--` quando o app não informa o tempo.
 - **Ícones de mídia** (⏮ ⏯ ⏭ e o alto-falante) desenhados em código, não com caracteres de fonte: os caracteres saíam pequenos, fora do centro ou coloridos (emoji) no menu.
-- **Textos do programa em português e inglês** (Windows e Mac; escolha no "Sobre", na primeira vez segue o idioma do sistema). O README principal é em inglês, com o PT-BR ao lado.
+- **Textos do programa em português, inglês e espanhol** (Windows e Mac; escolha no "Sobre", na primeira vez segue o idioma do sistema). O README principal é em inglês, com o PT-BR e o espanhol ao lado.

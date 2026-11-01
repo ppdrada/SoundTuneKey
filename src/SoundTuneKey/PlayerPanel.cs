@@ -146,10 +146,10 @@ public sealed class PlayerPanel : Panel
     /// <summary>Dicas dos botões no idioma escolhido (chamado de novo quando ele muda).</summary>
     public void ApplyTexts()
     {
-        _toolTip.SetToolTip(_playPause, Lang.T("Pausar / continuar", "Play / pause"));
-        _toolTip.SetToolTip(_previous, Lang.T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)"));
-        _toolTip.SetToolTip(_next, Lang.T("Próxima música", "Next track"));
-        _toolTip.SetToolTip(_speaker, Lang.T("Mudo / volta o som (Ctrl + Alt + M)", "Mute / unmute (Ctrl + Alt + M)"));
+        _toolTip.SetToolTip(_playPause, Lang.T("Pausar / continuar", "Play / pause", "Reproducir / pausar"));
+        _toolTip.SetToolTip(_previous, Lang.T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)", "Volver al inicio (2 veces rápido: canción anterior)"));
+        _toolTip.SetToolTip(_next, Lang.T("Próxima música", "Next track", "Siguiente canción"));
+        _toolTip.SetToolTip(_speaker, Lang.T("Mudo / volta o som (Ctrl + Alt + M)", "Mute / unmute (Ctrl + Alt + M)", "Silenciar / activar sonido (Ctrl + Alt + M)"));
     }
 
     private MediaButton Button(MediaGlyph glyph, Action action)

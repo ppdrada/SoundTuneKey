@@ -1,14 +1,12 @@
 # <img src="assets/icon/icon.png" alt="Sound Tune Key logo" width="36"> Sound Tune Key
 
-🇺🇸 **English** | 🇧🇷 [Português](README.pt-BR.md)
+🇺🇸 **English** | 🇧🇷 [Português](README.pt-BR.md) | 🇪🇸 [Español](README.es.md)
 
 Control the audio of **one specific app** straight from your keyboard.
 
 Pick the app you want to control — Spotify, Google Chrome, Discord or anything else that is playing sound — and use global hotkeys to change its volume, pause it or skip tracks. The rest of your computer's volume stays untouched.
 
 ![Sound Tune Key in action: per-app volume, mute, media buttons and the menu bar icon](docs/demo/demo-en.gif)
-
-[▶ Watch in higher quality (MP4)](docs/demo/demo-en.mp4)
 
 [![Download for Windows](https://img.shields.io/badge/Windows-Download_.exe-1DB954?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe) [![Download for macOS](https://img.shields.io/badge/macOS-Download_.zip-1DB954?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey-mac.zip)
 
@@ -41,7 +39,7 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 | `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 | `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
 | `Ctrl + Alt + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
-| `Ctrl + Alt + V` | 🎤 Mute / unmute the microphone (the whole Windows mic, for Discord, games and everything) |
+| `Ctrl + Alt + V` | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in Windows) |
 
 When you use the volume or mute hotkeys, a small notice shows the app and the volume at the bottom of the screen (when muted, the app name and the speaker turn red) for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
 
@@ -60,7 +58,7 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 | `⌃ + ⌥ + →` | ⏭️ Next track |
 | `⌃ + ⌥ + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
 | `⌃ + ⌥ + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
-| `⌃ + ⌥ + V` | 🎤 Mute / unmute the microphone (the whole Mac's: works for Discord, games and everything) |
+| `⌃ + ⌥ + V` | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in macOS) |
 
 When you use the volume, mute, switch-app or microphone hotkeys, a small notice shows the app and the volume at the bottom of the screen (red when muted) for a moment, without taking the focus, even over full-screen games. To turn it off, switch off **Aviso na tela** (On-screen notice), next to "Controlando" in the window, or **Mostrar aviso na tela** in the menu bar menu.
 
@@ -89,7 +87,7 @@ If Windows blocks it **with no "Run anyway" button**, the PC has **Smart App Con
 
 #### 🖥️ System tray
 
-Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program comes in Portuguese and English: pick it in **Sobre** (About); the first time, it follows the Windows language. Right-click the icon for:
+Closing or minimizing the window does not quit the program: it stays in the tray icon (next to the clock) and the hotkeys keep working. The program comes in Portuguese, English and Spanish: pick it in **Sobre** (About); the first time, it follows the Windows language. Right-click the icon for:
 
 - **Sound Tune Key**, at the very top with the app icon — opens **Sobre** (About): version, author, the GitHub link and a button to check for updates
 - Below it, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
@@ -133,7 +131,7 @@ The **Open Anyway** button only shows up right after you try to open the app: if
 Closing the window does not quit the program: it stays in the menu bar icon (next to Wi-Fi) and the hotkeys keep working. To move the icon, hold **⌘** and drag it. The program is in Portuguese; click the icon for:
 
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
-- **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up. In **Sobre**, **Português · English** switches the whole app's language, right away
+- **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up. In **Sobre**, **Português · English · Español** switches the whole app's language, right away
 - **Microfone ligado / desligado** (Microphone on / off) — mutes and unmutes the microphone (red when off)
 - **Abrir** (Open) — show the window again
 - **Aplicativos** (Apps) — shows the controlled app ("Aplicativos - Controlando: Spotify"). Click an app to control it (the checked app is the one being controlled); its submenu has **Mudo** (Mute). Picking and toggling don't close the menu, so you can fix a wrong pick right away; muted apps show in red, and the menu bar icon turns red while the chosen app is muted

@@ -279,24 +279,24 @@ public class MainForm : Form
     // Textos fixos nas duas línguas: ao abrir e quando o idioma muda no "Sobre" (vale na hora).
     private void ApplyTexts()
     {
-        _startWithWindows.Text = _startupItem.Text = Lang.T("Iniciar com o Windows", "Start with Windows");
-        _showOsd.Text = Lang.T("Aviso na tela", "On-screen notice");
-        _osdItem.Text = Lang.T("Mostrar aviso na tela", "Show on-screen notice");
-        _list.Columns[0].Text = Lang.T("Aplicativo", "App");
-        _shortcutsLink.Text = _shortcutsItem.Text = Lang.T("Atalhos", "Shortcuts");
-        _aboutLink.Text = Lang.T("Sobre", "About");
-        _openItem.Text = Lang.T("Abrir", "Open");
-        _checkItem.Text = Lang.T("Verificar atualizações...", "Check for updates...");
-        _exitItem.Text = Lang.T("Sair", "Exit");
-        _footerTips.SetToolTip(_micButton, Lang.T("Liga / desliga o microfone (Ctrl + Alt + V)", "Microphone on / off (Ctrl + Alt + V)"));
+        _startWithWindows.Text = _startupItem.Text = Lang.T("Iniciar com o Windows", "Start with Windows", "Iniciar con Windows");
+        _showOsd.Text = Lang.T("Aviso na tela", "On-screen notice", "Aviso en pantalla");
+        _osdItem.Text = Lang.T("Mostrar aviso na tela", "Show on-screen notice", "Mostrar aviso en pantalla");
+        _list.Columns[0].Text = Lang.T("Aplicativo", "App", "Aplicación");
+        _shortcutsLink.Text = _shortcutsItem.Text = Lang.T("Atalhos", "Shortcuts", "Atajos");
+        _aboutLink.Text = Lang.T("Sobre", "About", "Acerca de");
+        _openItem.Text = Lang.T("Abrir", "Open", "Abrir");
+        _checkItem.Text = Lang.T("Verificar atualizações...", "Check for updates...", "Buscar actualizaciones...");
+        _exitItem.Text = Lang.T("Sair", "Exit", "Salir");
+        _footerTips.SetToolTip(_micButton, Lang.T("Liga / desliga o microfone (Ctrl + Alt + V)", "Microphone on / off (Ctrl + Alt + V)", "Activa / desactiva el micrófono (Ctrl + Alt + V)"));
         _player.ApplyTexts();
         _trayPlayer.ApplyTexts();
         ShowSelected();
         ShowMicrophoneState(Microphone.IsMuted());
         if (_availableVersion is { } version)
         {
-            _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}");
-            _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update");
+            _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}", $"Actualizar a la versión {version}");
+            _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update", $"Versión {version} disponible · Actualizar");
         }
         _shortcutsWindow?.Close(); // abre de novo já no idioma novo
     }
@@ -426,7 +426,7 @@ public class MainForm : Form
         var apps = AudioApps.List(withSilent: true);
         _appsSignature = Signature(apps);
         if (apps.Count == 0)
-            appsMenu.DropDownItems.Add(new ToolStripMenuItem(Lang.T("Nenhum app com som", "No apps with sound")) { Enabled = false });
+            appsMenu.DropDownItems.Add(new ToolStripMenuItem(Lang.T("Nenhum app com som", "No apps with sound", "Ninguna app con sonido")) { Enabled = false });
 
         foreach (var app in apps)
         {
@@ -456,7 +456,7 @@ public class MainForm : Form
     // "Mudo", marcado quando o app está mudo: no submenu da bandeja e no botão direito da lista
     private ToolStripMenuItem MuteItem(AudioApp app)
     {
-        var mute = new ToolStripMenuItem(Lang.T("Mudo", "Mute")) { Checked = app.IsMuted };
+        var mute = new ToolStripMenuItem(Lang.T("Mudo", "Mute", "Silenciar")) { Checked = app.IsMuted };
         mute.Click += (_, _) =>
         {
             // o menu fica aberto: o estado vem do ✓, não do app guardado quando o menu abriu
@@ -524,7 +524,7 @@ public class MainForm : Form
         if (muted is not bool m)
             return;
         _micButton.Set(m ? Theme.MicOffGlyph : Theme.MicGlyph, m ? Theme.Mute : Theme.MutedText);
-        _micItem.Text = m ? Lang.T("Microfone desligado", "Microphone off") : Lang.T("Microfone ligado", "Microphone on");
+        _micItem.Text = m ? Lang.T("Microfone desligado", "Microphone off", "Micrófono desactivado") : Lang.T("Microfone ligado", "Microphone on", "Micrófono activado");
         _micItem.ForeColor = m ? Theme.Mute : Theme.Text;
         _micItem.Image = Theme.MenuIcon((m ? Theme.MicOffGlyph : Theme.MicGlyph)[0], m ? Theme.Mute : Theme.MutedText);
     }
@@ -564,7 +564,7 @@ public class MainForm : Form
         if (justUpdated)
         {
             _balloonOpensUpdate = false;
-            _tray.ShowBalloonTip(4000, "Sound Tune Key", Lang.T($"Atualizado para a versão {Updates.Current.ToString(3)}.", $"Updated to version {Updates.Current.ToString(3)}."), ToolTipIcon.Info);
+            _tray.ShowBalloonTip(4000, "Sound Tune Key", Lang.T($"Atualizado para a versão {Updates.Current.ToString(3)}.", $"Updated to version {Updates.Current.ToString(3)}.", $"Actualizado a la versión {Updates.Current.ToString(3)}."), ToolTipIcon.Info);
         }
     }
 
@@ -585,9 +585,9 @@ public class MainForm : Form
     private void ShowUpdateAvailable(string version)
     {
         _availableVersion = version;
-        _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}");
+        _updateItem.Text = Lang.T($"Atualizar para a versão {version}", $"Update to version {version}", $"Actualizar a la versión {version}");
         _updateItem.Visible = true;
-        _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update");
+        _updateBar.Text = Lang.T($"Versão {version} disponível · Atualizar", $"Version {version} available · Update", $"Versión {version} disponible · Actualizar");
         _updateBar.Visible = true;
 
         if (_settings.NotifiedVersion == version)
@@ -595,7 +595,7 @@ public class MainForm : Form
         _settings.NotifiedVersion = version;
         _settings.Save();
         _balloonOpensUpdate = true;
-        _tray.ShowBalloonTip(5000, "Sound Tune Key", Lang.T($"Versão {version} disponível. Clique aqui para atualizar.", $"Version {version} available. Click here to update."), ToolTipIcon.Info);
+        _tray.ShowBalloonTip(5000, "Sound Tune Key", Lang.T($"Versão {version} disponível. Clique aqui para atualizar.", $"Version {version} available. Click here to update.", $"Versión {version} disponible. Haz clic aquí para actualizar."), ToolTipIcon.Info);
     }
 
     private void ShowAboutWindow(bool checkNow)
@@ -660,7 +660,7 @@ public class MainForm : Form
             _trayTipShown = true;
             _balloonOpensUpdate = false;
             _tray.ShowBalloonTip(3000, "Sound Tune Key",
-                Lang.T("Continua rodando aqui na bandeja. Os atalhos seguem funcionando.", "Still running here in the tray. The hotkeys keep working."), ToolTipIcon.Info);
+                Lang.T("Continua rodando aqui na bandeja. Os atalhos seguem funcionando.", "Still running here in the tray. The hotkeys keep working.", "Sigue funcionando aquí en la bandeja. Los atajos siguen activos."), ToolTipIcon.Info);
         }
     }
 
@@ -716,7 +716,9 @@ public class MainForm : Form
                 Lang.T($"Não foi possível usar: {string.Join(", ", failed)}.\n\n" +
                     "Outro programa já usa esse atalho (por exemplo, um script do AutoHotkey). Feche-o e abra o Sound Tune Key de novo.",
                     $"Couldn't use: {string.Join(", ", failed)}.\n\n" +
-                    "Another program already uses this hotkey (for example, an AutoHotkey script). Close it and open Sound Tune Key again."),
+                    "Another program already uses this hotkey (for example, an AutoHotkey script). Close it and open Sound Tune Key again.",
+                    $"No se pudo usar: {string.Join(", ", failed)}.\n\n" +
+                    "Otro programa ya usa ese atajo (por ejemplo, un script de AutoHotkey). Ciérralo y abre Sound Tune Key de nuevo."),
                 "Sound Tune Key", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
@@ -851,8 +853,8 @@ public class MainForm : Form
 
         if (app is null)
         {
-            _selectedLabel.Text = Lang.T("Selecione um app na lista", "Pick an app from the list");
-            _appsMenu.Text = Lang.T("Aplicativos", "Apps");
+            _selectedLabel.Text = Lang.T("Selecione um app na lista", "Pick an app from the list", "Elige una app de la lista");
+            _appsMenu.Text = Lang.T("Aplicativos", "Apps", "Aplicaciones");
             _tray.Text = "Sound Tune Key";
             return;
         }
@@ -863,10 +865,10 @@ public class MainForm : Form
             _settings.Save();
         }
 
-        _selectedLabel.Text = Lang.T("Controlando: ", "Controlling: ") + app.DisplayName +
-            (app.HasAudio ? "" : Lang.T(" (sem som ainda)", " (no sound yet)"));
+        _selectedLabel.Text = Lang.T("Controlando: ", "Controlling: ", "Controlando: ") + app.DisplayName +
+            (app.HasAudio ? "" : Lang.T(" (sem som ainda)", " (no sound yet)", " (sin sonido aún)"));
         // no menu da bandeja, o app controlado aparece no próprio "Aplicativos" e muda junto
-        _appsMenu.Text = Lang.T($"Aplicativos - Controlando: {app.DisplayName}", $"Apps - Controlling: {app.DisplayName}");
+        _appsMenu.Text = Lang.T($"Aplicativos - Controlando: {app.DisplayName}", $"Apps - Controlling: {app.DisplayName}", $"Aplicaciones - Controlando: {app.DisplayName}");
         _tray.Text = TrayText($"Sound Tune Key — {app.DisplayName}");
     }
 

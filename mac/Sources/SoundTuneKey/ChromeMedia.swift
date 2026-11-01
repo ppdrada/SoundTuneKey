@@ -106,7 +106,7 @@ enum ChromeMedia {
     /// menu "Ver" dele já aparecer na barra de menus. O aviso some sozinho quando passa a funcionar.
     static func showSetup() {
         let alert = NSAlert()
-        alert.messageText = T("Controlar vídeos do Chrome", "Control Chrome videos")
+        alert.messageText = T("Controlar vídeos do Chrome", "Control Chrome videos", "Controlar videos de Chrome")
         alert.informativeText = T("""
             O Chrome só deixa o Sound Tune Key ver o tempo, pausar e pular vídeos com esta opção ligada:
 
@@ -123,10 +123,18 @@ enum ChromeMedia {
             3. Click Allow JavaScript from Apple Events.
 
             If you use more than one Chrome profile, turn it on in each one. The volume works even without it.
+            """, """
+            Chrome solo deja que Sound Tune Key vea el tiempo, pause y salte videos con esta opción activada:
+
+            1. Con Chrome al frente, haz clic en Ver, en la barra de menús de arriba.
+            2. Ve a Desarrollador.
+            3. Haz clic en Permitir JavaScript de Apple Events.
+
+            Si usas más de un perfil en Chrome, actívala en cada uno. El volumen funciona incluso sin esto.
             """)
         alert.icon = NSApp.applicationIconImage
-        alert.addButton(withTitle: T("Abrir o Chrome", "Open Chrome"))
-        alert.addButton(withTitle: T("Cancelar", "Cancel"))
+        alert.addButton(withTitle: T("Abrir o Chrome", "Open Chrome", "Abrir Chrome"))
+        alert.addButton(withTitle: T("Cancelar", "Cancel", "Cancelar"))
         NSApp.activate()
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         NSRunningApplication.runningApplications(withBundleIdentifier: bundleID).first?.activate()

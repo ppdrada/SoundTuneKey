@@ -1,14 +1,12 @@
 # <img src="assets/icon/icon.png" alt="Logo do Sound Tune Key" width="36"> Sound Tune Key
 
-🇺🇸 [English](README.md) | 🇧🇷 **Português**
+🇺🇸 [English](README.md) | 🇧🇷 **Português** | 🇪🇸 [Español](README.es.md)
 
 Controle o áudio de **um aplicativo específico** direto pelo teclado.
 
 Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qualquer outro que esteja tocando som — e use atalhos globais para ajustar o volume, pausar ou trocar de música. O volume do resto do computador não é alterado.
 
 ![Sound Tune Key funcionando: volume por app, mudo, botões de mídia e o ícone da barra de menus](docs/demo/demo-pt.gif)
-
-[▶ Assistir em qualidade melhor (MP4)](docs/demo/demo-pt.mp4)
 
 [![Baixar para Windows](https://img.shields.io/badge/Windows-Baixar_.exe-1DB954?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey.exe) [![Baixar para macOS](https://img.shields.io/badge/macOS-Baixar_.zip-1DB954?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/ppdrada/SoundTuneKey/raw/main/download/SoundTuneKey-mac.zip)
 
@@ -41,7 +39,7 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 | `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 | `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
 | `Ctrl + Alt + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
-| `Ctrl + Alt + V` | 🎤 Desliga / liga o microfone (o do Windows inteiro: vale para Discord, jogo e tudo) |
+| `Ctrl + Alt + V` | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no Windows) |
 
 Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, o nome do app e o alto-falante ficam vermelhos) por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
 
@@ -60,7 +58,7 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 | `⌃ + ⌥ + →` | ⏭️ Próxima música |
 | `⌃ + ⌥ + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
 | `⌃ + ⌥ + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
-| `⌃ + ⌥ + V` | 🎤 Desliga / liga o microfone (o do Mac inteiro: vale para Discord, jogo e tudo) |
+| `⌃ + ⌥ + V` | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no macOS) |
 
 Ao usar os atalhos de volume, mudo, troca de app ou microfone, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, em vermelho) por um instante, sem tirar o foco, até sobre jogos em tela cheia. Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da barra.
 
@@ -89,7 +87,7 @@ Se o Windows bloquear **sem o botão "Executar assim mesmo"**, o PC está com o 
 
 #### 🖥️ Bandeja do Windows
 
-Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. O programa vem em português e inglês: escolha no **Sobre**; na primeira vez, ele segue o idioma do Windows. Clique com o botão direito no ícone para:
+Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da bandeja (perto do relógio) e os atalhos seguem funcionando. O programa vem em português, inglês e espanhol: escolha no **Sobre**; na primeira vez, ele segue o idioma do Windows. Clique com o botão direito no ícone para:
 
 - **Sound Tune Key**, bem no topo com o ícone do app — abre o **Sobre**: versão, autor, o link do GitHub e um botão para verificar atualizações
 - Logo abaixo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
@@ -133,7 +131,7 @@ O botão **Abrir Mesmo Assim** só aparece logo depois de você tentar abrir o a
 Fechar a janela não encerra o programa: ele continua no ícone da barra de menus (perto do Wi-Fi) e os atalhos seguem funcionando. Para mudar o ícone de lugar, segure **⌘** e arraste. Clique no ícone para:
 
 - No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
-- **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**. No **Sobre**, **Português · English** troca o idioma do app inteiro, na hora
+- **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**. No **Sobre**, **Português · English · Español** troca o idioma do app inteiro, na hora
 - **Microfone ligado / desligado** — liga e desliga o microfone (vermelho quando desligado)
 - **Abrir** — mostra a janela de novo
 - **Aplicativos** — mostra o app controlado ("Aplicativos - Controlando: Spotify"). Clique num app para controlá-lo (o marcado é o controlado); o submenu dele tem **Mudo**. Escolher e ligar/desligar não fecham o menu, para corrigir na hora; apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo

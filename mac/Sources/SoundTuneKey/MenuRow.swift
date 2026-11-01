@@ -111,7 +111,7 @@ struct AppMenuRow: View {
         let submenu = NSMenu()
         submenu.addItem(MenuRow.item(model: model, content: { model in
             let muted = model.isMuted(app.bundleID)
-            return (T("Mudo", "Mute"), muted ? NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil) : nil,
+            return (T("Mudo", "Mute", "Silenciar"), muted ? NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil) : nil,
                     muted ? Theme.mute : nil)
         }, action: { model.toggleMute(app.bundleID) }))
         item.submenu = submenu

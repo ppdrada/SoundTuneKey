@@ -131,7 +131,7 @@ struct MediaError: LocalizedError {
     // nomes exatos do menu do Chrome em cada idioma
     static var chromeJavaScriptOffMessage: String {
         T("No Chrome, na barra de menus do Mac: Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple.",
-          "In Chrome, on the Mac menu bar: View → Developer → Allow JavaScript from Apple Events.")
+          "In Chrome, on the Mac menu bar: View → Developer → Allow JavaScript from Apple Events.", "En Chrome, en la barra de menús del Mac: Ver → Desarrollador → Permitir JavaScript de Apple Events.")
     }
 
     var errorDescription: String? {
@@ -139,7 +139,7 @@ struct MediaError: LocalizedError {
         // -1743: o usuário não deixou (ou ainda não respondeu) o controle do app
         return code == -1743
             ? T("Libere o controle em Ajustes do Sistema → Privacidade e Segurança → Automação.",
-                "Allow control in System Settings → Privacy & Security → Automation.")
-            : T("O player não respondeu (erro \(code)).", "The player didn't respond (error \(code)).")
+                "Allow control in System Settings → Privacy & Security → Automation.", "Permite el control en Ajustes del Sistema → Privacidad y seguridad → Automatización.")
+            : T("O player não respondeu (erro \(code)).", "The player didn't respond (error \(code)).", "El reproductor no respondió (error \(code)).")
     }
 }
