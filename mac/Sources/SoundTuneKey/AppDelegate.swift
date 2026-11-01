@@ -13,19 +13,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
     private let appsMenu = NSMenu()
     private var selectionWatch: AnyCancellable?
     private var muteWatch: AnyCancellable?
+    private var titleWatch: AnyCancellable?
+    private var mainMenuEnglish: Bool?
     // escolher e ligar/desligar não fecham o menu (MenuRow); a bolinha acompanha a da janela
     private lazy var startAtLoginItem = MenuRow.item(model: model, content: {
-        ("Iniciar com o Mac", RadioDot.menuImage(on: $0.startsAtLogin), nil)
+        (T("Iniciar com o Mac", "Start with Mac"), RadioDot.menuImage(on: $0.startsAtLogin), nil)
     }, action: { [unowned self] in toggleStartAtLogin() })
     private lazy var osdItem = MenuRow.item(model: model, content: {
-        ("Mostrar aviso na tela", RadioDot.menuImage(on: $0.showOsd), nil)
+        (T("Mostrar aviso na tela", "Show on-screen notice"), RadioDot.menuImage(on: $0.showOsd), nil)
     }, action: { [unowned self] in toggleOsd() })
     private lazy var updateItem = item("Atualizar", #selector(showUpdate), symbol: "arrow.down.circle")
     private lazy var micItem = MenuRow.item(model: model, content: { [unowned self] model in
         let off = model.micMuted == true
-        return (off ? "Microfone desligado" : "Microfone ligado",
+        return (off ? T("Microfone desligado", "Microphone off") : T("Microfone ligado", "Microphone on"),
                 symbol(off ? "mic.slash" : "mic", color: off ? NSColor(Theme.mute) : nil), off ? Theme.mute : nil)
     }, action: { [unowned self] in toggleMic() })
+    private lazy var openItem = item("", #selector(showWindow), symbol: "macwindow")
+    private lazy var appsItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+    private lazy var shortcutsItem = item("", #selector(showShortcuts), symbol: "keyboard")
+    private lazy var checkItem = item("", #selector(showUpdate), symbol: "arrow.clockwise")
+    private lazy var quitItem = item("", #selector(quit), symbol: "power")
     private var aboutWindow: NSWindow?
     private var shortcutsWindow: NSWindow?
 
@@ -124,18 +131,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         menu.addItem(media)
         menu.addItem(.separator())
         menu.addItem(micItem)
-        menu.addItem(item("Abrir", #selector(showWindow), symbol: "macwindow"))
-        let apps = NSMenuItem(title: "Aplicativos", action: nil, keyEquivalent: "")
-        apps.image = symbol("list.bullet")
-        apps.submenu = appsMenu
-        menu.addItem(apps)
-        menu.addItem(item("Atalhos", #selector(showShortcuts), symbol: "keyboard"))
+        menu.addItem(openItem)
+        appsItem.image = symbol("list.bullet")
+        appsItem.submenu = appsMenu
+        menu.addItem(appsItem)
+        menu.addItem(shortcutsItem)
         menu.addItem(.separator())
         menu.addItem(startAtLoginItem)
         menu.addItem(osdItem)
         menu.addItem(.separator())
-        menu.addItem(item("Verificar atualizações...", #selector(showUpdate), symbol: "arrow.clockwise"))
-        menu.addItem(item("Sair", #selector(quit), symbol: "power"))
+        menu.addItem(checkItem)
+        menu.addItem(quitItem)
         // a lista de apps é montada na hora em que o menu abre, para estar sempre atual
         appsMenu.delegate = self
         menu.delegate = self
@@ -143,6 +149,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
         // o app pode ser escolhido na janela ou no menu; a dica do ícone acompanha os dois
         selectionWatch = model.$selectedBundleID.receive(on: RunLoop.main).sink { [weak self] _ in self?.updateToolTip() }
+        // títulos no idioma escolhido; "Aplicativos - Controlando: X" muda na hora, até com o menu aberto
+        titleWatch = model.$selectedBundleID.combineLatest(model.$apps, Lang.shared.$english)
+            .receive(on: RunLoop.main).sink { [weak self] _ in self?.retitleMenu() }
         // ícone vermelho enquanto o app escolhido estiver no mudo
         muteWatch = model.$selectedBundleID.combineLatest(model.$muted).receive(on: RunLoop.main).sink { [weak self] app, muted in
             self?.statusItem.button?.image = app.map(muted.contains) == true ? MenuBarIcon.muted : MenuBarIcon.image
@@ -154,7 +163,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
             // menu principal: a bolinha acompanha a da janela e os Ajustes do Sistema
             model.refreshStartsAtLogin()
             updateItem.isHidden = model.updates.available == nil
-            updateItem.title = "Atualizar para a versão \(model.updates.available ?? "")"
+            updateItem.title = T("Atualizar para a versão ", "Update to version ") + (model.updates.available ?? "")
             model.refreshMic()
             micItem.isHidden = model.micMuted == nil
             return
@@ -163,13 +172,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         model.refresh()
 
         if model.apps.isEmpty {
-            let empty = NSMenuItem(title: "Nenhum app com som", action: nil, keyEquivalent: "")
+            let empty = NSMenuItem(title: T("Nenhum app com som", "No apps with sound"), action: nil, keyEquivalent: "")
             empty.isEnabled = false
             menu.addItem(empty)
             return
         }
         for app in model.apps {
             menu.addItem(AppMenuRow.item(model: model, app: app))
+        }
+    }
+
+    /// Títulos dos itens comuns do menu (os desenhados, MenuRow, se trocam sozinhos).
+    private func retitleMenu() {
+        openItem.title = T("Abrir", "Open")
+        let apps = T("Aplicativos", "Apps")
+        appsItem.title = model.selectedApp.map { apps + T(" - Controlando: ", " - Controlling: ") + $0.displayName } ?? apps
+        shortcutsItem.title = T("Atalhos", "Shortcuts")
+        checkItem.title = T("Verificar atualizações...", "Check for updates...")
+        quitItem.title = T("Sair", "Quit")
+        if mainMenuEnglish != Lang.shared.english {
+            mainMenuEnglish = Lang.shared.english
+            NSApp.mainMenu = makeMainMenu()
         }
     }
 
@@ -234,9 +257,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
 
     private func makeMainMenu() -> NSMenu {
         let appMenu = NSMenu()
-        appMenu.addItem(NSMenuItem(title: "Sair do Sound Tune Key", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        let windowMenu = NSMenu(title: "Janela")
-        windowMenu.addItem(NSMenuItem(title: "Fechar", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
+        appMenu.addItem(NSMenuItem(title: T("Sair do Sound Tune Key", "Quit Sound Tune Key"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        let windowMenu = NSMenu(title: T("Janela", "Window"))
+        windowMenu.addItem(NSMenuItem(title: T("Fechar", "Close"), action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
 
         let main = NSMenu()
         for submenu in [appMenu, windowMenu] {

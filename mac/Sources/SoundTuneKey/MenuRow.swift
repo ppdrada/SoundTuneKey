@@ -10,6 +10,7 @@ struct MenuRow: View {
     let content: (AppModel) -> (title: String, icon: NSImage?, color: Color?)
     let action: () -> Void
 
+    @ObservedObject private var lang = Lang.shared // o texto vem do content(), relido na troca de idioma
     @State private var hovering = false
 
     static let height: CGFloat = 22
@@ -67,20 +68,23 @@ struct AppMenuRow: View {
     var body: some View {
         let selected = model.selectedBundleID == app.bundleID
         let muted = model.isMuted(app.bundleID)
-        let text = hovering ? Color.white : (muted ? Theme.mute : Color.primary)
+        // em cinza: aberto, mas ainda sem som
+        let text = hovering ? Color.white : !app.hasAudio ? Color.secondary : muted ? Theme.mute : Color.primary
         HStack(spacing: 6) {
             Image(systemName: "checkmark")
                 .opacity(selected ? 1 : 0)
                 .frame(width: 16, height: 16)
             Text(app.displayName)
                 .lineLimit(1)
-            // tocando: a bolinha da janela (um 🔊 se confundiria com o alto-falante do mudo)
+            // tocando: o alto-falante da janela (cortado e vermelho no mudo)
             if app.isPlaying {
-                Circle().frame(width: 5, height: 5)
+                MediaIcon(glyph: muted ? .speakerMuted : .speaker, size: 11, color: text)
             }
             Spacer(minLength: 12)
+            // só app com som tem o submenu do Mudo
             Image(systemName: "chevron.right")
                 .font(.system(size: 10, weight: .semibold))
+                .opacity(app.hasAudio ? 1 : 0)
         }
         .foregroundStyle(text)
         .font(.system(size: NSFont.menuFont(ofSize: 0).pointSize))
@@ -103,10 +107,11 @@ struct AppMenuRow: View {
         view.frame = NSRect(x: 0, y: 0, width: 220, height: MenuRow.height)
         view.autoresizingMask = [.width]
         item.view = view
+        guard app.hasAudio else { return item }
         let submenu = NSMenu()
         submenu.addItem(MenuRow.item(model: model, content: { model in
             let muted = model.isMuted(app.bundleID)
-            return ("Mudo", muted ? NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil) : nil,
+            return (T("Mudo", "Mute"), muted ? NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil) : nil,
                     muted ? Theme.mute : nil)
         }, action: { model.toggleMute(app.bundleID) }))
         item.submenu = submenu

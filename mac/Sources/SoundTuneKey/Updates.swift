@@ -20,11 +20,16 @@ final class Updates: ObservableObject {
 
         var message: String {
             switch self {
-            case let .newer(version): "Versão \(version) disponível! Você está na \(Updates.current)."
-            case .upToDate: "Você já tem a versão mais nova (\(Updates.current))."
-            case .missing: "O GitHub ainda não informa a versão nova."
-            case .offline: "Não deu para falar com o GitHub. Confira a internet e tente de novo."
-            case .unexpected: "O GitHub respondeu algo inesperado. Tente de novo mais tarde."
+            case let .newer(version): T("Versão \(version) disponível! Você está na \(Updates.current).",
+                                        "Version \(version) available! You have \(Updates.current).")
+            case .upToDate: T("Você já tem a versão mais nova (\(Updates.current)).",
+                              "You already have the latest version (\(Updates.current)).")
+            case .missing: T("O GitHub ainda não informa a versão nova. Tente de novo mais tarde.",
+                             "GitHub doesn't list the new version yet. Try again later.")
+            case .offline: T("Não deu para falar com o GitHub. Confira a internet e tente de novo.",
+                             "Couldn't reach GitHub. Check the internet and try again.")
+            case .unexpected: T("O GitHub respondeu algo inesperado. Tente de novo mais tarde.",
+                                "GitHub sent an unexpected answer. Try again later.")
             }
         }
     }
@@ -46,7 +51,8 @@ final class Updates: ObservableObject {
         guard (try? await center.requestAuthorization(options: [.alert])) == true else { return }
         let content = UNMutableNotificationContent()
         content.title = "Sound Tune Key"
-        content.body = "Versão \(version) disponível. Clique para atualizar."
+        content.body = T("Versão \(version) disponível. Clique aqui para atualizar.",
+                         "Version \(version) available. Click here to update.")
         try? await center.add(UNNotificationRequest(identifier: "update", content: content, trigger: nil))
     }
 
@@ -83,7 +89,7 @@ final class Updates: ObservableObject {
     // MARK: - Atualizar agora
 
     /// Baixa o .zip, descompacta ao lado, confere que é o Sound Tune Key, troca o .app e reabre.
-    func install(progress: @escaping @MainActor (Int) -> Void) async throws {
+    func install(progress: @escaping @MainActor (Int) -> Void, opening: @MainActor () -> Void) async throws {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("SoundTuneKey-update-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let zip = folder.appendingPathComponent("SoundTuneKey-mac.zip")
@@ -114,6 +120,7 @@ final class Updates: ObservableObject {
 
         let current = Bundle.main.bundleURL
         _ = try FileManager.default.replaceItemAt(current, withItemAt: newApp)
+        opening()
 
         // reabre o app novo depois que este fechar; ele mostra "Atualizado para a versão X"
         let script = "while kill -0 \(getpid()) 2>/dev/null; do sleep 0.2; done; open -n \"$0\" --args --after-update \"$1\""
@@ -141,6 +148,9 @@ final class Updates: ObservableObject {
     }
 
     struct UpdateError: LocalizedError {
-        var errorDescription: String? { "Não deu para atualizar sozinho. Baixe a versão nova pelo navegador." }
+        var errorDescription: String? {
+            T("Não deu para atualizar sozinho. Clique em Baixar para pegar pelo navegador.",
+              "Couldn't update by itself. Click Download to get it in the browser.")
+        }
     }
 }

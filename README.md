@@ -106,7 +106,7 @@ Closing or minimizing the window does not quit the program: it stays in the tray
 
 1. Click **macOS · Download .zip** above and open the `.zip` to unzip it.
 2. Move `SoundTuneKey.app` to the **Applications** folder and open it.
-3. Select the app you want to control from the list.
+3. Select the app you want to control from the list. Apps that are playing have a 🔈 next to the volume. Open apps that haven't played sound yet show **in gray** at the end of the list: you can pick them (media already works), and the volume starts working by itself once the app plays.
 4. The first time you change a volume, macOS asks for **System Audio Recording** permission: allow it. That is how Sound Tune Key changes the volume of one app only.
 
 The program remembers the last app you picked and the volume of each app. The volume only applies while Sound Tune Key is open: when you quit it, every app goes back to its normal volume until you open it again.
@@ -133,10 +133,10 @@ The **Open Anyway** button only shows up right after you try to open the app: if
 Closing the window does not quit the program: it stays in the menu bar icon (next to Wi-Fi) and the hotkeys keep working. To move the icon, hold **⌘** and drag it. The program is in Portuguese; click the icon for:
 
 - At the top, like Spotify: the **time bar**, the **⏮ ⏯ ⏭** buttons and the **volume** of the selected app; the menu stays open so you can click more than once
-- **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up
+- **Sound Tune Key** (at the top) — opens **Sobre** (About); when there is a new version, **Atualizar para a versão X** (Update to version X) shows up. In **Sobre**, **Português · English** switches the whole app's language, right away
 - **Microfone ligado / desligado** (Microphone on / off) — mutes and unmutes the microphone (red when off)
 - **Abrir** (Open) — show the window again
-- **Aplicativos** (Apps) — click an app to control it (the checked app is the one being controlled); its submenu has **Mudo** (Mute). Picking and toggling don't close the menu, so you can fix a wrong pick right away; muted apps show in red, and the menu bar icon turns red while the chosen app is muted
+- **Aplicativos** (Apps) — shows the controlled app ("Aplicativos - Controlando: Spotify"). Click an app to control it (the checked app is the one being controlled); its submenu has **Mudo** (Mute). Picking and toggling don't close the menu, so you can fix a wrong pick right away; muted apps show in red, and the menu bar icon turns red while the chosen app is muted
 - **Atalhos** (Hotkeys) — open the small window with the hotkey list
 - **Iniciar com o Mac** (Start with Mac) — start the program automatically, already in the menu bar, when you log in
 - **Mostrar aviso na tela** (Show on-screen notice) — turns the volume and mute notice on or off

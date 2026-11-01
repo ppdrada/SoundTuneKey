@@ -1,7 +1,7 @@
 import AppKit
 import CoreAudio
 
-/// Um app que tem pelo menos um processo de áudio no Core Audio.
+/// Um app aberto: com processo de áudio no Core Audio ou, em cinza, ainda sem som.
 struct AudioApp: Identifiable, Equatable {
     let bundleID: String
     let displayName: String
@@ -9,12 +9,14 @@ struct AudioApp: Identifiable, Equatable {
     let isPlaying: Bool
     /// Processos de áudio do Core Audio que pertencem ao app (o principal e os auxiliares).
     let processes: [AudioObjectID]
+    /// false: aberto, mas ainda não abriu o som; o macOS só dá volume depois disso.
+    var hasAudio = true
 
     var id: String { bundleID }
 
     static func == (a: AudioApp, b: AudioApp) -> Bool {
         a.bundleID == b.bundleID && a.displayName == b.displayName && a.isPlaying == b.isPlaying
-            && a.processes == b.processes
+            && a.processes == b.processes && a.hasAudio == b.hasAudio
     }
 }
 
@@ -30,9 +32,18 @@ enum AudioApps {
         "com.github.wez.wezterm",
         "co.zeit.hyper",
     ]
+    /// Apps do sistema que nunca tocam som: não entram nem em cinza.
+    private static let silentSystem: Set<String> = ["com.apple.finder"]
+
+    /// Nome com mais de duas palavras fica só com as duas primeiras ("Visual Studio Code" → "Visual Studio").
+    static func shortName(_ name: String) -> String {
+        let words = name.split(separator: " ")
+        return words.count > 2 ? words.prefix(2).joined(separator: " ") : name
+    }
 
     /// Lista os apps com processo de áudio. Processos auxiliares (ex.: "Google Chrome Helper")
-    /// são juntados ao app principal, então cada app vira uma linha só.
+    /// são juntados ao app principal, então cada app vira uma linha só. Depois, em ordem
+    /// alfabética, os apps abertos que ainda não abriram o som (para já poder escolher).
     static func list() -> [AudioApp] {
         let regularApps = NSWorkspace.shared.runningApplications.filter { $0.activationPolicy == .regular }
 
@@ -47,9 +58,9 @@ enum AudioApps {
                               (apps[bundleID]?.processes ?? []) + [object])
         }
 
-        return apps.map { bundleID, entry in
+        let withAudio = apps.map { bundleID, entry in
             AudioApp(bundleID: bundleID,
-                     displayName: entry.app.localizedName ?? bundleID,
+                     displayName: shortName(entry.app.localizedName ?? bundleID),
                      icon: entry.app.icon,
                      isPlaying: entry.playing,
                      processes: entry.processes.sorted())
@@ -58,6 +69,17 @@ enum AudioApps {
             if $0.isPlaying != $1.isPlaying { return $0.isPlaying }
             return $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
         }
+
+        var seen = Set(apps.keys)
+        let silent = regularApps.compactMap { app -> AudioApp? in
+            guard let bundleID = app.bundleIdentifier, app.processIdentifier != getpid(), !ignored.contains(bundleID),
+                  !silentSystem.contains(bundleID), seen.insert(bundleID).inserted else { return nil }
+            return AudioApp(bundleID: bundleID, displayName: shortName(app.localizedName ?? bundleID), icon: app.icon,
+                            isPlaying: false, processes: [], hasAudio: false)
+        }
+        .sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
+
+        return withAudio + silent
     }
 
     // MARK: - App dono do processo

@@ -4,16 +4,18 @@ import Carbon
 /// escolhido (Spotify ou Música); as teclas de mídia do Mac (F7/F8/F9) continuam valendo
 /// para o app que estiver tocando.
 enum Shortcuts {
-    static let list: [(keys: String, action: String)] = [
-        ("⌘ ⌥ ↑", "Aumenta o volume"),
-        ("⌘ ⌥ ↓", "Diminui o volume"),
-        ("⌃ ⌥ P", "Pausar / continuar"),
-        ("⌃ ⌥ →", "Próxima música"),
-        ("⌃ ⌥ ←", "Volta ao começo (2x rápido: anterior)"),
-        ("⌃ ⌥ M", "Mudo / volta o som do app"),
-        ("⌃ ⌥ A", "Troca para o próximo app"),
-        ("⌃ ⌥ V", "Desliga / liga o microfone"),
-    ]
+    static var list: [(keys: String, action: String)] {
+        [
+            ("⌘ ⌥ ↑", T("Aumenta o volume", "Volume up")),
+            ("⌘ ⌥ ↓", T("Diminui o volume", "Volume down")),
+            ("⌃ ⌥ P", T("Pausar / continuar", "Play / pause")),
+            ("⌃ ⌥ →", T("Próxima música", "Next track")),
+            ("⌃ ⌥ ←", T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)")),
+            ("⌃ ⌥ M", T("Mudo / volta o som", "Mute / unmute")),
+            ("⌃ ⌥ A", T("Troca o app controlado (o próximo da lista)", "Switch the controlled app (next in the list)")),
+            ("⌃ ⌥ V", T("Liga / desliga o microfone (o do Mac inteiro)", "Microphone on / off (for the whole Mac)")),
+        ]
+    }
 
     /// Nome legível de um atalho, para o aviso de "outro programa já usa".
     static func name(of hotkey: GlobalHotkeys.Hotkey) -> String {

@@ -75,7 +75,7 @@ final class AppModel: ObservableObject {
             Hotkey(keyCode: Hotkey.upArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: 0.01) },
             Hotkey(keyCode: Hotkey.downArrow, modifiers: Hotkey.commandOption, repeats: true) { [weak self] in self?.nudgeVolume(by: -0.01) },
             Hotkey(keyCode: Hotkey.mKey, modifiers: Hotkey.controlOption, repeats: false) { [weak self] in
-                guard let self, let bundleID = selectedBundleID else { return }
+                guard let self, let bundleID = selectedBundleID, selectedHasAudio else { return }
                 toggleMute(bundleID)
                 showVolumeOsd()
             },
@@ -92,24 +92,26 @@ final class AppModel: ObservableObject {
         ])
         if let failed = hotkeys?.failed, !failed.isEmpty {
             let names = failed.map { Shortcuts.name(of: $0) }.joined(separator: ", ")
-            errorMessage = "Outro programa já usa \(names); esse atalho não vai funcionar."
+            errorMessage = T("Outro programa já usa \(names); esse atalho não vai funcionar.",
+                             "Another program already uses \(names); that shortcut won't work.")
         }
     }
 
     /// Atalhos de volume: ±1% no app escolhido, arredondando para o 1% mais perto.
     private func nudgeVolume(by step: Float) {
-        guard let bundleID = selectedBundleID else { return }
+        guard let bundleID = selectedBundleID, selectedHasAudio else { return }
         let steps = ((volume(of: bundleID) + step) * 100).rounded()
         setVolume(steps / 100, for: bundleID)
         showVolumeOsd()
     }
 
-    /// ⌃⌥A: o próximo app da lista (os tocando vêm primeiro); depois do último, volta ao primeiro.
+    /// ⌃⌥A: o próximo app com som da lista (os tocando vêm primeiro); depois do último, volta ao primeiro.
     func switchApp() {
         refresh()
-        guard !apps.isEmpty else { return }
-        let index = apps.firstIndex { $0.bundleID == selectedBundleID }.map { ($0 + 1) % apps.count } ?? 0
-        selectedBundleID = apps[index].bundleID
+        let audible = apps.filter(\.hasAudio)
+        guard !audible.isEmpty else { return }
+        let index = audible.firstIndex { $0.bundleID == selectedBundleID }.map { ($0 + 1) % audible.count } ?? 0
+        selectedBundleID = audible[index].bundleID
         showVolumeOsd()
     }
 
@@ -130,11 +132,13 @@ final class AppModel: ObservableObject {
     func toggleMic() {
         refreshMic()
         guard let micMuted else { return }
-        if !Microphone.setMuted(!micMuted) { errorMessage = "Não foi possível mudar o microfone." }
+        if !Microphone.setMuted(!micMuted) { errorMessage = T("Não foi possível mudar o microfone.", "Couldn't change the microphone.") }
         refreshMic()
     }
 
     var selectedApp: AudioApp? { apps.first { $0.bundleID == selectedBundleID } }
+    /// App em cinza (ainda sem som): sem volume nem mudo; a mídia funciona.
+    var selectedHasAudio: Bool { selectedApp?.hasAudio ?? false }
 
     func volume(of bundleID: String) -> Float { volumes[bundleID] ?? 1 }
 
@@ -258,10 +262,11 @@ final class AppModel: ObservableObject {
             try LoginItem.setEnabled(enabled)
             errorMessage = nil
         } catch {
-            errorMessage = "Não foi possível mudar o Iniciar com o Mac: \(error.localizedDescription)"
+            errorMessage = T("Não foi possível mudar o Iniciar com o Mac: ", "Couldn't change Start with Mac: ") + error.localizedDescription
         }
         if enabled && LoginItem.needsApproval {
-            errorMessage = "Libere o Sound Tune Key em Ajustes do Sistema → Geral → Itens de Início."
+            errorMessage = T("Libere o Sound Tune Key em Ajustes do Sistema → Geral → Itens de Início.",
+                             "Allow Sound Tune Key in System Settings → General → Login Items.")
             LoginItem.openSettings()
         }
         refreshStartsAtLogin()
@@ -286,7 +291,7 @@ final class AppModel: ObservableObject {
         }
 
         guard let outputUID else { return }
-        for app in apps where taps[app.bundleID] == nil && gain(of: app.bundleID) < 1 && !failed.contains(app.bundleID) {
+        for app in apps where app.hasAudio && taps[app.bundleID] == nil && gain(of: app.bundleID) < 1 && !failed.contains(app.bundleID) {
             do {
                 taps[app.bundleID] = try AppVolumeTap(processes: app.processes, outputUID: outputUID, volume: gain(of: app.bundleID))
                 errorMessage = nil

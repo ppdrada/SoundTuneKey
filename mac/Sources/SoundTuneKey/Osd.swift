@@ -78,13 +78,13 @@ struct OsdCard: View { // fora do private: o vídeo de demonstração desenha o 
                     .frame(width: 44, alignment: .trailing)
                     .position(x: width - 20 - 22, y: 56)
             case let .mic(muted):
-                Text("Microfone")
+                Text(T("Microfone", "Microphone"))
                     .font(.system(size: 12.7))
                     .foregroundStyle(muted ? Theme.mute : Theme.mutedText)
                     .position(x: width / 2, y: 25)
                 HStack(spacing: 8) {
                     MediaIcon(glyph: muted ? .micMuted : .mic, size: 18, color: muted ? Theme.mute : Theme.text)
-                    Text(muted ? "Desligado" : "Ligado")
+                    Text(muted ? T("Desligado", "Off") : T("Ligado", "On"))
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(muted ? Theme.mute : Theme.text)
                 }
