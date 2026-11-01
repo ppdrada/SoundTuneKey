@@ -28,7 +28,7 @@ public class ShortcutsWindow : Form
         Text = Lang.T("Sound Tune Key — Atalhos", "Sound Tune Key — Shortcuts", "Sound Tune Key — Atajos");
         FormBorderStyle = FormBorderStyle.None;
         StartPosition = FormStartPosition.CenterScreen;
-        ClientSize = new Size(440, 112 + Shortcuts.Length * 28);
+        ClientSize = new Size(540, 112 + Shortcuts.Length * 28); // 540: o texto do microfone em espanhol é o mais comprido
         BackColor = Theme.Background;
         ForeColor = Theme.Text;
         Icon = AppIcon.Load();
