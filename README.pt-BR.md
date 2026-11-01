@@ -106,7 +106,7 @@ Fechar ou minimizar a janela não encerra o programa: ele continua no ícone da 
 
 1. Clique em **macOS · Baixar .zip** acima e abra o `.zip` para descompactar.
 2. Mova o `SoundTuneKey.app` para a pasta **Aplicativos** e abra.
-3. Selecione na lista o aplicativo que você quer controlar.
+3. Selecione na lista o aplicativo que você quer controlar. Os apps tocando têm um 🔈 ao lado do volume. Apps abertos que ainda não tocaram som aparecem **em cinza**, no fim da lista: dá para escolher (a mídia já funciona), e o volume passa a valer sozinho quando o app tocar.
 4. Na primeira vez que você mudar um volume, o macOS pede a permissão de **Gravação de áudio do sistema**: aceite. É assim que o Sound Tune Key muda o volume de um app só.
 
 O programa lembra o último app escolhido e o volume de cada app. O volume vale enquanto o Sound Tune Key estiver aberto: ao fechá-lo, os apps voltam ao volume normal até você abrir de novo.
@@ -133,10 +133,10 @@ O botão **Abrir Mesmo Assim** só aparece logo depois de você tentar abrir o a
 Fechar a janela não encerra o programa: ele continua no ícone da barra de menus (perto do Wi-Fi) e os atalhos seguem funcionando. Para mudar o ícone de lugar, segure **⌘** e arraste. Clique no ícone para:
 
 - No topo, como no Spotify: a **barra de tempo**, os botões **⏮ ⏯ ⏭** e o **volume** do app escolhido; o menu fica aberto para clicar mais de uma vez
-- **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**
+- **Sound Tune Key** (no topo) — abre o **Sobre**; quando há versão nova, aparece **Atualizar para a versão X**. No **Sobre**, **Português · English** troca o idioma do app inteiro, na hora
 - **Microfone ligado / desligado** — liga e desliga o microfone (vermelho quando desligado)
 - **Abrir** — mostra a janela de novo
-- **Aplicativos** — clique num app para controlá-lo (o marcado é o controlado); o submenu dele tem **Mudo**. Escolher e ligar/desligar não fecham o menu, para corrigir na hora; apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo
+- **Aplicativos** — mostra o app controlado ("Aplicativos - Controlando: Spotify"). Clique num app para controlá-lo (o marcado é o controlado); o submenu dele tem **Mudo**. Escolher e ligar/desligar não fecham o menu, para corrigir na hora; apps mudos aparecem em vermelho, e o ícone da barra fica vermelho quando o app escolhido está mudo
 - **Atalhos** — abre a janelinha com a lista de atalhos
 - **Iniciar com o Mac** — abre o programa sozinho, já na barra de menus, quando você entra no Mac
 - **Mostrar aviso na tela** — liga ou desliga o aviso de volume e mudo

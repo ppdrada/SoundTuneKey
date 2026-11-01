@@ -150,7 +150,7 @@ struct PlayButton: View {
             Circle().fill(enabled ? style.text : style.disabled)
         })
         .disabled(!enabled)
-        .help("Pausar / continuar")
+        .help(T("Pausar / continuar", "Play / pause"))
     }
 }
 
@@ -191,7 +191,8 @@ struct PlayerView: View {
     let style: PlayerStyle
 
     var body: some View {
-        let app = model.selectedApp
+        // app em cinza (ainda sem som): volume desligado, com "—"; a mídia funciona
+        let app = model.selectedApp.flatMap { $0.hasAudio ? $0 : nil }
         let volume = app.map { Int((model.volume(of: $0.bundleID) * 100).rounded()) }
         let muted = app.map { model.isMuted($0.bundleID) } ?? false
         let h = style.rowHeight
@@ -205,13 +206,13 @@ struct PlayerView: View {
                 Spacer(minLength: 0)
                 MediaButton(glyph: .previous, size: style.iconSize, enabled: model.mediaSupported, color: style.text,
                             dimColor: style.disabled, hoverColor: style.hover,
-                            help: "Volta ao começo (2x rápido: música anterior)") { model.mediaPrevious() }
+                            help: T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)")) { model.mediaPrevious() }
                     .frame(width: h * 2.4)
                 PlayButton(playing: model.mediaStatus?.isPlaying ?? false, style: style,
                            enabled: model.mediaSupported) { model.mediaPlayPause() }
                     .frame(width: h * 1.5)
                 MediaButton(glyph: .next, size: style.iconSize, enabled: model.mediaSupported, color: style.text,
-                            dimColor: style.disabled, hoverColor: style.hover, help: "Próxima música") { model.mediaNext() }
+                            dimColor: style.disabled, hoverColor: style.hover, help: T("Próxima música", "Next track")) { model.mediaNext() }
                     .frame(width: h * 2.4)
                 Spacer(minLength: 0)
             }
@@ -229,7 +230,7 @@ struct PlayerView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(app == nil)
-                .help(muted ? "Tirar o mudo" : "Mudo")
+                .help(T("Mudo / volta o som (⌃⌥M)", "Mute / unmute (⌃⌥M)"))
                 .pointerCursor(app != nil)
                 Spacer().frame(width: 16)
                 VolumeBar(value: volume ?? 0, enabled: app != nil, thumbSize: style.volumeThumb,

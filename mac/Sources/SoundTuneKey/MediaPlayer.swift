@@ -128,15 +128,18 @@ struct MediaError: LocalizedError {
     /// O Chrome recusa JavaScript vindo do AppleScript até o usuário ligar a opção.
     var isChromeJavaScriptOff: Bool { message.contains("JavaScript") }
 
-    // nomes exatos do menu do Chrome em português
-    static let chromeJavaScriptOffMessage =
-        "No Chrome, na barra de menus do Mac: Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple."
+    // nomes exatos do menu do Chrome em cada idioma
+    static var chromeJavaScriptOffMessage: String {
+        T("No Chrome, na barra de menus do Mac: Ver → Desenvolvedor → Permitir o JavaScript do Eventos da Apple.",
+          "In Chrome, on the Mac menu bar: View → Developer → Allow JavaScript from Apple Events.")
+    }
 
     var errorDescription: String? {
         if isChromeJavaScriptOff { return Self.chromeJavaScriptOffMessage }
         // -1743: o usuário não deixou (ou ainda não respondeu) o controle do app
         return code == -1743
-            ? "Libere o controle em Ajustes do Sistema → Privacidade e Segurança → Automação."
-            : "O player não respondeu (erro \(code))."
+            ? T("Libere o controle em Ajustes do Sistema → Privacidade e Segurança → Automação.",
+                "Allow control in System Settings → Privacy & Security → Automation.")
+            : T("O player não respondeu (erro \(code)).", "The player didn't respond (error \(code)).")
     }
 }

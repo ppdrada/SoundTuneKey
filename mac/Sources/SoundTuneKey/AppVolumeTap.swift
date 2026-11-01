@@ -39,7 +39,7 @@ final class AppVolumeTap {
         description.name = "Sound Tune Key"
         description.isPrivate = true
         description.muteBehavior = .mutedWhenTapped
-        try check(AudioHardwareCreateProcessTap(description, &tapID), "criar a captura")
+        try check(AudioHardwareCreateProcessTap(description, &tapID), T("criar a captura", "create the capture"))
 
         let aggregate: [String: Any] = [
             kAudioAggregateDeviceNameKey: "Sound Tune Key",
@@ -53,12 +53,12 @@ final class AppVolumeTap {
                 kAudioSubTapDriftCompensationKey: true,
             ]],
         ]
-        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), "criar o dispositivo")
+        try check(AudioHardwareCreateAggregateDevice(aggregate as CFDictionary, &aggregateID), T("criar o dispositivo", "create the device"))
 
         try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, nil) { [unowned self] _, input, _, output, _ in
             Self.copy(input, to: output, gain: self.gain)
-        }, "criar o processamento")
-        try check(AudioDeviceStart(aggregateID, ioProcID), "começar a tocar")
+        }, T("criar o processamento", "create the processing"))
+        try check(AudioDeviceStart(aggregateID, ioProcID), T("começar a tocar", "start playing"))
     }
 
     func stop() {
@@ -119,7 +119,7 @@ final class AppVolumeTap {
 struct AudioError: LocalizedError {
     let step: String
     let status: OSStatus
-    var errorDescription: String? { "Não foi possível \(step) (erro \(status))." }
+    var errorDescription: String? { T("Não foi possível \(step) (erro \(status)).", "Couldn't \(step) (error \(status)).") }
 }
 
 private func check(_ status: OSStatus, _ step: String) throws {

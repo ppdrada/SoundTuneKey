@@ -22,7 +22,7 @@ struct ToggleSwitch: View {
         .onTapGesture { withAnimation(.easeOut(duration: 0.15)) { isOn.toggle() } }
         .pointerCursor()
         .accessibilityAddTraits(.isButton)
-        .accessibilityValue(isOn ? "ligado" : "desligado")
+        .accessibilityValue(isOn ? T("ligado", "on") : T("desligado", "off"))
     }
 }
 
@@ -45,7 +45,7 @@ struct RadioDot: View {
         .onTapGesture { isOn.toggle() }
         .pointerCursor()
         .accessibilityAddTraits(.isButton)
-        .accessibilityValue(isOn ? "ligado" : "desligado")
+        .accessibilityValue(isOn ? T("ligado", "on") : T("desligado", "off"))
     }
 
     /// A mesma bolinha para os itens de liga/desliga do menu da barra.
@@ -65,27 +65,23 @@ struct RadioDot: View {
     }
 }
 
-/// Link em cinza que sublinha com o mouse em cima e fica branco ao clicar ("Atalhos", "Sobre").
+/// Link em cinza que fica branco com o mouse em cima, sem sublinhado ("Atalhos", "Sobre"),
+/// igual ao ícone do microfone ao lado.
 struct LinkText: View {
     let title: String
+    var color = Theme.mutedText
     let action: () -> Void
     @State private var hovering = false
 
     var body: some View {
         Button(action: action) {
-            Text(title).underline(hovering)
+            Text(title)
+                .font(.system(size: 12))
+                .foregroundStyle(hovering ? Theme.text : color)
         }
-        .buttonStyle(LinkStyle())
+        .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .pointerCursor()
-    }
-
-    private struct LinkStyle: ButtonStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            configuration.label
-                .font(.system(size: 12))
-                .foregroundStyle(configuration.isPressed ? Theme.text : Theme.mutedText)
-        }
     }
 }
 

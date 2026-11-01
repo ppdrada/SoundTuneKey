@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var model: AppModel
     @ObservedObject var updates: Updates
+    @ObservedObject private var lang = Lang.shared
     var openShortcuts: () -> Void = {}
     /// Abre o Sobre; true já procura a versão nova (faixa de versão nova).
     var openAbout: (Bool) -> Void = { _ in }
@@ -11,7 +12,7 @@ struct ContentView: View {
         VStack(spacing: 0) {
             // títulos das colunas, como na lista do Windows
             HStack {
-                Text("Aplicativo")
+                Text(T("Aplicativo", "App"))
                 Spacer()
                 Text("Volume")
             }
@@ -30,10 +31,12 @@ struct ContentView: View {
                                selected: app.bundleID == model.selectedBundleID)
                             .contentShape(Rectangle())
                             .onTapGesture { model.selectedBundleID = app.bundleID }
-                            // só o Mudo, marcado com ✓; não troca o app controlado
+                            // só o Mudo, marcado com ✓; não troca o app controlado. App em cinza não tem mudo
                             .contextMenu {
-                                Toggle("Mudo", isOn: Binding(get: { model.isMuted(app.bundleID) },
-                                                             set: { _ in model.toggleMute(app.bundleID) }))
+                                if app.hasAudio {
+                                    Toggle(T("Mudo", "Mute"), isOn: Binding(get: { model.isMuted(app.bundleID) },
+                                                                            set: { _ in model.toggleMute(app.bundleID) }))
+                                }
                             }
                             .pointerCursor()
                     }
@@ -44,7 +47,7 @@ struct ContentView: View {
             .background(Theme.surface)
             .overlay(alignment: .center) {
                 if model.apps.isEmpty {
-                    Text("Nenhum app com som aberto")
+                    Text(T("Nenhum app com som", "No apps with sound"))
                         .foregroundStyle(Theme.mutedText)
                 }
             }
@@ -61,7 +64,7 @@ struct ContentView: View {
             }
 
             if let version = updates.available {
-                LinkText(title: "Versão \(version) disponível · Atualizar") { openAbout(true) }
+                LinkText(title: T("Versão \(version) disponível · Atualizar", "Version \(version) available · Update")) { openAbout(true) }
                     .frame(maxWidth: .infinity)
                     .frame(height: 30)
                     .background(Theme.elevated)
@@ -74,17 +77,19 @@ struct ContentView: View {
         .foregroundStyle(Theme.text)
         .preferredColorScheme(.dark)
         .onAppear { model.refreshStartsAtLogin() }
+        .id(lang.english) // trocar o idioma escreve tudo de novo, na hora
     }
 
     private var controllingRow: some View {
         let app = model.selectedApp
         return HStack(spacing: 0) {
-            Text(app.map { "Controlando: \($0.displayName)" } ?? "Selecione um app na lista")
+            Text(app.map { T("Controlando: ", "Controlling: ") + $0.displayName + ($0.hasAudio ? "" : T(" (sem som ainda)", " (no sound yet)")) }
+                 ?? T("Selecione um app na lista", "Pick an app from the list"))
                 .font(.system(size: 13))
                 .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
                 .lineLimit(1)
             Spacer(minLength: 8)
-            ToggleSwitch(title: "Aviso na tela", isOn: $model.showOsd)
+            ToggleSwitch(title: T("Aviso na tela", "On-screen notice"), isOn: $model.showOsd)
         }
         .padding(.leading, 8)
         .padding(.trailing, 10)
@@ -99,7 +104,7 @@ struct ContentView: View {
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true) // as duas linhas, sem cortar
             if error == MediaError.chromeJavaScriptOffMessage {
-                Button("Como ligar") { ChromeMedia.showSetup() }
+                Button(T("Como ligar", "How to turn on")) { ChromeMedia.showSetup() }
                     .controlSize(.small)
                     .pointerCursor()
             }
@@ -112,14 +117,14 @@ struct ContentView: View {
     /// Rodapé: "Iniciar com o Mac" à esquerda; microfone, Atalhos e Sobre à direita.
     private var footer: some View {
         HStack(spacing: 12) {
-            RadioDot(title: "Iniciar com o Mac", isOn: Binding(get: { model.startsAtLogin },
+            RadioDot(title: T("Iniciar com o Mac", "Start with Mac"), isOn: Binding(get: { model.startsAtLogin },
                                                               set: { model.setStartsAtLogin($0) }))
             Spacer()
             if let micMuted = model.micMuted {
                 MicButton(muted: micMuted) { model.toggleMic() }
             }
-            LinkText(title: "Atalhos", action: openShortcuts)
-            LinkText(title: "Sobre") { openAbout(false) }
+            LinkText(title: T("Atalhos", "Shortcuts"), action: openShortcuts)
+            LinkText(title: T("Sobre", "About")) { openAbout(false) }
         }
         .padding(.horizontal, 10)
         .padding(.bottom, 2)
@@ -142,7 +147,7 @@ private struct MicButton: View {
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
-        .help(muted ? "Ligar o microfone (⌃⌥V)" : "Desligar o microfone (⌃⌥V)")
+        .help(T("Liga / desliga o microfone (⌃⌥V)", "Microphone on / off (⌃⌥V)"))
         .pointerCursor()
     }
 }
@@ -160,24 +165,17 @@ private struct AppRow: View {
             } else {
                 RoundedRectangle(cornerRadius: 5).fill(Theme.dim).frame(width: 22, height: 22)
             }
+            // em cinza: aberto, mas ainda sem som
             Text(app.displayName).lineLimit(1)
-                .foregroundStyle(muted ? Theme.mute : Theme.text)
+                .foregroundStyle(!app.hasAudio ? Theme.mutedText : muted ? Theme.mute : Theme.text)
             Spacer()
+            // tocando: alto-falante no fim da coluna do nome (cortado e vermelho no mudo)
             if app.isPlaying {
-                HStack(spacing: 5) {
-                    Circle().fill(Theme.text).frame(width: 6, height: 6)
-                    Text("tocando")
-                }
-                .font(.system(size: 11))
-                .foregroundStyle(muted ? Theme.mute : Theme.text)
-            } else {
-                Text("parado")
-                    .font(.system(size: 11))
-                    .foregroundStyle(muted ? Theme.mute : Theme.dim)
+                MediaIcon(glyph: muted ? .speakerMuted : .speaker, size: 11, color: muted ? Theme.mute : Theme.mutedText)
             }
-            Text("\(Int((volume * 100).rounded()))%")
+            Text(app.hasAudio ? "\(Int((volume * 100).rounded()))%" : "—")
                 .font(.system(size: 12).monospacedDigit())
-                .foregroundStyle(muted ? Theme.mute : Theme.mutedText)
+                .foregroundStyle(muted && app.hasAudio ? Theme.mute : Theme.mutedText)
                 .frame(width: 40, alignment: .trailing)
         }
         .font(.system(size: 13))
