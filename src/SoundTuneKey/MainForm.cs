@@ -283,6 +283,7 @@ public class MainForm : Form
         _showOsd.Text = Lang.T("Aviso na tela", "On-screen notice", "Aviso en pantalla");
         _osdItem.Text = Lang.T("Mostrar aviso na tela", "Show on-screen notice", "Mostrar aviso en pantalla");
         _list.Columns[0].Text = Lang.T("Aplicativo", "App", "Aplicación");
+        _list.Columns[1].Text = Lang.T("Volume", "Volume", "Volumen");
         _shortcutsLink.Text = _shortcutsItem.Text = Lang.T("Atalhos", "Shortcuts", "Atajos");
         _aboutLink.Text = Lang.T("Sobre", "About", "Acerca de");
         _openItem.Text = Lang.T("Abrir", "Open", "Abrir");
