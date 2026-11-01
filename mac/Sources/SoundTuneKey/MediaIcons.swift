@@ -150,7 +150,7 @@ struct PlayButton: View {
             Circle().fill(enabled ? style.text : style.disabled)
         })
         .disabled(!enabled)
-        .help(T("Pausar / continuar", "Play / pause"))
+        .help(T("Pausar / continuar", "Play / pause", "Reproducir / pausar"))
     }
 }
 
@@ -206,13 +206,13 @@ struct PlayerView: View {
                 Spacer(minLength: 0)
                 MediaButton(glyph: .previous, size: style.iconSize, enabled: model.mediaSupported, color: style.text,
                             dimColor: style.disabled, hoverColor: style.hover,
-                            help: T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)")) { model.mediaPrevious() }
+                            help: T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)", "Volver al inicio (2 veces rápido: canción anterior)")) { model.mediaPrevious() }
                     .frame(width: h * 2.4)
                 PlayButton(playing: model.mediaStatus?.isPlaying ?? false, style: style,
                            enabled: model.mediaSupported) { model.mediaPlayPause() }
                     .frame(width: h * 1.5)
                 MediaButton(glyph: .next, size: style.iconSize, enabled: model.mediaSupported, color: style.text,
-                            dimColor: style.disabled, hoverColor: style.hover, help: T("Próxima música", "Next track")) { model.mediaNext() }
+                            dimColor: style.disabled, hoverColor: style.hover, help: T("Próxima música", "Next track", "Siguiente canción")) { model.mediaNext() }
                     .frame(width: h * 2.4)
                 Spacer(minLength: 0)
             }
@@ -230,7 +230,7 @@ struct PlayerView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(app == nil)
-                .help(T("Mudo / volta o som (⌃⌥M)", "Mute / unmute (⌃⌥M)"))
+                .help(T("Mudo / volta o som (⌃⌥M)", "Mute / unmute (⌃⌥M)", "Silenciar / activar sonido (⌃⌥M)"))
                 .pointerCursor(app != nil)
                 Spacer().frame(width: 16)
                 VolumeBar(value: volume ?? 0, enabled: app != nil, thumbSize: style.volumeThumb,

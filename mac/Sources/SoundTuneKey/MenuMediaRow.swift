@@ -13,6 +13,6 @@ struct MenuMediaRow: View {
         PlayerView(model: model, style: .menu)
             .padding(EdgeInsets(top: 8, leading: 10, bottom: 12, trailing: 10))
             .frame(width: Self.size.width, height: Self.size.height)
-            .id(lang.english)
+            .id(lang.code)
     }
 }

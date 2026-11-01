@@ -93,7 +93,7 @@ final class AppModel: ObservableObject {
         if let failed = hotkeys?.failed, !failed.isEmpty {
             let names = failed.map { Shortcuts.name(of: $0) }.joined(separator: ", ")
             errorMessage = T("Outro programa já usa \(names); esse atalho não vai funcionar.",
-                             "Another program already uses \(names); that shortcut won't work.")
+                             "Another program already uses \(names); that shortcut won't work.", "Otro programa ya usa \(names); ese atajo no va a funcionar.")
         }
     }
 
@@ -132,7 +132,7 @@ final class AppModel: ObservableObject {
     func toggleMic() {
         refreshMic()
         guard let micMuted else { return }
-        if !Microphone.setMuted(!micMuted) { errorMessage = T("Não foi possível mudar o microfone.", "Couldn't change the microphone.") }
+        if !Microphone.setMuted(!micMuted) { errorMessage = T("Não foi possível mudar o microfone.", "Couldn't change the microphone.", "No se pudo cambiar el micrófono.") }
         refreshMic()
     }
 
@@ -262,11 +262,11 @@ final class AppModel: ObservableObject {
             try LoginItem.setEnabled(enabled)
             errorMessage = nil
         } catch {
-            errorMessage = T("Não foi possível mudar o Iniciar com o Mac: ", "Couldn't change Start with Mac: ") + error.localizedDescription
+            errorMessage = T("Não foi possível mudar o Iniciar com o Mac: ", "Couldn't change Start with Mac: ", "No se pudo cambiar Iniciar con Mac: ") + error.localizedDescription
         }
         if enabled && LoginItem.needsApproval {
             errorMessage = T("Libere o Sound Tune Key em Ajustes do Sistema → Geral → Itens de Início.",
-                             "Allow Sound Tune Key in System Settings → General → Login Items.")
+                             "Allow Sound Tune Key in System Settings → General → Login Items.", "Permite Sound Tune Key en Ajustes del Sistema → General → Ítems de inicio.")
             LoginItem.openSettings()
         }
         refreshStartsAtLogin()

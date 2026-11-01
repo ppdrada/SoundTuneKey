@@ -6,14 +6,14 @@ import Carbon
 enum Shortcuts {
     static var list: [(keys: String, action: String)] {
         [
-            ("⌘ ⌥ ↑", T("Aumenta o volume", "Volume up")),
-            ("⌘ ⌥ ↓", T("Diminui o volume", "Volume down")),
-            ("⌃ ⌥ P", T("Pausar / continuar", "Play / pause")),
-            ("⌃ ⌥ →", T("Próxima música", "Next track")),
-            ("⌃ ⌥ ←", T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)")),
-            ("⌃ ⌥ M", T("Mudo / volta o som", "Mute / unmute")),
-            ("⌃ ⌥ A", T("Troca o app controlado (o próximo da lista)", "Switch the controlled app (next in the list)")),
-            ("⌃ ⌥ V", T("Liga / desliga o microfone (o do Mac inteiro)", "Microphone on / off (for the whole Mac)")),
+            ("⌘ ⌥ ↑", T("Aumenta o volume", "Volume up", "Sube el volumen")),
+            ("⌘ ⌥ ↓", T("Diminui o volume", "Volume down", "Baja el volumen")),
+            ("⌃ ⌥ P", T("Pausar / continuar", "Play / pause", "Reproducir / pausar")),
+            ("⌃ ⌥ →", T("Próxima música", "Next track", "Siguiente canción")),
+            ("⌃ ⌥ ←", T("Volta ao começo (2x rápido: música anterior)", "Back to start (twice quickly: previous track)", "Volver al inicio (2 veces rápido: canción anterior)")),
+            ("⌃ ⌥ M", T("Mudo / volta o som", "Mute / unmute", "Silenciar / activar sonido")),
+            ("⌃ ⌥ A", T("Troca o app controlado (o próximo da lista)", "Switch the controlled app (next in the list)", "Cambia la app controlada (la siguiente de la lista)")),
+            ("⌃ ⌥ V", T("Liga / desliga o microfone (o padrão do Mac)", "Microphone on / off (the Mac's default one)", "Micrófono activado / desactivado (el predeterminado del Mac)")),
         ]
     }
 

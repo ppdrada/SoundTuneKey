@@ -12,7 +12,7 @@ struct ContentView: View {
         VStack(spacing: 0) {
             // títulos das colunas, como na lista do Windows
             HStack {
-                Text(T("Aplicativo", "App"))
+                Text(T("Aplicativo", "App", "App"))
                 Spacer()
                 Text("Volume")
             }
@@ -34,7 +34,7 @@ struct ContentView: View {
                             // só o Mudo, marcado com ✓; não troca o app controlado. App em cinza não tem mudo
                             .contextMenu {
                                 if app.hasAudio {
-                                    Toggle(T("Mudo", "Mute"), isOn: Binding(get: { model.isMuted(app.bundleID) },
+                                    Toggle(T("Mudo", "Mute", "Silenciar"), isOn: Binding(get: { model.isMuted(app.bundleID) },
                                                                             set: { _ in model.toggleMute(app.bundleID) }))
                                 }
                             }
@@ -47,7 +47,7 @@ struct ContentView: View {
             .background(Theme.surface)
             .overlay(alignment: .center) {
                 if model.apps.isEmpty {
-                    Text(T("Nenhum app com som", "No apps with sound"))
+                    Text(T("Nenhum app com som", "No apps with sound", "No hay apps con sonido"))
                         .foregroundStyle(Theme.mutedText)
                 }
             }
@@ -64,7 +64,7 @@ struct ContentView: View {
             }
 
             if let version = updates.available {
-                LinkText(title: T("Versão \(version) disponível · Atualizar", "Version \(version) available · Update")) { openAbout(true) }
+                LinkText(title: T("Versão \(version) disponível · Atualizar", "Version \(version) available · Update", "Versión \(version) disponible · Actualizar")) { openAbout(true) }
                     .frame(maxWidth: .infinity)
                     .frame(height: 30)
                     .background(Theme.elevated)
@@ -77,19 +77,19 @@ struct ContentView: View {
         .foregroundStyle(Theme.text)
         .preferredColorScheme(.dark)
         .onAppear { model.refreshStartsAtLogin() }
-        .id(lang.english) // trocar o idioma escreve tudo de novo, na hora
+        .id(lang.code) // trocar o idioma escreve tudo de novo, na hora
     }
 
     private var controllingRow: some View {
         let app = model.selectedApp
         return HStack(spacing: 0) {
-            Text(app.map { T("Controlando: ", "Controlling: ") + $0.displayName + ($0.hasAudio ? "" : T(" (sem som ainda)", " (no sound yet)")) }
-                 ?? T("Selecione um app na lista", "Pick an app from the list"))
+            Text(app.map { T("Controlando: ", "Controlling: ", "Controlando: ") + $0.displayName + ($0.hasAudio ? "" : T(" (sem som ainda)", " (no sound yet)", " (sin sonido aún)")) }
+                 ?? T("Selecione um app na lista", "Pick an app from the list", "Elige una app de la lista"))
                 .font(.system(size: 13))
                 .foregroundStyle(app == nil ? Theme.mutedText : Theme.text)
                 .lineLimit(1)
             Spacer(minLength: 8)
-            ToggleSwitch(title: T("Aviso na tela", "On-screen notice"), isOn: $model.showOsd)
+            ToggleSwitch(title: T("Aviso na tela", "On-screen notice", "Aviso en pantalla"), isOn: $model.showOsd)
         }
         .padding(.leading, 8)
         .padding(.trailing, 10)
@@ -104,7 +104,7 @@ struct ContentView: View {
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true) // as duas linhas, sem cortar
             if error == MediaError.chromeJavaScriptOffMessage {
-                Button(T("Como ligar", "How to turn on")) { ChromeMedia.showSetup() }
+                Button(T("Como ligar", "How to turn on", "Cómo activarlo")) { ChromeMedia.showSetup() }
                     .controlSize(.small)
                     .pointerCursor()
             }
@@ -117,14 +117,14 @@ struct ContentView: View {
     /// Rodapé: "Iniciar com o Mac" à esquerda; microfone, Atalhos e Sobre à direita.
     private var footer: some View {
         HStack(spacing: 12) {
-            RadioDot(title: T("Iniciar com o Mac", "Start with Mac"), isOn: Binding(get: { model.startsAtLogin },
+            RadioDot(title: T("Iniciar com o Mac", "Start with Mac", "Iniciar con Mac"), isOn: Binding(get: { model.startsAtLogin },
                                                               set: { model.setStartsAtLogin($0) }))
             Spacer()
             if let micMuted = model.micMuted {
                 MicButton(muted: micMuted) { model.toggleMic() }
             }
-            LinkText(title: T("Atalhos", "Shortcuts"), action: openShortcuts)
-            LinkText(title: T("Sobre", "About")) { openAbout(false) }
+            LinkText(title: T("Atalhos", "Shortcuts", "Atajos"), action: openShortcuts)
+            LinkText(title: T("Sobre", "About", "Acerca de")) { openAbout(false) }
         }
         .padding(.horizontal, 10)
         .padding(.bottom, 2)
@@ -147,7 +147,7 @@ private struct MicButton: View {
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
-        .help(T("Liga / desliga o microfone (⌃⌥V)", "Microphone on / off (⌃⌥V)"))
+        .help(T("Liga / desliga o microfone (⌃⌥V)", "Microphone on / off (⌃⌥V)", "Micrófono activado / desactivado (⌃⌥V)"))
         .pointerCursor()
     }
 }

@@ -3,29 +3,39 @@ using System.Globalization;
 namespace SoundTuneKey;
 
 /// <summary>
-/// Idioma do app: português ou inglês, escolhido no "Sobre". Cada texto fica no próprio lugar onde
-/// é usado, nas duas línguas: <c>Lang.T("Sair", "Exit")</c>. Ao trocar, <see cref="Changed"/> avisa as
-/// telas abertas para escreverem tudo de novo (vale na hora, sem reabrir o app).
+/// Idioma do app: português, inglês ou espanhol, escolhido no "Sobre". Cada texto fica no próprio lugar
+/// onde é usado, nas três línguas: <c>Lang.T("Sair", "Exit", "Salir")</c>. Ao trocar, <see cref="Changed"/>
+/// avisa as telas abertas para escreverem tudo de novo (vale na hora, sem reabrir o app).
 /// </summary>
 public static class Lang
 {
-    public static bool English { get; private set; }
+    /// <summary>"pt", "en" ou "es"; é o que fica salvo nas preferências.</summary>
+    public static string Code { get; private set; } = "pt";
 
     public static event Action? Changed;
 
-    public static string T(string portuguese, string english) => English ? english : portuguese;
-
-    /// <param name="saved">"pt" ou "en" salvo nas preferências; sem nada, segue o idioma do Windows</param>
-    public static void Load(string? saved) =>
-        English = saved is null ? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "pt" : saved == "en";
-
-    public static string Code => English ? "en" : "pt";
-
-    public static void Set(bool english)
+    public static string T(string portuguese, string english, string spanish) => Code switch
     {
-        if (English == english)
+        "en" => english,
+        "es" => spanish,
+        _ => portuguese,
+    };
+
+    /// <param name="saved">"pt", "en" ou "es" salvo nas preferências; sem nada, segue o idioma do Windows</param>
+    public static void Load(string? saved) =>
+        Code = saved is "pt" or "en" or "es" ? saved : CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+        {
+            "pt" => "pt",
+            "es" => "es",
+            _ => "en",
+        };
+
+    /// <param name="code">"pt", "en" ou "es"</param>
+    public static void Set(string code)
+    {
+        if (Code == code)
             return;
-        English = english;
+        Code = code;
         Changed?.Invoke();
     }
 }

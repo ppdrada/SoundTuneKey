@@ -88,7 +88,7 @@ private final class Recorder {
 
     init(repo: URL, english: Bool) {
         self.english = english
-        Lang.shared.english = english // as telas do app no idioma do vídeo
+        Lang.shared.code = english ? .en : .pt // as telas do app no idioma do vídeo
         iconURL = repo.appendingPathComponent("assets/icon/icon.png")
         func icon(_ path: String) -> NSImage? {
             FileManager.default.fileExists(atPath: path) ? NSWorkspace.shared.icon(forFile: path) : nil
