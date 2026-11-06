@@ -32,14 +32,14 @@ Elige la aplicación que quieres controlar (Spotify, Google Chrome, Discord o cu
 
 | Atajo | Acción |
 |---|---|
-| `Ctrl + Alt + ↑` | 🔊 Sube el volumen de la aplicación seleccionada |
-| `Ctrl + Alt + ↓` | 🔉 Baja el volumen de la aplicación seleccionada |
-| `Ctrl + Alt + P` | ⏯️ Reproducir / pausar |
-| `Ctrl + Alt + →` | ⏭️ Siguiente canción |
-| `Ctrl + Alt + ←` | ⏪ Reinicia la canción actual · presiónalo dos veces en menos de 1 s para ⏮️ canción anterior |
-| `Ctrl + Alt + M` | 🔇 Silencia / activa el sonido de la aplicación seleccionada (se conserva su volumen) |
-| `Ctrl + Alt + A` | 🔁 Cambia la aplicación controlada a la siguiente de la lista (se muestra en el aviso en pantalla) |
-| `Ctrl + Alt + V` | 🎤 Silencia / activa el micrófono (sirve para Discord, juegos y todo lo demás; solo silencia el micrófono configurado como predeterminado en Windows) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↑</code> | 🔊 Sube el volumen de la aplicación seleccionada |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↓</code> | 🔉 Baja el volumen de la aplicación seleccionada |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;P</code> | ⏯️ Reproducir / pausar |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;→</code> | ⏭️ Siguiente canción |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;←</code> | ⏪ Reinicia la canción actual · presiónalo dos veces en menos de 1 s para ⏮️ canción anterior |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;M</code> | 🔇 Silencia / activa el sonido de la aplicación seleccionada (se conserva su volumen) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;A</code> | 🔁 Cambia la aplicación controlada a la siguiente de la lista (se muestra en el aviso en pantalla) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;V</code> | 🎤 Silencia / activa el micrófono (sirve para Discord, juegos y todo lo demás; solo silencia el micrófono configurado como predeterminado en Windows) |
 
 Al usar los atajos de volumen o de silenciar, un pequeño aviso muestra por un momento la aplicación y el volumen en la parte inferior de la pantalla (al silenciar, el nombre de la aplicación y el altavoz se ponen en rojo), sin quitarle el foco a tu juego. No aparece sobre juegos en pantalla completa exclusiva (en ventana sin bordes sí funciona). Para desactivarlo, apaga el interruptor **Aviso en pantalla**, junto a "Controlando" en la ventana, o **Mostrar aviso en pantalla** en el menú de la bandeja.
 
@@ -51,14 +51,14 @@ Los atajos también aparecen dentro del programa: haz clic en **Atajos** en la p
 
 | Atajo | Acción |
 |---|---|
-| `⌘ + ⌥ + ↑` | 🔊 Sube el volumen de la aplicación seleccionada (mantenerlo presionado repite) |
-| `⌘ + ⌥ + ↓` | 🔉 Baja el volumen de la aplicación seleccionada (mantenerlo presionado repite) |
-| `⌃ + ⌥ + M` | 🔇 Silencia / activa el sonido de la aplicación seleccionada (se conserva el volumen) |
-| `⌃ + ⌥ + P` | ⏯️ Reproducir / pausar |
-| `⌃ + ⌥ + →` | ⏭️ Siguiente canción |
-| `⌃ + ⌥ + ←` | ⏪ Reinicia la canción actual · presiónalo dos veces en menos de 1 s para ⏮️ canción anterior |
-| `⌃ + ⌥ + A` | 🔁 Cambia la aplicación controlada a la siguiente de la lista (se muestra en el aviso en pantalla) |
-| `⌃ + ⌥ + V` | 🎤 Silencia / activa el micrófono (sirve para Discord, juegos y todo lo demás; solo silencia el micrófono configurado como predeterminado en macOS) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↑</code> | 🔊 Sube el volumen de la aplicación seleccionada (mantenerlo presionado repite) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↓</code> | 🔉 Baja el volumen de la aplicación seleccionada (mantenerlo presionado repite) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;M</code> | 🔇 Silencia / activa el sonido de la aplicación seleccionada (se conserva el volumen) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;P</code> | ⏯️ Reproducir / pausar |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;→</code> | ⏭️ Siguiente canción |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;←</code> | ⏪ Reinicia la canción actual · presiónalo dos veces en menos de 1 s para ⏮️ canción anterior |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;A</code> | 🔁 Cambia la aplicación controlada a la siguiente de la lista (se muestra en el aviso en pantalla) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;V</code> | 🎤 Silencia / activa el micrófono (sirve para Discord, juegos y todo lo demás; solo silencia el micrófono configurado como predeterminado en macOS) |
 
 Al usar los atajos de volumen, silenciar, cambio de aplicación o micrófono, un pequeño aviso muestra por un momento la aplicación y el volumen en la parte inferior de la pantalla (en rojo al silenciar), sin quitar el foco, incluso sobre juegos en pantalla completa. Para desactivarlo, apaga el interruptor **Aviso en pantalla**, junto a "Controlando" en la ventana, o **Mostrar aviso en pantalla** en el menú de la barra de menús.
 

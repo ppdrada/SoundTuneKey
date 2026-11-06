@@ -32,14 +32,14 @@ Escolha o app que você quer controlar — Spotify, Google Chrome, Discord ou qu
 
 | Atalho | Função |
 |---|---|
-| `Ctrl + Alt + ↑` | 🔊 Aumenta o volume do app selecionado |
-| `Ctrl + Alt + ↓` | 🔉 Diminui o volume do app selecionado |
-| `Ctrl + Alt + P` | ⏯️ Pausar / continuar |
-| `Ctrl + Alt + →` | ⏭️ Próxima música |
-| `Ctrl + Alt + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
-| `Ctrl + Alt + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
-| `Ctrl + Alt + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
-| `Ctrl + Alt + V` | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no Windows) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↑</code> | 🔊 Aumenta o volume do app selecionado |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↓</code> | 🔉 Diminui o volume do app selecionado |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;P</code> | ⏯️ Pausar / continuar |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;→</code> | ⏭️ Próxima música |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;←</code> | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;M</code> | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;A</code> | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;V</code> | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no Windows) |
 
 Ao usar os atalhos de volume ou de mudo, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, o nome do app e o alto-falante ficam vermelhos) por um instante, sem tirar o foco do jogo. Ele não aparece por cima de jogos em tela cheia exclusiva (em janela sem borda funciona). Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da bandeja.
 
@@ -51,14 +51,14 @@ Os atalhos também aparecem dentro do programa: clique em **Atalhos**, embaixo d
 
 | Atalho | Função |
 |---|---|
-| `⌘ + ⌥ + ↑` | 🔊 Aumenta o volume do app selecionado (segurar repete) |
-| `⌘ + ⌥ + ↓` | 🔉 Diminui o volume do app selecionado (segurar repete) |
-| `⌃ + ⌥ + M` | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
-| `⌃ + ⌥ + P` | ⏯️ Pausar / continuar |
-| `⌃ + ⌥ + →` | ⏭️ Próxima música |
-| `⌃ + ⌥ + ←` | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
-| `⌃ + ⌥ + A` | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
-| `⌃ + ⌥ + V` | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no macOS) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↑</code> | 🔊 Aumenta o volume do app selecionado (segurar repete) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↓</code> | 🔉 Diminui o volume do app selecionado (segurar repete) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;M</code> | 🔇 Deixa mudo / volta o som do app selecionado (o volume fica guardado) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;P</code> | ⏯️ Pausar / continuar |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;→</code> | ⏭️ Próxima música |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;←</code> | ⏪ Volta ao começo da música · aperte duas vezes em menos de 1 s para ⏮️ música anterior |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;A</code> | 🔁 Troca o app controlado para o próximo da lista (aparece no aviso na tela) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;V</code> | 🎤 Desliga / liga o microfone (vale para Discord, jogo e tudo; só o microfone configurado como padrão no macOS) |
 
 Ao usar os atalhos de volume, mudo, troca de app ou microfone, um aviso pequeno mostra o app e o volume embaixo da tela (no mudo, em vermelho) por um instante, sem tirar o foco, até sobre jogos em tela cheia. Para desligar, desligue o interruptor **Aviso na tela**, ao lado de "Controlando" na janela, ou **Mostrar aviso na tela** no menu da barra.
 

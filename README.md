@@ -32,14 +32,14 @@ Pick the app you want to control — Spotify, Google Chrome, Discord or anything
 
 | Hotkey | Action |
 |---|---|
-| `Ctrl + Alt + ↑` | 🔊 Volume up for the selected app |
-| `Ctrl + Alt + ↓` | 🔉 Volume down for the selected app |
-| `Ctrl + Alt + P` | ⏯️ Play / pause |
-| `Ctrl + Alt + →` | ⏭️ Next track |
-| `Ctrl + Alt + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
-| `Ctrl + Alt + M` | 🔇 Mute / unmute the selected app (its volume is kept) |
-| `Ctrl + Alt + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
-| `Ctrl + Alt + V` | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in Windows) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↑</code> | 🔊 Volume up for the selected app |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;↓</code> | 🔉 Volume down for the selected app |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;P</code> | ⏯️ Play / pause |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;→</code> | ⏭️ Next track |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;←</code> | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;M</code> | 🔇 Mute / unmute the selected app (its volume is kept) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;A</code> | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
+| <code>Ctrl&nbsp;+&nbsp;Alt&nbsp;+&nbsp;V</code> | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in Windows) |
 
 When you use the volume or mute hotkeys, a small notice shows the app and the volume at the bottom of the screen (when muted, the app name and the speaker turn red) for a moment, without taking the focus from your game. It does not appear over games in exclusive full screen (borderless window works). To turn it off, switch off **Aviso na tela** (On-screen notice) next to "Controlando" in the window, or **Mostrar aviso na tela** in the tray menu.
 
@@ -51,14 +51,14 @@ The hotkeys are also listed inside the app: click **Atalhos** (Hotkeys) at the b
 
 | Hotkey | Action |
 |---|---|
-| `⌘ + ⌥ + ↑` | 🔊 Volume up for the selected app (hold to repeat) |
-| `⌘ + ⌥ + ↓` | 🔉 Volume down for the selected app (hold to repeat) |
-| `⌃ + ⌥ + M` | 🔇 Mute / unmute the selected app (the volume is kept) |
-| `⌃ + ⌥ + P` | ⏯️ Play / pause |
-| `⌃ + ⌥ + →` | ⏭️ Next track |
-| `⌃ + ⌥ + ←` | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
-| `⌃ + ⌥ + A` | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
-| `⌃ + ⌥ + V` | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in macOS) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↑</code> | 🔊 Volume up for the selected app (hold to repeat) |
+| <code>⌘&nbsp;+&nbsp;⌥&nbsp;+&nbsp;↓</code> | 🔉 Volume down for the selected app (hold to repeat) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;M</code> | 🔇 Mute / unmute the selected app (the volume is kept) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;P</code> | ⏯️ Play / pause |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;→</code> | ⏭️ Next track |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;←</code> | ⏪ Restart the current track · press twice within 1 s for ⏮️ previous track |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;A</code> | 🔁 Switch the controlled app to the next one in the list (shown in the on-screen notice) |
+| <code>⌃&nbsp;+&nbsp;⌥&nbsp;+&nbsp;V</code> | 🎤 Mute / unmute the microphone (for Discord, games and everything; only the mic set as default in macOS) |
 
 When you use the volume, mute, switch-app or microphone hotkeys, a small notice shows the app and the volume at the bottom of the screen (red when muted) for a moment, without taking the focus, even over full-screen games. To turn it off, switch off **Aviso na tela** (On-screen notice), next to "Controlando" in the window, or **Mostrar aviso na tela** in the menu bar menu.
 
