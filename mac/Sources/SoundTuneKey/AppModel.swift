@@ -285,7 +285,8 @@ final class AppModel: ObservableObject {
 
         for (bundleID, tap) in taps {
             let app = apps.first { $0.bundleID == bundleID }
-            if gain(of: bundleID) >= 1 || app == nil || app?.processes != tap.processes || tap.outputUID != outputUID {
+            if gain(of: bundleID) >= 1 || app == nil || app?.processes != tap.processes || tap.outputUID != outputUID
+                || tap.isStalled() {
                 taps[bundleID] = nil
             }
         }

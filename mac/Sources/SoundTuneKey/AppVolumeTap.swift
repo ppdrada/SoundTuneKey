@@ -16,6 +16,10 @@ final class AppVolumeTap {
     private var tapID = AudioObjectID(kAudioObjectUnknown)
     private var aggregateID = AudioObjectID(kAudioObjectUnknown)
     private var ioProcID: AudioDeviceIOProcID?
+    /// Quantas vezes o som passou pela captura (sobe a cada ~10 ms, mesmo com o app em silêncio).
+    private var cycles = 0
+    private var lastCycles = 0
+    private var lastCheck = Date()
 
     init(processes: [AudioObjectID], outputUID: String, volume: Float) throws {
         self.processes = processes
@@ -32,6 +36,15 @@ final class AppVolumeTap {
     deinit { stop() }
 
     func setVolume(_ volume: Float) { gain = volume }
+
+    /// true se o som parou de passar desde a última pergunta (meio segundo atrás ou mais). Acontece
+    /// quando a saída se reconfigura sem mudar de nome (o Bluetooth troca de modo ao ligar o
+    /// microfone): a captura continua silenciando o app, mas não toca mais nada, e ele fica mudo.
+    func isStalled() -> Bool {
+        guard Date().timeIntervalSince(lastCheck) >= 0.5 else { return false }
+        defer { lastCycles = cycles; lastCheck = Date() }
+        return cycles == lastCycles
+    }
 
     private func start() throws {
         let description = CATapDescription(stereoMixdownOfProcesses: processes)
@@ -57,6 +70,7 @@ final class AppVolumeTap {
 
         try check(AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggregateID, nil) { [unowned self] _, input, _, output, _ in
             Self.copy(input, to: output, gain: self.gain)
+            self.cycles &+= 1
         }, T("criar o processamento", "create the processing", "crear el procesamiento"))
         try check(AudioDeviceStart(aggregateID, ioProcID), T("começar a tocar", "start playing", "empezar a reproducir"))
     }

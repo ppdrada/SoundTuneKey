@@ -32,8 +32,27 @@ enum AudioApps {
         "com.github.wez.wezterm",
         "co.zeit.hyper",
     ]
-    /// Apps do sistema que nunca tocam som: não entram nem em cinza.
-    private static let silentSystem: Set<String> = ["com.apple.finder"]
+    /// Apps que ninguém quer controlar: não entram em cinza. Se um deles tocar som, aparece normal.
+    private static let silentSystem: Set<String> = [
+        "com.apple.finder",
+        "com.apple.systempreferences",
+        "com.apple.Notes",
+        "com.apple.TextEdit",
+        "com.apple.Dictionary",
+        "com.apple.Preview",
+        "com.apple.calculator",
+        "com.apple.iCal",
+        "com.apple.reminders",
+        "com.apple.AddressBook",
+        "com.apple.ActivityMonitor",
+        "com.apple.Console",
+        "com.cisco.secureclient.gui",
+        "com.cisco.anyconnect.gui",
+        "com.apple.mail",
+        "com.microsoft.Outlook",
+    ]
+    /// Pelo nome: o Gmail instalado pelo Chrome ou pelo Safari ganha um ID diferente em cada Mac.
+    private static let silentNames: Set<String> = ["Gmail"]
 
     /// Nome com mais de duas palavras fica só com as duas primeiras ("Visual Studio Code" → "Visual Studio").
     static func shortName(_ name: String) -> String {
@@ -73,7 +92,8 @@ enum AudioApps {
         var seen = Set(apps.keys)
         let silent = regularApps.compactMap { app -> AudioApp? in
             guard let bundleID = app.bundleIdentifier, app.processIdentifier != getpid(), !ignored.contains(bundleID),
-                  !silentSystem.contains(bundleID), seen.insert(bundleID).inserted else { return nil }
+                  !silentSystem.contains(bundleID), !silentNames.contains(app.localizedName ?? ""),
+                  seen.insert(bundleID).inserted else { return nil }
             return AudioApp(bundleID: bundleID, displayName: shortName(app.localizedName ?? bundleID), icon: app.icon,
                             isPlaying: false, processes: [], hasAudio: false)
         }
