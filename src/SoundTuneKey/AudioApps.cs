@@ -91,7 +91,8 @@ public static class AudioApps
                         apps[name] = new AudioApp(name, FriendlyName(process), volume, playing, muted);
                     }
                 }
-                catch (InvalidOperationException) { } // o app fechou no meio da leitura
+                // o app fechou ou a sessão sumiu (troca de saída de som) no meio da leitura: segue com as outras
+                catch (Exception ex) when (ex is InvalidOperationException or COMException) { }
             }
         }
         catch (COMException) { } // sem saída de som (fone desconectado, acesso remoto): lista vazia
@@ -99,9 +100,22 @@ public static class AudioApps
         return apps.Values.OrderByDescending(a => a.IsPlaying).ThenBy(a => a.DisplayName).ToList();
     }
 
-    /// <summary>O estado atual do app no Windows (volume e mudo podem ter mudado no Mixer), ou null se ele não tem mais áudio.</summary>
-    public static AudioApp? Find(string processName) =>
-        AudioSessions().Find(a => a.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase));
+    /// <summary>
+    /// Volume e mudo atuais do app no Windows (podem ter mudado no Mixer), ou null se ele não tem mais áudio.
+    /// Lê só as sessões dele, sem o nome amigável: roda a cada repetição do atalho.
+    /// </summary>
+    public static (float Volume, bool IsMuted)? Find(string processName)
+    {
+        float volume = 0f;
+        bool muted = true;
+        // mesma regra da lista: o maior volume, e mudo só se todas as sessões estão mudas
+        bool found = ForEachSession(processName, session =>
+        {
+            volume = Math.Max(volume, session.SimpleAudioVolume.Volume);
+            muted &= session.SimpleAudioVolume.Mute;
+        });
+        return found ? (volume, muted) : null;
+    }
 
     /// <summary>
     /// Define o volume (0 a 1) de todas as sessões do app. O volume geral do Windows não muda.
@@ -141,7 +155,8 @@ public static class AudioApps
                     action(session);
                     found = true;
                 }
-                catch (InvalidOperationException) { } // o app fechou no meio da leitura
+                // o app fechou ou a sessão sumiu no meio: segue com as outras sessões do app
+                catch (Exception ex) when (ex is InvalidOperationException or COMException) { }
             }
         }
         catch (COMException) { } // sem saída de som: nada a mudar
