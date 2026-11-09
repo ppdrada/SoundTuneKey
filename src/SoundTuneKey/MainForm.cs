@@ -673,6 +673,17 @@ public class MainForm : Form
         LoadApps();
     }
 
+    // a pessoa abriu o .exe de novo: a segunda cópia fecha e pede para esta aparecer
+    protected override void WndProc(ref Message m)
+    {
+        if (m.Msg == Program.ShowRunningMessage)
+        {
+            ShowFromTray();
+            return;
+        }
+        base.WndProc(ref m);
+    }
+
     private void ExitApp()
     {
         _exiting = true;
@@ -810,7 +821,17 @@ public class MainForm : Form
         if (SelectedApp is null or { HasAudio: false } && _settings.LastApp is not null)
             LoadApps();
 
-        return SelectedApp is { HasAudio: true } app ? app : null;
+        if (SelectedApp is not { HasAudio: true } app)
+            return null;
+
+        // o volume e o mudo podem ter mudado no Mixer do Windows: o atalho parte do valor de agora
+        if (AudioApps.Find(app.ProcessName) is not { } live)
+        {
+            LoadApps(); // o app fechou ou parou de usar áudio
+            return null;
+        }
+        ShowAppChange(app with { Volume = live.Volume, IsMuted = live.IsMuted });
+        return _current;
     }
 
     private void LoadApps(string? select = null)
@@ -909,7 +930,9 @@ public class MainForm : Form
             return;
         }
 
-        ShowAppChange(app with { IsMuted = muted });
+        // o app do menu foi guardado quando ele abriu: o volume dele pode estar velho, o do _current não
+        var latest = app.ProcessName == _current?.ProcessName ? _current : app;
+        ShowAppChange(latest with { IsMuted = muted });
     }
 
     private void ShowAppChange(AudioApp app)

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using NAudio.CoreAudioApi;
 
 namespace SoundTuneKey;
@@ -52,42 +53,55 @@ public static class AudioApps
 
     private static List<AudioApp> AudioSessions()
     {
-        using var enumerator = new MMDeviceEnumerator();
-        using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-        var sessions = device.AudioSessionManager.Sessions;
-
         var apps = new Dictionary<string, AudioApp>(StringComparer.OrdinalIgnoreCase);
-        for (int i = 0; i < sessions.Count; i++)
+        try
         {
-            var session = sessions[i];
-            if (session.IsSystemSoundsSession)
-                continue;
+            using var enumerator = new MMDeviceEnumerator();
+            using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var sessions = device.AudioSessionManager.Sessions;
 
-            var process = TryGetProcess((int)session.GetProcessID);
-            if (process is null)
-                continue;
-
-            bool playing = session.State == NAudio.CoreAudioApi.Interfaces.AudioSessionState.AudioSessionStateActive;
-            float volume = session.SimpleAudioVolume.Volume;
-            bool muted = session.SimpleAudioVolume.Mute;
-
-            if (apps.TryGetValue(process.ProcessName, out var existing))
+            for (int i = 0; i < sessions.Count; i++)
             {
-                apps[process.ProcessName] = existing with
+                try
                 {
-                    IsPlaying = existing.IsPlaying || playing,
-                    Volume = Math.Max(existing.Volume, volume),
-                    IsMuted = existing.IsMuted && muted, // mudo só se todas as sessões estão mudas
-                };
-            }
-            else
-            {
-                apps[process.ProcessName] = new AudioApp(process.ProcessName, FriendlyName(process), volume, playing, muted);
+                    var session = sessions[i];
+                    if (session.IsSystemSoundsSession)
+                        continue;
+
+                    var process = TryGetProcess((int)session.GetProcessID);
+                    if (process is null)
+                        continue;
+
+                    var name = process.ProcessName;
+                    bool playing = session.State == NAudio.CoreAudioApi.Interfaces.AudioSessionState.AudioSessionStateActive;
+                    float volume = session.SimpleAudioVolume.Volume;
+                    bool muted = session.SimpleAudioVolume.Mute;
+
+                    if (apps.TryGetValue(name, out var existing))
+                    {
+                        apps[name] = existing with
+                        {
+                            IsPlaying = existing.IsPlaying || playing,
+                            Volume = Math.Max(existing.Volume, volume),
+                            IsMuted = existing.IsMuted && muted, // mudo só se todas as sessões estão mudas
+                        };
+                    }
+                    else
+                    {
+                        apps[name] = new AudioApp(name, FriendlyName(process), volume, playing, muted);
+                    }
+                }
+                catch (InvalidOperationException) { } // o app fechou no meio da leitura
             }
         }
+        catch (COMException) { } // sem saída de som (fone desconectado, acesso remoto): lista vazia
 
         return apps.Values.OrderByDescending(a => a.IsPlaying).ThenBy(a => a.DisplayName).ToList();
     }
+
+    /// <summary>O estado atual do app no Windows (volume e mudo podem ter mudado no Mixer), ou null se ele não tem mais áudio.</summary>
+    public static AudioApp? Find(string processName) =>
+        AudioSessions().Find(a => a.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Define o volume (0 a 1) de todas as sessões do app. O volume geral do Windows não muda.
@@ -105,24 +119,32 @@ public static class AudioApps
 
     private static bool ForEachSession(string processName, Action<AudioSessionControl> action)
     {
-        using var enumerator = new MMDeviceEnumerator();
-        using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-        var sessions = device.AudioSessionManager.Sessions;
-
         bool found = false;
-        for (int i = 0; i < sessions.Count; i++)
+        try
         {
-            var session = sessions[i];
-            if (session.IsSystemSoundsSession)
-                continue;
+            using var enumerator = new MMDeviceEnumerator();
+            using var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            var sessions = device.AudioSessionManager.Sessions;
 
-            var process = TryGetProcess((int)session.GetProcessID);
-            if (process is null || !process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                continue;
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                try
+                {
+                    var session = sessions[i];
+                    if (session.IsSystemSoundsSession)
+                        continue;
 
-            action(session);
-            found = true;
+                    var process = TryGetProcess((int)session.GetProcessID);
+                    if (process is null || !process.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    action(session);
+                    found = true;
+                }
+                catch (InvalidOperationException) { } // o app fechou no meio da leitura
+            }
         }
+        catch (COMException) { } // sem saída de som: nada a mudar
 
         return found;
     }
